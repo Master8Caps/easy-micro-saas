@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { generateBrain } from "@/server/actions/brain";
 import { loadBrain } from "@/server/actions/brain-load";
+import { updateProductStatus } from "@/server/actions/products";
 
 interface Avatar {
   name: string;
@@ -32,6 +33,58 @@ interface BrainOutput {
   positioning_summary: string;
 }
 
+// ── Channel pill colors ──────────────────────────────
+const channelStyles: Record<string, string> = {
+  linkedin: "border-blue-500/30 bg-blue-500/10 text-blue-400",
+  "x / twitter": "border-zinc-500/30 bg-zinc-500/10 text-zinc-300",
+  "x/twitter": "border-zinc-500/30 bg-zinc-500/10 text-zinc-300",
+  twitter: "border-zinc-500/30 bg-zinc-500/10 text-zinc-300",
+  x: "border-zinc-500/30 bg-zinc-500/10 text-zinc-300",
+  reddit: "border-orange-500/30 bg-orange-500/10 text-orange-400",
+  "product hunt": "border-orange-500/30 bg-orange-500/10 text-orange-400",
+  "indie hackers": "border-cyan-500/30 bg-cyan-500/10 text-cyan-400",
+  email: "border-purple-500/30 bg-purple-500/10 text-purple-400",
+  "blog / seo": "border-green-500/30 bg-green-500/10 text-green-400",
+  blog: "border-green-500/30 bg-green-500/10 text-green-400",
+  seo: "border-green-500/30 bg-green-500/10 text-green-400",
+  "paid ads": "border-amber-500/30 bg-amber-500/10 text-amber-400",
+};
+
+function getChannelStyle(channel: string) {
+  return (
+    channelStyles[channel.toLowerCase()] ??
+    "border-zinc-600/30 bg-zinc-600/10 text-zinc-400"
+  );
+}
+
+// ── Format content type ──────────────────────────────
+function formatContentType(type: string) {
+  return type
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+// ── Channel pill component ───────────────────────────
+function ChannelPill({ channel }: { channel: string }) {
+  return (
+    <span
+      className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${getChannelStyle(channel)}`}
+    >
+      {channel}
+    </span>
+  );
+}
+
+// ── Content type pill ────────────────────────────────
+function TypePill({ type }: { type: string }) {
+  return (
+    <span className="rounded-full border border-zinc-700/50 bg-zinc-800/50 px-2.5 py-0.5 text-xs text-zinc-400">
+      {formatContentType(type)}
+    </span>
+  );
+}
+
 export default function BrainPage() {
   const params = useParams();
   const router = useRouter();
@@ -42,8 +95,9 @@ export default function BrainPage() {
   );
   const [output, setOutput] = useState<BrainOutput | null>(null);
   const [error, setError] = useState("");
+  const [productStatus, setProductStatus] = useState<string>("active");
+  const [togglingStatus, setTogglingStatus] = useState(false);
 
-  // Try to load existing brain results first
   useEffect(() => {
     let cancelled = false;
 
@@ -54,11 +108,11 @@ export default function BrainPage() {
 
       if (result.output) {
         setOutput(result.output as BrainOutput);
+        if (result.productStatus) setProductStatus(result.productStatus);
         setStatus("done");
         return;
       }
 
-      // No existing results — generate
       setStatus("generating");
       const genResult = await generateBrain({ productId });
 
@@ -93,9 +147,19 @@ export default function BrainPage() {
     }
   }, [productId]);
 
+  async function handleToggleStatus() {
+    setTogglingStatus(true);
+    const newStatus = productStatus === "active" ? "archived" : "active";
+    const result = await updateProductStatus(productId, newStatus);
+    if (!result.error) {
+      setProductStatus(newStatus);
+    }
+    setTogglingStatus(false);
+  }
+
   if (status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-white" />
       </div>
     );
@@ -103,7 +167,7 @@ export default function BrainPage() {
 
   if (status === "generating") {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-white" />
           <h1 className="mt-6 font-heading text-2xl font-bold">
@@ -123,7 +187,7 @@ export default function BrainPage() {
 
   if (status === "error") {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <h1 className="font-heading text-2xl font-bold text-red-400">
             Generation failed
@@ -142,32 +206,54 @@ export default function BrainPage() {
 
   if (!output) return null;
 
+  const statusLabel = productStatus.charAt(0).toUpperCase() + productStatus.slice(1);
+  const statusStyle =
+    productStatus === "active"
+      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+      : "border-zinc-600/30 bg-zinc-600/10 text-zinc-500";
+
   return (
-    <div className="min-h-screen px-6 py-12">
+    <div className="py-4">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
-        <div className="mb-12">
+        <div className="mb-10">
           <button
             onClick={() => router.push("/")}
             className="text-sm text-zinc-500 transition-colors hover:text-zinc-300"
           >
             &larr; Back to Dashboard
           </button>
-          <div className="mt-4 flex items-start justify-between">
-            <div>
-              <h1 className="font-heading text-3xl font-bold">
-                Marketing Brain
-              </h1>
+          <div className="mt-4 flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-3">
+                <h1 className="font-heading text-3xl font-bold">
+                  Marketing Brain
+                </h1>
+                <span
+                  className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusStyle}`}
+                >
+                  {statusLabel}
+                </span>
+              </div>
               <p className="mt-2 text-lg text-zinc-400">
                 {output.positioning_summary}
               </p>
             </div>
-            <button
-              onClick={handleRegenerate}
-              className="shrink-0 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
-            >
-              Regenerate
-            </button>
+            <div className="flex shrink-0 gap-2">
+              <button
+                onClick={handleToggleStatus}
+                disabled={togglingStatus}
+                className="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-300 disabled:opacity-50"
+              >
+                {productStatus === "active" ? "Archive" : "Reactivate"}
+              </button>
+              <button
+                onClick={handleRegenerate}
+                className="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
+              >
+                Regenerate
+              </button>
+            </div>
           </div>
         </div>
 
@@ -178,7 +264,7 @@ export default function BrainPage() {
             {output.avatars.map((avatar) => (
               <div
                 key={avatar.name}
-                className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6"
+                className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/50 p-6"
               >
                 <h3 className="text-lg font-semibold">{avatar.name}</h3>
                 <p className="mt-2 text-sm text-zinc-400">
@@ -202,31 +288,28 @@ export default function BrainPage() {
                   <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
                     Channels
                   </p>
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-2 flex flex-wrap gap-1.5">
                     {avatar.channels.map((channel) => (
-                      <span
-                        key={channel}
-                        className="rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-300"
-                      >
-                        {channel}
-                      </span>
+                      <ChannelPill key={channel} channel={channel} />
                     ))}
                   </div>
                 </div>
 
-                <div className="mt-4 rounded-lg bg-zinc-800/50 p-3">
-                  <p className="text-xs text-zinc-500">
-                    <strong className="text-zinc-400">Role:</strong>{" "}
-                    {avatar.icp_details.role}
-                  </p>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    <strong className="text-zinc-400">Context:</strong>{" "}
-                    {avatar.icp_details.context}
-                  </p>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    <strong className="text-zinc-400">Motivation:</strong>{" "}
-                    {avatar.icp_details.motivation}
-                  </p>
+                <div className="mt-auto pt-4">
+                  <div className="rounded-lg bg-zinc-800/50 p-3">
+                    <p className="text-xs text-zinc-500">
+                      <strong className="text-zinc-400">Role:</strong>{" "}
+                      {avatar.icp_details.role}
+                    </p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      <strong className="text-zinc-400">Context:</strong>{" "}
+                      {avatar.icp_details.context}
+                    </p>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      <strong className="text-zinc-400">Motivation:</strong>{" "}
+                      {avatar.icp_details.motivation}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
@@ -242,13 +325,9 @@ export default function BrainPage() {
                 key={i}
                 className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6"
               >
-                <div className="flex items-center gap-2">
-                  <span className="rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-300">
-                    {campaign.channel}
-                  </span>
-                  <span className="rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-300">
-                    {campaign.content_type}
-                  </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <ChannelPill channel={campaign.channel} />
+                  <TypePill type={campaign.content_type} />
                   <span className="text-xs text-zinc-500">
                     for {campaign.avatar_name}
                   </span>

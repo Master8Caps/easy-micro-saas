@@ -17,6 +17,13 @@ export async function loadBrain(input: LoadBrainInput) {
     return { error: "Not authenticated" };
   }
 
+  // Fetch product status
+  const { data: product } = await supabase
+    .from("products")
+    .select("status")
+    .eq("id", input.productId)
+    .single();
+
   // Find the most recent completed generation for this product
   const { data: generation } = await supabase
     .from("generations")
@@ -28,8 +35,11 @@ export async function loadBrain(input: LoadBrainInput) {
     .single();
 
   if (!generation || !generation.raw_output) {
-    return { output: null };
+    return { output: null, productStatus: product?.status ?? "active" };
   }
 
-  return { output: generation.raw_output };
+  return {
+    output: generation.raw_output,
+    productStatus: product?.status ?? "active",
+  };
 }

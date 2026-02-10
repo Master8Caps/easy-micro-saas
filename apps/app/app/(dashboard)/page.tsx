@@ -1,6 +1,23 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
+const statusStyles: Record<string, string> = {
+  active: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
+  draft: "border-amber-500/30 bg-amber-500/10 text-amber-400",
+  archived: "border-zinc-600/30 bg-zinc-600/10 text-zinc-500",
+};
+
+function StatusPill({ status }: { status: string }) {
+  const label = status.charAt(0).toUpperCase() + status.slice(1);
+  return (
+    <span
+      className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusStyles[status] ?? statusStyles.draft}`}
+    >
+      {label}
+    </span>
+  );
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -66,9 +83,7 @@ export default async function DashboardPage() {
                       {product.description}
                     </p>
                   </div>
-                  <span className="rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-400">
-                    {product.status}
-                  </span>
+                  <StatusPill status={product.status} />
                 </div>
               </Link>
             ))}

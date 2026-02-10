@@ -41,3 +41,26 @@ export async function createProduct(input: CreateProductInput) {
 
   return { id: data.id };
 }
+
+export async function updateProductStatus(productId: string, status: "active" | "archived") {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const { error } = await supabase
+    .from("products")
+    .update({ status })
+    .eq("id", productId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
+}

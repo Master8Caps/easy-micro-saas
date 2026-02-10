@@ -52,6 +52,7 @@ interface ContentPiece {
   body: string;
   metadata: { cta_text?: string; notes?: string };
   status: string;
+  archived: boolean;
   created_at: string;
 }
 

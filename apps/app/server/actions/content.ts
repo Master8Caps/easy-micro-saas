@@ -206,7 +206,7 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
     const { data: savedPieces, error: insertError } = await supabase
       .from("content_pieces")
       .insert(inserts)
-      .select("id, type, title, body, metadata, status, created_at");
+      .select("id, type, title, body, metadata, status, archived, created_at");
 
     if (insertError) return { error: insertError.message };
 
@@ -262,7 +262,7 @@ export async function loadContentForCampaign(campaignId: string) {
 
   const { data, error } = await supabase
     .from("content_pieces")
-    .select("id, type, title, body, metadata, status, created_at")
+    .select("id, type, title, body, metadata, status, archived, created_at")
     .eq("campaign_id", campaignId)
     .order("created_at", { ascending: false });
 
@@ -273,7 +273,7 @@ export async function loadContentForCampaign(campaignId: string) {
 // ── Update content piece status ──────────────────────
 export async function updateContentPieceStatus(
   pieceId: string,
-  status: "draft" | "ready" | "published" | "archived",
+  status: "draft" | "ready" | "published",
 ) {
   const supabase = await createClient();
 
@@ -286,6 +286,28 @@ export async function updateContentPieceStatus(
   const { error } = await supabase
     .from("content_pieces")
     .update({ status })
+    .eq("id", pieceId);
+
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+// ── Toggle content piece archived flag ───────────────
+export async function toggleContentPieceArchived(
+  pieceId: string,
+  archived: boolean,
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Not authenticated" };
+
+  const { error } = await supabase
+    .from("content_pieces")
+    .update({ archived })
     .eq("id", pieceId);
 
   if (error) return { error: error.message };

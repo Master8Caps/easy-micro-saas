@@ -70,18 +70,17 @@ export async function updateProductStatus(productId: string, status: "active" | 
     return { error: error.message };
   }
 
-  // Cascade status to campaigns and content pieces
-  const campaignStatus = status === "archived" ? "paused" : "draft";
-  const contentStatus = status === "archived" ? "archived" : "draft";
+  // Cascade archived flag to campaigns and content pieces
+  const archived = status === "archived";
 
   await supabase
     .from("campaigns")
-    .update({ status: campaignStatus })
+    .update({ archived })
     .eq("product_id", productId);
 
   await supabase
     .from("content_pieces")
-    .update({ status: contentStatus })
+    .update({ archived })
     .eq("product_id", productId);
 
   return { success: true };

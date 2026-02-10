@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { ChannelPill, TypePill, StatusSelect } from "@/components/pills";
+import { ChannelPill, TypePill, StatusSelect, ArchivedBadge, ArchiveToggle } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
-import { updateContentPieceStatus } from "@/server/actions/content";
+import { updateContentPieceStatus, toggleContentPieceArchived } from "@/server/actions/content";
 
 interface ContentPieceRow {
   id: string;
@@ -14,6 +14,7 @@ interface ContentPieceRow {
   body: string;
   metadata: { channel?: string; angle?: string; cta_text?: string; notes?: string };
   status: string;
+  archived: boolean;
   created_at: string;
   products: { name: string } | null;
   campaigns: { angle: string; channel: string; category?: string } | null;
@@ -40,7 +41,6 @@ const statusOptions = [
   { value: "draft", label: "Draft" },
   { value: "ready", label: "Ready" },
   { value: "published", label: "Published" },
-  { value: "archived", label: "Archived" },
 ];
 
 const categoryOptions = [
@@ -67,9 +67,11 @@ export function ContentList({
   const [typeFilter, setTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [showArchived, setShowArchived] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const filtered = pieces.filter((p) => {
+    if (!showArchived && p.archived) return false;
     if (productFilter && p.product_id !== productFilter) return false;
     if (typeFilter && p.type !== typeFilter) return false;
     if (statusFilter && p.status !== statusFilter) return false;
@@ -80,11 +82,20 @@ export function ContentList({
   async function handleStatusChange(pieceId: string, newStatus: string) {
     const result = await updateContentPieceStatus(
       pieceId,
-      newStatus as "draft" | "ready" | "published" | "archived",
+      newStatus as "draft" | "ready" | "published",
     );
     if (result.success) {
       setPieces((prev) =>
         prev.map((p) => (p.id === pieceId ? { ...p, status: newStatus } : p)),
+      );
+    }
+  }
+
+  async function handleArchiveToggle(pieceId: string, currentArchived: boolean) {
+    const result = await toggleContentPieceArchived(pieceId, !currentArchived);
+    if (result.success) {
+      setPieces((prev) =>
+        prev.map((p) => (p.id === pieceId ? { ...p, archived: !currentArchived } : p)),
       );
     }
   }
@@ -138,6 +149,15 @@ export function ContentList({
             </option>
           ))}
         </select>
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-400">
+          <input
+            type="checkbox"
+            checked={showArchived}
+            onChange={(e) => setShowArchived(e.target.checked)}
+            className="rounded border-zinc-600 bg-zinc-800 text-indigo-500 focus:ring-indigo-500/30"
+          />
+          Show archived
+        </label>
         <span className="flex items-center text-sm text-zinc-500">
           {filtered.length} piece{filtered.length === 1 ? "" : "s"}
         </span>
@@ -182,6 +202,11 @@ export function ContentList({
                   <StatusSelect
                     value={piece.status}
                     onChange={(v) => handleStatusChange(piece.id, v)}
+                  />
+                  {piece.archived && <ArchivedBadge />}
+                  <ArchiveToggle
+                    archived={piece.archived}
+                    onToggle={() => handleArchiveToggle(piece.id, piece.archived)}
                   />
                 </div>
               </div>

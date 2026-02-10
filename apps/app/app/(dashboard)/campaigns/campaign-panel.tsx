@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ChannelPill, TypePill, StatusSelect } from "@/components/pills";
+import { ChannelPill, TypePill, StatusSelect, ArchivedBadge, ArchiveToggle } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
 import { useUser } from "@/components/user-context";
 import {
   generateContentForCampaign,
   loadContentForCampaign,
   updateContentPieceStatus,
+  toggleContentPieceArchived,
 } from "@/server/actions/content";
 
 interface ContentPiece {
@@ -17,6 +18,7 @@ interface ContentPiece {
   body: string;
   metadata: { cta_text?: string; notes?: string };
   status: string;
+  archived: boolean;
   created_at: string;
 }
 
@@ -75,11 +77,20 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
   async function handleStatusChange(pieceId: string, newStatus: string) {
     const result = await updateContentPieceStatus(
       pieceId,
-      newStatus as "draft" | "ready" | "published" | "archived",
+      newStatus as "draft" | "ready" | "published",
     );
     if (result.success) {
       setPieces((prev) =>
         prev.map((p) => (p.id === pieceId ? { ...p, status: newStatus } : p)),
+      );
+    }
+  }
+
+  async function handleArchiveToggle(pieceId: string, currentArchived: boolean) {
+    const result = await toggleContentPieceArchived(pieceId, !currentArchived);
+    if (result.success) {
+      setPieces((prev) =>
+        prev.map((p) => (p.id === pieceId ? { ...p, archived: !currentArchived } : p)),
       );
     }
   }
@@ -228,12 +239,17 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                         </span>
                       </div>
                       <div
-                        className="shrink-0"
+                        className="flex shrink-0 items-center gap-1.5"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <StatusSelect
                           value={piece.status}
                           onChange={(v) => handleStatusChange(piece.id, v)}
+                        />
+                        {piece.archived && <ArchivedBadge />}
+                        <ArchiveToggle
+                          archived={piece.archived}
+                          onToggle={() => handleArchiveToggle(piece.id, piece.archived)}
                         />
                       </div>
                     </button>

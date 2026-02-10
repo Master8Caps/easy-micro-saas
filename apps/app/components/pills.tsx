@@ -95,7 +95,6 @@ const statusSelectColors: Record<string, string> = {
   draft: "border-amber-500/30 bg-amber-500/10 text-amber-400",
   ready: "border-blue-500/30 bg-blue-500/10 text-blue-400",
   published: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
-  archived: "border-zinc-600/30 bg-zinc-600/10 text-zinc-500",
 };
 
 export function StatusSelect({
@@ -115,7 +114,58 @@ export function StatusSelect({
       <option value="draft" className="bg-zinc-900 text-zinc-200">Draft</option>
       <option value="ready" className="bg-zinc-900 text-zinc-200">Ready</option>
       <option value="published" className="bg-zinc-900 text-zinc-200">Published</option>
-      <option value="archived" className="bg-zinc-900 text-zinc-200">Archived</option>
     </select>
+  );
+}
+
+// ── Archived badge ──────────────────────────────────
+export function ArchivedBadge() {
+  return (
+    <span className="rounded-full border border-zinc-600/30 bg-zinc-600/10 px-2 py-0.5 text-xs font-medium text-zinc-500">
+      Archived
+    </span>
+  );
+}
+
+// ── Archive toggle button ───────────────────────────
+export function ArchiveToggle({
+  archived,
+  onToggle,
+}: {
+  archived: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      onClick={onToggle}
+      title={archived ? "Unarchive" : "Archive"}
+      className="rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {archived ? (
+          <>
+            <path d="M21 8V21H3V8" />
+            <rect x="1" y="3" width="22" height="5" />
+            <line x1="10" y1="12" x2="14" y2="12" />
+          </>
+        ) : (
+          <>
+            <path d="M21 8V21H3V8" />
+            <rect x="1" y="3" width="22" height="5" />
+            <line x1="10" y1="12" x2="14" y2="12" />
+          </>
+        )}
+      </svg>
+    </button>
   );
 }

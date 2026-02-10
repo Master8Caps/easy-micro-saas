@@ -1,4 +1,5 @@
 import { AnimateOnScroll } from "./animate-on-scroll";
+import { WaitlistForm } from "./waitlist-form";
 
 export function CTA() {
   return (
@@ -26,17 +27,12 @@ export function CTA() {
         </AnimateOnScroll>
 
         <AnimateOnScroll delay={200}>
-          <div className="mt-10">
-            <a
-              href={process.env.NEXT_PUBLIC_APP_URL || "#"}
-              className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-3.5 text-base font-semibold text-zinc-950 shadow-lg shadow-white/10 transition-all hover:bg-zinc-200 hover:shadow-white/20"
-            >
-              Get Started Free
-            </a>
+          <div className="mx-auto mt-10 max-w-2xl">
+            <WaitlistForm source="cta" />
+            <p className="mt-4 text-sm text-zinc-500">
+              Early access opening soon. Join the waitlist to be first in line.
+            </p>
           </div>
-          <p className="mt-4 text-sm text-zinc-500">
-            No credit card required. Set up in under five minutes.
-          </p>
         </AnimateOnScroll>
       </div>
     </section>

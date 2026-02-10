@@ -71,24 +71,35 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 
 ### In Progress
 
-- [ ] Marketing site prototype (v1 — working proof of concept)
 - [ ] Domain selection and DNS configuration
 
 ### To Do (Before Launch)
 
 - [ ] Add environment variables to both Vercel projects (see .env.example files)
-  - Marketing: NEXT_PUBLIC_APP_URL, NEXT_PUBLIC_SITE_URL, SUPABASE_URL, SUPABASE_ANON_KEY
-  - App: All marketing vars + SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+  - Marketing: NEXT_PUBLIC_APP_URL, NEXT_PUBLIC_SITE_URL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+  - App: NEXT_PUBLIC_APP_URL, NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+- [ ] Run migration `00002_add_roles_and_waitlist.sql` in Supabase SQL Editor
+
+### Recently Completed
+
+- [x] Marketing site prototype (v1 — working proof of concept with scroll animations)
+- [x] Supabase project setup (database, auth)
+- [x] Database schema design — 10 tables: profiles, products, generations, avatars, campaigns, content_pieces, links, clicks, customers, subscriptions
+- [x] RLS policies on all tables (users access own data only)
+- [x] Supabase Auth integration (email/password signup + login)
+- [x] Protected routes via middleware (session refresh + route protection)
+- [x] Product intake flow (3-step brief form: info, goals, channels)
+- [x] Marketing Brain generation (Anthropic Claude API — real, not mocked)
+- [x] Structured JSON output for avatars + campaigns, saved to database
+- [x] Brain results page with regenerate functionality
+- [x] User roles system (admin, free, paid) — migration 00002
+- [x] Waitlist table and API endpoint on marketing site
+- [x] Waitlist form components (full + compact variants)
+- [x] Marketing site CTAs updated to use waitlist forms instead of app links
+- [x] App environment variables configured in Vercel
 
 ### Backlog — Stage 1: Core Foundation (Weeks 1–2)
 
-- [ ] Supabase project setup (database, auth, storage)
-- [ ] Database schema design (products, avatars, campaigns, content, clicks)
-- [ ] Supabase Auth integration (signup, login, session management)
-- [ ] Protected routes / auth middleware
-- [ ] Product intake flow (brief form)
-- [ ] Marketing Brain generation (Anthropic API integration)
-- [ ] Structured JSON output for avatars, campaigns, hooks
 - [ ] Stripe integration (billing, subscription plans)
 - [ ] Event tracking and logging foundation
 
@@ -228,5 +239,8 @@ The Week 1 prototype is an **intelligence and output spike** — it validates th
 | 2026-02-10 | Tailwind dark-mode-first | Matches product aesthetic, simpler than toggle |
 | 2026-02-10 | Space Grotesk + Inter fonts | Confident headings, clean body text |
 | 2026-02-10 | server-only package for backend boundary | Build-time enforcement of client/server separation |
-| 2026-02-10 | Supabase for DB + Auth (deferred) | Postgres + pgvector + Auth + Storage in one service |
+| 2026-02-10 | Supabase for DB + Auth | Postgres + Auth + Storage in one service |
 | 2026-02-10 | Anthropic as primary LLM, OpenAI for embeddings | Best generation quality + best embedding ecosystem |
+| 2026-02-10 | Marketing site = waitlist, App = auth | Marketing captures interest, app handles login/signup |
+| 2026-02-10 | User roles: admin / free / paid | Build with roles from the start, only admins use initially |
+| 2026-02-10 | pgvector deferred | Not needed yet — will add when embeddings are implemented |

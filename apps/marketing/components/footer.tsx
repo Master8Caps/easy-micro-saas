@@ -1,3 +1,5 @@
+import { WaitlistFormCompact } from "./waitlist-form";
+
 export function Footer() {
   return (
     <footer className="border-t border-zinc-800/50 px-6 py-12">
@@ -9,12 +11,7 @@ export function Footer() {
               Stop guessing. Start growing.
             </p>
           </div>
-          <a
-            href={process.env.NEXT_PUBLIC_APP_URL || "#"}
-            className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-2.5 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200"
-          >
-            Get Started
-          </a>
+          <WaitlistFormCompact source="footer" />
         </div>
         <div className="mt-8 border-t border-zinc-800/50 pt-8 text-center text-sm text-zinc-600">
           &copy; {new Date().getFullYear()} Micro Machine. All rights reserved.

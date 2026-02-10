@@ -1,4 +1,5 @@
 import { AnimateOnScroll } from "./animate-on-scroll";
+import { WaitlistFormCompact } from "./waitlist-form";
 
 export function Hero() {
   return (
@@ -27,19 +28,11 @@ export function Hero() {
         </AnimateOnScroll>
 
         <AnimateOnScroll delay={200}>
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a
-              href="#cta"
-              className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-3.5 text-base font-semibold text-zinc-950 shadow-lg shadow-white/10 transition-all hover:bg-zinc-200 hover:shadow-white/20"
-            >
-              Get Started
-            </a>
-            <a
-              href="#how-it-works"
-              className="inline-flex items-center justify-center rounded-lg border border-zinc-700 px-8 py-3.5 text-base font-medium text-zinc-400 transition-colors hover:border-zinc-500 hover:text-zinc-200"
-            >
-              See How It Works
-            </a>
+          <div className="mx-auto mt-10 max-w-lg">
+            <WaitlistFormCompact source="hero" />
+            <p className="mt-3 text-sm text-zinc-500">
+              Join the waitlist for early access. No spam, ever.
+            </p>
           </div>
         </AnimateOnScroll>
       </div>

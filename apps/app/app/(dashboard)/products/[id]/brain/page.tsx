@@ -36,10 +36,10 @@ interface BrainOutput {
 // ── Channel pill colors ──────────────────────────────
 const channelStyles: Record<string, string> = {
   linkedin: "border-blue-500/30 bg-blue-500/10 text-blue-400",
-  "x / twitter": "border-sky-500/30 bg-sky-500/10 text-sky-400",
-  "x/twitter": "border-sky-500/30 bg-sky-500/10 text-sky-400",
-  twitter: "border-sky-500/30 bg-sky-500/10 text-sky-400",
-  x: "border-sky-500/30 bg-sky-500/10 text-sky-400",
+  "x / twitter": "border-zinc-400/30 bg-zinc-400/10 text-zinc-300",
+  "x/twitter": "border-zinc-400/30 bg-zinc-400/10 text-zinc-300",
+  twitter: "border-zinc-400/30 bg-zinc-400/10 text-zinc-300",
+  x: "border-zinc-400/30 bg-zinc-400/10 text-zinc-300",
   reddit: "border-orange-500/30 bg-orange-500/10 text-orange-400",
   "product hunt": "border-rose-500/30 bg-rose-500/10 text-rose-400",
   "indie hackers": "border-cyan-500/30 bg-cyan-500/10 text-cyan-400",

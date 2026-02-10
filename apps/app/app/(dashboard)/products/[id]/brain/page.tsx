@@ -29,6 +29,8 @@ interface Avatar {
 interface BrainOutput {
   avatars: Avatar[];
   campaigns: unknown[];
+  ad_campaigns?: unknown[];
+  website_kit?: unknown;
   positioning_summary: string;
 }
 
@@ -40,6 +42,7 @@ interface DbCampaign {
   hook: string;
   content_type: string;
   status: string;
+  category: string;
 }
 
 interface ContentPiece {
@@ -48,6 +51,16 @@ interface ContentPiece {
   title: string;
   body: string;
   metadata: { cta_text?: string; notes?: string };
+  status: string;
+  created_at: string;
+}
+
+interface WebsiteKitPiece {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  metadata: Record<string, unknown>;
   status: string;
   created_at: string;
 }
@@ -61,7 +74,11 @@ export default function BrainPage() {
 
   const [status, setStatus] = useState<"loading" | "generating" | "done" | "error">("loading");
   const [output, setOutput] = useState<BrainOutput | null>(null);
-  const [campaigns, setCampaigns] = useState<DbCampaign[]>([]);
+  const [socialCampaigns, setSocialCampaigns] = useState<DbCampaign[]>([]);
+  const [adCampaigns, setAdCampaigns] = useState<DbCampaign[]>([]);
+  const [websiteKitPieces, setWebsiteKitPieces] = useState<WebsiteKitPiece[]>([]);
+  const [hasWebsite, setHasWebsite] = useState(false);
+  const [wantsAds, setWantsAds] = useState(false);
   const [error, setError] = useState("");
   const [productStatus, setProductStatus] = useState<string>("active");
   const [togglingStatus, setTogglingStatus] = useState(false);
@@ -70,6 +87,7 @@ export default function BrainPage() {
   const [contentByCampaign, setContentByCampaign] = useState<Record<string, ContentPiece[]>>({});
   const [generatingCampaigns, setGeneratingCampaigns] = useState<Set<string>>(new Set());
   const [bulkGenerating, setBulkGenerating] = useState(false);
+  const [bulkAdGenerating, setBulkAdGenerating] = useState(false);
   const [expandedCampaigns, setExpandedCampaigns] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -80,13 +98,21 @@ export default function BrainPage() {
 
       if (cancelled) return;
 
-      if (result.campaigns) setCampaigns(result.campaigns as DbCampaign[]);
+      if (result.socialCampaigns) setSocialCampaigns(result.socialCampaigns as DbCampaign[]);
+      if (result.adCampaigns) setAdCampaigns(result.adCampaigns as DbCampaign[]);
+      if (result.websiteKitPieces) setWebsiteKitPieces(result.websiteKitPieces as WebsiteKitPiece[]);
       if (result.productStatus) setProductStatus(result.productStatus);
+      setHasWebsite(result.hasWebsite ?? false);
+      setWantsAds(result.wantsAds ?? false);
 
       // Load existing content for each campaign
-      if (result.campaigns && result.contentCounts) {
+      const allCampaigns = [
+        ...((result.socialCampaigns as DbCampaign[]) ?? []),
+        ...((result.adCampaigns as DbCampaign[]) ?? []),
+      ];
+      if (allCampaigns.length > 0 && result.contentCounts) {
         const counts = result.contentCounts as Record<string, number>;
-        const campaignsWithContent = (result.campaigns as DbCampaign[]).filter(
+        const campaignsWithContent = allCampaigns.filter(
           (c) => (counts[c.id] ?? 0) > 0,
         );
         const contentResults = await Promise.all(
@@ -139,9 +165,11 @@ export default function BrainPage() {
       setStatus("error");
     } else {
       setOutput(result.output as BrainOutput);
-      // Reload campaigns from DB
+      // Reload data from DB
       const reloaded = await loadBrain({ productId });
-      if (reloaded.campaigns) setCampaigns(reloaded.campaigns as DbCampaign[]);
+      if (reloaded.socialCampaigns) setSocialCampaigns(reloaded.socialCampaigns as DbCampaign[]);
+      if (reloaded.adCampaigns) setAdCampaigns(reloaded.adCampaigns as DbCampaign[]);
+      if (reloaded.websiteKitPieces) setWebsiteKitPieces(reloaded.websiteKitPieces as WebsiteKitPiece[]);
       setContentByCampaign({});
       setStatus("done");
     }
@@ -177,8 +205,8 @@ export default function BrainPage() {
     [productId],
   );
 
-  const handleBulkGenerate = useCallback(async () => {
-    setBulkGenerating(true);
+  const handleBulkGenerate = useCallback(async (campaigns: DbCampaign[], setLoading: (v: boolean) => void) => {
+    setLoading(true);
     const ids = campaigns.map((c) => c.id);
     setGeneratingCampaigns(new Set(ids));
 
@@ -191,8 +219,8 @@ export default function BrainPage() {
     setContentByCampaign(newContent);
     setExpandedCampaigns(new Set(ids));
     setGeneratingCampaigns(new Set());
-    setBulkGenerating(false);
-  }, [productId, campaigns, contentByCampaign]);
+    setLoading(false);
+  }, [productId, contentByCampaign]);
 
   function toggleExpanded(campaignId: string) {
     setExpandedCampaigns((prev) => {
@@ -263,7 +291,8 @@ export default function BrainPage() {
     return rawCampaign?.avatar_name ?? "";
   }
 
-  const sortedCampaigns = [...campaigns].sort((a, b) => a.channel.localeCompare(b.channel));
+  const sortedSocial = [...socialCampaigns].sort((a, b) => a.channel.localeCompare(b.channel));
+  const sortedAds = [...adCampaigns].sort((a, b) => a.channel.localeCompare(b.channel));
 
   return (
     <div className="py-4">
@@ -302,15 +331,6 @@ export default function BrainPage() {
                   className="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
                 >
                   Regenerate
-                </button>
-              )}
-              {isAdmin && campaigns.length > 0 && (
-                <button
-                  onClick={handleBulkGenerate}
-                  disabled={bulkGenerating}
-                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
-                >
-                  {bulkGenerating ? "Generating..." : "Generate All Content"}
                 </button>
               )}
             </div>
@@ -362,84 +382,122 @@ export default function BrainPage() {
           </div>
         </section>
 
-        {/* Campaigns */}
+        {/* Social Campaigns */}
         <section className="mb-12">
-          <h2 className="text-xl font-bold">Campaign Angles</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">Social Campaigns</h2>
+            {isAdmin && sortedSocial.length > 0 && (
+              <button
+                onClick={() => handleBulkGenerate(sortedSocial, setBulkGenerating)}
+                disabled={bulkGenerating}
+                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+              >
+                {bulkGenerating ? "Generating..." : "Generate All Social Content"}
+              </button>
+            )}
+          </div>
           <div className="mt-6 space-y-4">
-            {sortedCampaigns.map((campaign) => {
+            {sortedSocial.map((campaign) => {
               const avatarName = getAvatarName(campaign);
               const pieces = contentByCampaign[campaign.id];
               const isGenerating = generatingCampaigns.has(campaign.id);
               const isExpanded = expandedCampaigns.has(campaign.id);
 
               return (
-                <div key={campaign.id} className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <ChannelPill channel={campaign.channel} />
-                    <TypePill type={campaign.content_type} />
-                    {avatarName && <span className="text-xs text-zinc-500">for {avatarName}</span>}
-                  </div>
-                  <h3 className="mt-3 font-semibold">{campaign.angle}</h3>
-                  <p className="mt-2 text-sm italic text-zinc-300">&ldquo;{campaign.hook}&rdquo;</p>
-
-                  {/* Content generation section */}
-                  <div className="mt-4 flex items-center justify-between border-t border-zinc-800 pt-4">
-                    <div>
-                      {pieces && pieces.length > 0 && (
-                        <button
-                          onClick={() => toggleExpanded(campaign.id)}
-                          className="text-xs text-zinc-400 transition-colors hover:text-zinc-200"
-                        >
-                          {isExpanded
-                            ? "Hide content"
-                            : `Show ${pieces.length} piece${pieces.length === 1 ? "" : "s"}`}
-                        </button>
-                      )}
-                    </div>
-                    {isAdmin ? (
-                      <button
-                        onClick={() => handleGenerateContent(campaign.id)}
-                        disabled={isGenerating}
-                        className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-300 transition-colors hover:bg-indigo-500/20 disabled:opacity-50"
-                      >
-                        {isGenerating ? (
-                          <span className="flex items-center gap-1.5">
-                            <span className="h-3 w-3 animate-spin rounded-full border border-indigo-300/30 border-t-indigo-300" />
-                            Generating...
-                          </span>
-                        ) : pieces && pieces.length > 0 ? (
-                          "Regenerate Content"
-                        ) : (
-                          "Generate Content"
-                        )}
-                      </button>
-                    ) : pieces && pieces.length > 0 ? (
-                      <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
-                        Generated
-                      </span>
-                    ) : null}
-                  </div>
-
-                  {/* Inline content preview */}
-                  {isExpanded &&
-                    pieces?.map((piece) => (
-                      <div key={piece.id} className="mt-3 rounded-lg bg-zinc-800/50 p-4">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-medium text-zinc-400">{piece.title}</p>
-                            <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
-                              {piece.body}
-                            </p>
-                          </div>
-                          <CopyButton text={piece.body} />
-                        </div>
-                      </div>
-                    ))}
-                </div>
+                <CampaignCard
+                  key={campaign.id}
+                  campaign={campaign}
+                  avatarName={avatarName}
+                  pieces={pieces}
+                  isGenerating={isGenerating}
+                  isExpanded={isExpanded}
+                  isAdmin={isAdmin}
+                  onGenerate={() => handleGenerateContent(campaign.id)}
+                  onToggleExpand={() => toggleExpanded(campaign.id)}
+                />
               );
             })}
           </div>
         </section>
+
+        {/* Ad Campaigns */}
+        {(wantsAds || sortedAds.length > 0) && (
+          <section className="mb-12">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold">Ad Campaigns</h2>
+              {isAdmin && sortedAds.length > 0 && (
+                <button
+                  onClick={() => handleBulkGenerate(sortedAds, setBulkAdGenerating)}
+                  disabled={bulkAdGenerating}
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+                >
+                  {bulkAdGenerating ? "Generating..." : "Generate All Ad Creatives"}
+                </button>
+              )}
+            </div>
+            {sortedAds.length > 0 ? (
+              <div className="mt-6 space-y-4">
+                {sortedAds.map((campaign) => {
+                  const avatarName = getAvatarName(campaign);
+                  const pieces = contentByCampaign[campaign.id];
+                  const isGenerating = generatingCampaigns.has(campaign.id);
+                  const isExpanded = expandedCampaigns.has(campaign.id);
+
+                  return (
+                    <CampaignCard
+                      key={campaign.id}
+                      campaign={campaign}
+                      avatarName={avatarName}
+                      pieces={pieces}
+                      isGenerating={isGenerating}
+                      isExpanded={isExpanded}
+                      isAdmin={isAdmin}
+                      onGenerate={() => handleGenerateContent(campaign.id)}
+                      onToggleExpand={() => toggleExpanded(campaign.id)}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="mt-6 rounded-xl border border-dashed border-zinc-700 p-8 text-center">
+                <p className="text-sm text-zinc-500">
+                  No ad campaigns generated yet. Regenerate the brain to include ad campaigns.
+                </p>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Website Kit */}
+        {(hasWebsite || websiteKitPieces.length > 0) && (
+          <section className="mb-12">
+            <h2 className="text-xl font-bold">Website Kit</h2>
+            {websiteKitPieces.length > 0 ? (
+              <div className="mt-6 space-y-4">
+                {websiteKitPieces.map((piece) => (
+                  <div key={piece.id} className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <TypePill type={piece.type} />
+                        <h3 className="mt-2 font-semibold">{piece.title}</h3>
+                      </div>
+                      <CopyButton text={piece.body} />
+                    </div>
+                    <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+                      {piece.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-6 rounded-xl border border-dashed border-zinc-700 p-8 text-center">
+                <p className="text-sm text-zinc-500">
+                  No website kit generated yet. Regenerate the brain to include website copy.
+                </p>
+              </div>
+            )}
+          </section>
+        )}
 
         {/* Actions */}
         <div className="flex gap-4">
@@ -451,6 +509,93 @@ export default function BrainPage() {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Campaign Card Component ──────────────────────────
+function CampaignCard({
+  campaign,
+  avatarName,
+  pieces,
+  isGenerating,
+  isExpanded,
+  isAdmin,
+  onGenerate,
+  onToggleExpand,
+}: {
+  campaign: DbCampaign;
+  avatarName: string;
+  pieces?: ContentPiece[];
+  isGenerating: boolean;
+  isExpanded: boolean;
+  isAdmin: boolean;
+  onGenerate: () => void;
+  onToggleExpand: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+      <div className="flex flex-wrap items-center gap-2">
+        <ChannelPill channel={campaign.channel} />
+        <TypePill type={campaign.content_type} />
+        {avatarName && <span className="text-xs text-zinc-500">for {avatarName}</span>}
+      </div>
+      <h3 className="mt-3 font-semibold">{campaign.angle}</h3>
+      <p className="mt-2 text-sm italic text-zinc-300">&ldquo;{campaign.hook}&rdquo;</p>
+
+      {/* Content generation section */}
+      <div className="mt-4 flex items-center justify-between border-t border-zinc-800 pt-4">
+        <div>
+          {pieces && pieces.length > 0 && (
+            <button
+              onClick={onToggleExpand}
+              className="text-xs text-zinc-400 transition-colors hover:text-zinc-200"
+            >
+              {isExpanded
+                ? "Hide content"
+                : `Show ${pieces.length} piece${pieces.length === 1 ? "" : "s"}`}
+            </button>
+          )}
+        </div>
+        {isAdmin ? (
+          <button
+            onClick={onGenerate}
+            disabled={isGenerating}
+            className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-300 transition-colors hover:bg-indigo-500/20 disabled:opacity-50"
+          >
+            {isGenerating ? (
+              <span className="flex items-center gap-1.5">
+                <span className="h-3 w-3 animate-spin rounded-full border border-indigo-300/30 border-t-indigo-300" />
+                Generating...
+              </span>
+            ) : pieces && pieces.length > 0 ? (
+              "Regenerate Content"
+            ) : (
+              "Generate Content"
+            )}
+          </button>
+        ) : pieces && pieces.length > 0 ? (
+          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
+            Generated
+          </span>
+        ) : null}
+      </div>
+
+      {/* Inline content preview */}
+      {isExpanded &&
+        pieces?.map((piece) => (
+          <div key={piece.id} className="mt-3 rounded-lg bg-zinc-800/50 p-4">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium text-zinc-400">{piece.title}</p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+                  {piece.body}
+                </p>
+              </div>
+              <CopyButton text={piece.body} />
+            </div>
+          </div>
+        ))}
     </div>
   );
 }

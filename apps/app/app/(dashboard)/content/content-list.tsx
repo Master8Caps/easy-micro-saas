@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ChannelPill, TypePill, StatusPill } from "@/components/pills";
+import { ChannelPill, TypePill, StatusSelect } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
-import { useUser } from "@/components/user-context";
 import { updateContentPieceStatus } from "@/server/actions/content";
 
 interface ContentPieceRow {
@@ -17,7 +16,7 @@ interface ContentPieceRow {
   status: string;
   created_at: string;
   products: { name: string } | null;
-  campaigns: { angle: string; channel: string } | null;
+  campaigns: { angle: string; channel: string; category?: string } | null;
 }
 
 const typeOptions = [
@@ -27,10 +26,13 @@ const typeOptions = [
   { value: "twitter-thread", label: "Thread" },
   { value: "video-hook", label: "Video Hook" },
   { value: "video-script", label: "Video Script" },
-  { value: "image-prompt", label: "Image Prompt" },
+  { value: "image-prompt", label: "Image Post" },
   { value: "landing-page-copy", label: "Landing Page" },
   { value: "email", label: "Email" },
   { value: "ad-copy", label: "Ad Copy" },
+  { value: "email-sequence", label: "Email Sequence" },
+  { value: "meta-description", label: "Meta Description" },
+  { value: "tagline", label: "Tagline" },
 ];
 
 const statusOptions = [
@@ -41,6 +43,18 @@ const statusOptions = [
   { value: "archived", label: "Archived" },
 ];
 
+const categoryOptions = [
+  { value: "", label: "All categories" },
+  { value: "social", label: "Social" },
+  { value: "ad", label: "Ads" },
+  { value: "website", label: "Website" },
+];
+
+function getCategory(piece: ContentPieceRow): string {
+  if (!piece.campaign_id) return "website";
+  return piece.campaigns?.category ?? "social";
+}
+
 export function ContentList({
   pieces: initialPieces,
   products,
@@ -48,19 +62,18 @@ export function ContentList({
   pieces: ContentPieceRow[];
   products: { id: string; name: string }[];
 }) {
-  const { role } = useUser();
   const [pieces, setPieces] = useState(initialPieces);
   const [productFilter, setProductFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  const isAdmin = role === "admin";
 
   const filtered = pieces.filter((p) => {
     if (productFilter && p.product_id !== productFilter) return false;
     if (typeFilter && p.type !== typeFilter) return false;
     if (statusFilter && p.status !== statusFilter) return false;
+    if (categoryFilter && getCategory(p) !== categoryFilter) return false;
     return true;
   });
 
@@ -80,6 +93,17 @@ export function ContentList({
     <>
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-3">
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+        >
+          {categoryOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
@@ -143,7 +167,6 @@ export function ContentList({
                       <ChannelPill channel={piece.campaigns.channel} />
                     )}
                     <TypePill type={piece.type} />
-                    <StatusPill status={piece.status} />
                   </div>
                   {piece.title && (
                     <h3 className="mt-2 font-semibold">{piece.title}</h3>
@@ -156,18 +179,10 @@ export function ContentList({
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <CopyButton text={piece.body} />
-                  {isAdmin && (
-                    <select
-                      value={piece.status}
-                      onChange={(e) => handleStatusChange(piece.id, e.target.value)}
-                      className="rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-xs text-zinc-400 focus:border-zinc-500 focus:outline-none"
-                    >
-                      <option value="draft">Draft</option>
-                      <option value="ready">Ready</option>
-                      <option value="published">Published</option>
-                      <option value="archived">Archived</option>
-                    </select>
-                  )}
+                  <StatusSelect
+                    value={piece.status}
+                    onChange={(v) => handleStatusChange(piece.id, v)}
+                  />
                 </div>
               </div>
 

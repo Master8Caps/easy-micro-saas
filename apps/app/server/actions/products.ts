@@ -8,6 +8,10 @@ interface CreateProductInput {
   market: string;
   goals: string;
   channels: string[];
+  has_website: boolean;
+  website_url: string;
+  wants_ads: boolean;
+  ad_platforms: string[];
 }
 
 export async function createProduct(input: CreateProductInput) {
@@ -30,6 +34,10 @@ export async function createProduct(input: CreateProductInput) {
       market: input.market,
       goals: input.goals,
       channels: input.channels,
+      has_website: input.has_website,
+      website_url: input.website_url || null,
+      wants_ads: input.wants_ads,
+      ad_platforms: input.ad_platforms,
       status: "active",
     })
     .select("id")

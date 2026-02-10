@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ChannelPill, TypePill, StatusPill } from "@/components/pills";
+import { ChannelPill, TypePill, StatusSelect } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
 import { useUser } from "@/components/user-context";
 import {
@@ -40,6 +40,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
   const [pieces, setPieces] = useState<ContentPiece[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [expandedPieceId, setExpandedPieceId] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -190,53 +191,73 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
 
           {/* Content pieces */}
           {!loading && hasContent && (
-            <div className="space-y-4">
-              {pieces.map((piece) => (
-                <div
-                  key={piece.id}
-                  className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
+            <div className="space-y-3">
+              {pieces.map((piece) => {
+                const isExpanded = expandedPieceId === piece.id;
+
+                return (
+                  <div
+                    key={piece.id}
+                    className="rounded-xl border border-zinc-800 bg-zinc-900/50"
+                  >
+                    {/* Compact header — always visible */}
+                    <button
+                      onClick={() =>
+                        setExpandedPieceId(isExpanded ? null : piece.id)
+                      }
+                      className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-zinc-800/30"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className={`shrink-0 text-zinc-500 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                      >
+                        <path d="m9 18 6-6-6-6" />
+                      </svg>
+                      <div className="flex min-w-0 flex-1 items-center gap-2">
                         <TypePill type={piece.type} />
-                        <StatusPill status={piece.status} />
+                        <span className="truncate text-sm font-medium text-zinc-300">
+                          {piece.title ?? "Untitled"}
+                        </span>
                       </div>
-                      {piece.title && (
-                        <h4 className="mt-2 text-sm font-semibold">
-                          {piece.title}
-                        </h4>
-                      )}
-                    </div>
-                    <div className="flex shrink-0 items-center gap-2">
-                      <CopyButton text={piece.body} />
-                      {isAdmin && (
-                        <select
+                      <div
+                        className="shrink-0"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <StatusSelect
                           value={piece.status}
-                          onChange={(e) =>
-                            handleStatusChange(piece.id, e.target.value)
-                          }
-                          className="rounded border border-zinc-700 bg-zinc-800 px-2 py-1 text-xs text-zinc-400 focus:border-zinc-500 focus:outline-none"
-                        >
-                          <option value="draft">Draft</option>
-                          <option value="ready">Ready</option>
-                          <option value="published">Published</option>
-                          <option value="archived">Archived</option>
-                        </select>
-                      )}
-                    </div>
+                          onChange={(v) => handleStatusChange(piece.id, v)}
+                        />
+                      </div>
+                    </button>
+
+                    {/* Expanded body */}
+                    {isExpanded && (
+                      <div className="border-t border-zinc-800 px-5 pb-5 pt-4">
+                        <div className="flex justify-end mb-2">
+                          <CopyButton text={piece.body} />
+                        </div>
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+                          {piece.body}
+                        </p>
+                        {piece.metadata?.notes && (
+                          <p className="mt-3 border-t border-zinc-800 pt-3 text-xs text-zinc-500">
+                            <strong className="text-zinc-400">Notes:</strong>{" "}
+                            {piece.metadata.notes}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
-                    {piece.body}
-                  </p>
-                  {piece.metadata?.notes && (
-                    <p className="mt-3 border-t border-zinc-800 pt-3 text-xs text-zinc-500">
-                      <strong className="text-zinc-400">Notes:</strong>{" "}
-                      {piece.metadata.notes}
-                    </p>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

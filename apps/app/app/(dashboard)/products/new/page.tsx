@@ -12,8 +12,11 @@ const channelOptions = [
   "Indie Hackers",
   "Email",
   "Blog / SEO",
-  "Paid Ads",
 ];
+
+const adPlatformOptions = ["Meta", "Google", "TikTok", "LinkedIn Ads"];
+
+const TOTAL_STEPS = 4;
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -26,12 +29,24 @@ export default function NewProductPage() {
   const [market, setMarket] = useState("");
   const [goals, setGoals] = useState("");
   const [channels, setChannels] = useState<string[]>([]);
+  const [hasWebsite, setHasWebsite] = useState(false);
+  const [websiteUrl, setWebsiteUrl] = useState("");
+  const [wantsAds, setWantsAds] = useState(false);
+  const [adPlatforms, setAdPlatforms] = useState<string[]>([]);
 
   function toggleChannel(channel: string) {
     setChannels((prev) =>
       prev.includes(channel)
         ? prev.filter((c) => c !== channel)
         : [...prev, channel],
+    );
+  }
+
+  function toggleAdPlatform(platform: string) {
+    setAdPlatforms((prev) =>
+      prev.includes(platform)
+        ? prev.filter((p) => p !== platform)
+        : [...prev, platform],
     );
   }
 
@@ -45,6 +60,10 @@ export default function NewProductPage() {
       market,
       goals,
       channels,
+      has_website: hasWebsite,
+      website_url: hasWebsite ? websiteUrl : "",
+      wants_ads: wantsAds,
+      ad_platforms: wantsAds ? adPlatforms : [],
     });
 
     if (result.error) {
@@ -61,10 +80,10 @@ export default function NewProductPage() {
       <div className="w-full max-w-lg">
         <div className="mb-8">
           <p className="text-sm font-medium text-zinc-500">
-            Step {step} of 3
+            Step {step} of {TOTAL_STEPS}
           </p>
           <div className="mt-2 flex gap-2">
-            {[1, 2, 3].map((s) => (
+            {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((s) => (
               <div
                 key={s}
                 className={`h-1 flex-1 rounded-full ${
@@ -182,7 +201,7 @@ export default function NewProductPage() {
               Where do you want to reach people?
             </h1>
             <p className="mt-2 text-sm text-zinc-400">
-              Pick the channels you want to focus on. Select at least one.
+              Pick the channels you want to post on. Select at least one.
             </p>
 
             <div className="mt-8 grid grid-cols-2 gap-3">
@@ -201,8 +220,6 @@ export default function NewProductPage() {
               ))}
             </div>
 
-            {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
-
             <div className="mt-8 flex gap-3">
               <button
                 onClick={() => setStep(2)}
@@ -211,8 +228,125 @@ export default function NewProductPage() {
                 Back
               </button>
               <button
+                onClick={() => setStep(4)}
+                disabled={channels.length === 0}
+                className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200 disabled:opacity-30"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div>
+            <h1 className="font-heading text-2xl font-bold">
+              A couple more things...
+            </h1>
+            <p className="mt-2 text-sm text-zinc-400">
+              This helps us tailor your marketing brain to your situation.
+            </p>
+
+            <div className="mt-8 space-y-6">
+              {/* Website toggle */}
+              <div className="rounded-xl border border-zinc-800 p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-zinc-200">
+                      Do you have a website?
+                    </p>
+                    <p className="mt-0.5 text-xs text-zinc-500">
+                      We&apos;ll generate landing page copy, meta descriptions,
+                      and email sequences.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setHasWebsite(!hasWebsite)}
+                    className={`relative h-6 w-11 rounded-full transition-colors ${
+                      hasWebsite ? "bg-white" : "bg-zinc-700"
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full transition-transform ${
+                        hasWebsite
+                          ? "translate-x-5 bg-zinc-950"
+                          : "bg-zinc-400"
+                      }`}
+                    />
+                  </button>
+                </div>
+                {hasWebsite && (
+                  <div className="mt-4">
+                    <input
+                      type="url"
+                      value={websiteUrl}
+                      onChange={(e) => setWebsiteUrl(e.target.value)}
+                      placeholder="https://yourproduct.com"
+                      className="block w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Ads toggle */}
+              <div className="rounded-xl border border-zinc-800 p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-zinc-200">
+                      Do you want to run paid ads?
+                    </p>
+                    <p className="mt-0.5 text-xs text-zinc-500">
+                      We&apos;ll generate ad creatives and copy for your chosen
+                      platforms.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setWantsAds(!wantsAds)}
+                    className={`relative h-6 w-11 rounded-full transition-colors ${
+                      wantsAds ? "bg-white" : "bg-zinc-700"
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full transition-transform ${
+                        wantsAds
+                          ? "translate-x-5 bg-zinc-950"
+                          : "bg-zinc-400"
+                      }`}
+                    />
+                  </button>
+                </div>
+                {wantsAds && (
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    {adPlatformOptions.map((platform) => (
+                      <button
+                        key={platform}
+                        onClick={() => toggleAdPlatform(platform)}
+                        className={`rounded-lg border px-3 py-2 text-left text-sm font-medium transition-colors ${
+                          adPlatforms.includes(platform)
+                            ? "border-white bg-white/10 text-zinc-100"
+                            : "border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-300"
+                        }`}
+                      >
+                        {platform}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+
+            <div className="mt-8 flex gap-3">
+              <button
+                onClick={() => setStep(3)}
+                className="rounded-lg border border-zinc-700 px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
+              >
+                Back
+              </button>
+              <button
                 onClick={handleSubmit}
-                disabled={channels.length === 0 || loading}
+                disabled={loading}
                 className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200 disabled:opacity-30"
               >
                 {loading ? "Creating..." : "Generate Marketing Brain"}

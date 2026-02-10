@@ -17,10 +17,10 @@ export async function loadBrain(input: LoadBrainInput) {
     return { error: "Not authenticated" };
   }
 
-  // Fetch product status
+  // Fetch product with new fields
   const { data: product } = await supabase
     .from("products")
-    .select("status")
+    .select("status, has_website, wants_ads")
     .eq("id", input.productId)
     .single();
 
@@ -34,18 +34,28 @@ export async function loadBrain(input: LoadBrainInput) {
     .limit(1)
     .single();
 
-  // Fetch campaigns with database IDs
-  const { data: campaigns } = await supabase
+  // Fetch social campaigns
+  const { data: socialCampaigns } = await supabase
     .from("campaigns")
-    .select("id, avatar_id, angle, channel, hook, content_type, status")
+    .select("id, avatar_id, angle, channel, hook, content_type, status, category")
     .eq("product_id", input.productId)
+    .eq("category", "social")
+    .order("created_at", { ascending: false });
+
+  // Fetch ad campaigns
+  const { data: adCampaigns } = await supabase
+    .from("campaigns")
+    .select("id, avatar_id, angle, channel, hook, content_type, status, category")
+    .eq("product_id", input.productId)
+    .eq("category", "ad")
     .order("created_at", { ascending: false });
 
   // Fetch existing content pieces grouped by campaign
   const { data: contentPieces } = await supabase
     .from("content_pieces")
     .select("id, campaign_id")
-    .eq("product_id", input.productId);
+    .eq("product_id", input.productId)
+    .not("campaign_id", "is", null);
 
   const contentCountMap: Record<string, number> = {};
   contentPieces?.forEach((piece) => {
@@ -54,19 +64,36 @@ export async function loadBrain(input: LoadBrainInput) {
     }
   });
 
+  // Fetch website kit pieces (no campaign_id)
+  const { data: websiteKitPieces } = await supabase
+    .from("content_pieces")
+    .select("id, type, title, body, metadata, status, created_at")
+    .eq("product_id", input.productId)
+    .is("campaign_id", null)
+    .in("type", ["landing-page-copy", "email-sequence", "meta-description", "tagline"])
+    .order("created_at", { ascending: true });
+
   if (!generation || !generation.raw_output) {
     return {
       output: null,
-      campaigns: campaigns ?? [],
+      socialCampaigns: socialCampaigns ?? [],
+      adCampaigns: adCampaigns ?? [],
       contentCounts: contentCountMap,
+      websiteKitPieces: websiteKitPieces ?? [],
       productStatus: product?.status ?? "active",
+      hasWebsite: product?.has_website ?? false,
+      wantsAds: product?.wants_ads ?? false,
     };
   }
 
   return {
     output: generation.raw_output,
-    campaigns: campaigns ?? [],
+    socialCampaigns: socialCampaigns ?? [],
+    adCampaigns: adCampaigns ?? [],
     contentCounts: contentCountMap,
+    websiteKitPieces: websiteKitPieces ?? [],
     productStatus: product?.status ?? "active",
+    hasWebsite: product?.has_website ?? false,
+    wantsAds: product?.wants_ads ?? false,
   };
 }

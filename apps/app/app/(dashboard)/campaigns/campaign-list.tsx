@@ -12,6 +12,7 @@ interface CampaignRow {
   hook: string;
   content_type: string;
   status: string;
+  category: string;
   created_at: string;
   products: { name: string } | null;
   avatars: { name: string } | null;
@@ -23,26 +24,33 @@ interface CampaignListProps {
 }
 
 export function CampaignList({ campaigns, contentCounts }: CampaignListProps) {
+  const [activeTab, setActiveTab] = useState<"social" | "ad">("social");
   const [productFilter, setProductFilter] = useState("");
   const [channelFilter, setChannelFilter] = useState("");
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignRow | null>(
     null,
   );
 
-  // Build unique product and channel lists for filters
+  const socialCampaigns = campaigns.filter((c) => (c.category ?? "social") === "social");
+  const adCampaigns = campaigns.filter((c) => c.category === "ad");
+  const hasAds = adCampaigns.length > 0;
+
+  const activeCampaigns = activeTab === "social" ? socialCampaigns : adCampaigns;
+
+  // Build unique product and channel lists for filters from active tab
   const products = Array.from(
     new Map(
-      campaigns
+      activeCampaigns
         .filter((c) => c.products)
         .map((c) => [c.product_id, c.products!.name]),
     ),
   ).sort((a, b) => a[1].localeCompare(b[1]));
 
   const channels = Array.from(
-    new Set(campaigns.map((c) => c.channel)),
+    new Set(activeCampaigns.map((c) => c.channel)),
   ).sort();
 
-  const filtered = campaigns.filter((c) => {
+  const filtered = activeCampaigns.filter((c) => {
     if (productFilter && c.product_id !== productFilter) return false;
     if (channelFilter && c.channel !== channelFilter) return false;
     return true;
@@ -50,6 +58,32 @@ export function CampaignList({ campaigns, contentCounts }: CampaignListProps) {
 
   return (
     <>
+      {/* Tabs */}
+      {hasAds && (
+        <div className="mb-6 flex gap-1 rounded-lg border border-zinc-800 bg-zinc-900/50 p-1 w-fit">
+          <button
+            onClick={() => { setActiveTab("social"); setProductFilter(""); setChannelFilter(""); }}
+            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+              activeTab === "social"
+                ? "bg-white text-zinc-950"
+                : "text-zinc-400 hover:text-zinc-200"
+            }`}
+          >
+            Social ({socialCampaigns.length})
+          </button>
+          <button
+            onClick={() => { setActiveTab("ad"); setProductFilter(""); setChannelFilter(""); }}
+            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+              activeTab === "ad"
+                ? "bg-white text-zinc-950"
+                : "text-zinc-400 hover:text-zinc-200"
+            }`}
+          >
+            Ads ({adCampaigns.length})
+          </button>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-3">
         <select
@@ -69,7 +103,7 @@ export function CampaignList({ campaigns, contentCounts }: CampaignListProps) {
           onChange={(e) => setChannelFilter(e.target.value)}
           className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
         >
-          <option value="">All channels</option>
+          <option value="">All {activeTab === "ad" ? "platforms" : "channels"}</option>
           {channels.map((ch) => (
             <option key={ch} value={ch}>
               {ch}

@@ -1,26 +1,18 @@
 import "server-only";
 
-// ============================================
-// Auth helpers — server-only
-// ============================================
-// Server-side authentication utilities.
-// Uses Supabase Auth for session management.
-//
-// Usage:
-//   import { getSession, requireAuth } from "@/server/auth";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
-export async function getSession() {
-  // TODO: Implement session retrieval from Supabase Auth
-  // const supabase = getServerSupabaseClient();
-  // const { data: { session } } = await supabase.auth.getSession();
-  // return session;
-  return null;
+export async function getUser() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
 }
 
 export async function requireAuth() {
-  const session = await getSession();
-  if (!session) {
-    throw new Error("Unauthorized");
+  const user = await getUser();
+  if (!user) {
+    redirect("/login");
   }
-  return session;
+  return user;
 }

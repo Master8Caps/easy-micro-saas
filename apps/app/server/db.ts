@@ -1,21 +1,12 @@
 import "server-only";
 
-// ============================================
-// Database client — server-only
-// ============================================
-// This file will contain Supabase client initialization
-// using SUPABASE_SERVICE_ROLE_KEY (never exposed to client).
-//
-// Usage:
-//   import { getServerSupabaseClient } from "@/server/db";
-//   const supabase = getServerSupabaseClient();
+import { createClient } from "@supabase/supabase-js";
 
-export function getServerSupabaseClient() {
-  // TODO: Initialize Supabase server client
-  // import { createClient } from "@supabase/supabase-js";
-  // return createClient(
-  //   process.env.SUPABASE_URL!,
-  //   process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  // );
-  throw new Error("Database client not configured yet. Set up Supabase first.");
+// Admin client using the service role key.
+// Bypasses RLS — use only in server-side code (API routes, server actions).
+export function getServiceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
 }

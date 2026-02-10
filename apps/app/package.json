@@ -12,6 +12,8 @@
   "dependencies": {
     "@repo/types": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.95.3",
     "clsx": "^2.1.0",
     "next": "^15.1.0",
     "react": "^19.0.0",

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { requireAuth } from "@/server/auth";
+import { SignOutButton } from "@/components/sign-out-button";
 
 const navItems = [
   { label: "Dashboard", href: "/", active: true },
@@ -7,12 +9,14 @@ const navItems = [
   { label: "Analytics", href: "/analytics" },
 ];
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const user = await requireAuth();
+
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-zinc-800 p-6">
-        <div className="font-heading text-lg font-bold">App</div>
+      <aside className="flex w-64 flex-col border-r border-zinc-800 p-6">
+        <div className="font-heading text-lg font-bold">Micro Machine</div>
         <nav className="mt-8 space-y-1">
           {navItems.map((item) => (
             <Link
@@ -28,6 +32,10 @@ export default function DashboardPage() {
             </Link>
           ))}
         </nav>
+        <div className="mt-auto border-t border-zinc-800 pt-4">
+          <p className="truncate text-sm text-zinc-400">{user.email}</p>
+          <SignOutButton />
+        </div>
       </aside>
 
       {/* Main content */}

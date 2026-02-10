@@ -67,11 +67,18 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 - [x] Validation: Both apps build successfully
 - [x] Rename: "Marketing Machine" → "Micro Machine"
 - [x] Git: Initial commit pushed to GitHub
+- [x] Vercel deployment setup (two projects created — env vars still to be configured)
 
 ### In Progress
 
-- [ ] Vercel deployment setup (two projects from same repo)
+- [ ] Marketing site prototype (v1 — working proof of concept)
 - [ ] Domain selection and DNS configuration
+
+### To Do (Before Launch)
+
+- [ ] Add environment variables to both Vercel projects (see .env.example files)
+  - Marketing: NEXT_PUBLIC_APP_URL, NEXT_PUBLIC_SITE_URL, SUPABASE_URL, SUPABASE_ANON_KEY
+  - App: All marketing vars + SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
 
 ### Backlog — Stage 1: Core Foundation (Weeks 1–2)
 

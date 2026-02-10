@@ -36,12 +36,12 @@ interface BrainOutput {
 // ── Channel pill colors ──────────────────────────────
 const channelStyles: Record<string, string> = {
   linkedin: "border-blue-500/30 bg-blue-500/10 text-blue-400",
-  "x / twitter": "border-zinc-500/30 bg-zinc-500/10 text-zinc-300",
-  "x/twitter": "border-zinc-500/30 bg-zinc-500/10 text-zinc-300",
-  twitter: "border-zinc-500/30 bg-zinc-500/10 text-zinc-300",
-  x: "border-zinc-500/30 bg-zinc-500/10 text-zinc-300",
+  "x / twitter": "border-sky-500/30 bg-sky-500/10 text-sky-400",
+  "x/twitter": "border-sky-500/30 bg-sky-500/10 text-sky-400",
+  twitter: "border-sky-500/30 bg-sky-500/10 text-sky-400",
+  x: "border-sky-500/30 bg-sky-500/10 text-sky-400",
   reddit: "border-orange-500/30 bg-orange-500/10 text-orange-400",
-  "product hunt": "border-orange-500/30 bg-orange-500/10 text-orange-400",
+  "product hunt": "border-rose-500/30 bg-rose-500/10 text-rose-400",
   "indie hackers": "border-cyan-500/30 bg-cyan-500/10 text-cyan-400",
   email: "border-purple-500/30 bg-purple-500/10 text-purple-400",
   "blog / seo": "border-green-500/30 bg-green-500/10 text-green-400",
@@ -79,7 +79,7 @@ function ChannelPill({ channel }: { channel: string }) {
 // ── Content type pill ────────────────────────────────
 function TypePill({ type }: { type: string }) {
   return (
-    <span className="rounded-full border border-zinc-700/50 bg-zinc-800/50 px-2.5 py-0.5 text-xs text-zinc-400">
+    <span className="rounded-md border border-indigo-500/20 bg-indigo-500/5 px-2 py-0.5 text-xs text-indigo-300/70">
       {formatContentType(type)}
     </span>
   );
@@ -289,7 +289,7 @@ export default function BrainPage() {
                     Channels
                   </p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    {avatar.channels.map((channel) => (
+                    {[...avatar.channels].sort((a, b) => a.localeCompare(b)).map((channel) => (
                       <ChannelPill key={channel} channel={channel} />
                     ))}
                   </div>
@@ -320,7 +320,7 @@ export default function BrainPage() {
         <section className="mb-12">
           <h2 className="text-xl font-bold">Campaign Angles</h2>
           <div className="mt-6 space-y-4">
-            {output.campaigns.map((campaign, i) => (
+            {[...output.campaigns].sort((a, b) => a.channel.localeCompare(b.channel)).map((campaign, i) => (
               <div
                 key={i}
                 className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6"

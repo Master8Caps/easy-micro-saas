@@ -78,6 +78,7 @@ export default function BrainPage() {
   const [socialCampaigns, setSocialCampaigns] = useState<DbCampaign[]>([]);
   const [adCampaigns, setAdCampaigns] = useState<DbCampaign[]>([]);
   const [websiteKitPieces, setWebsiteKitPieces] = useState<WebsiteKitPiece[]>([]);
+  const [emailPieces, setEmailPieces] = useState<WebsiteKitPiece[]>([]);
   const [hasWebsite, setHasWebsite] = useState(false);
   const [wantsAds, setWantsAds] = useState(false);
   const [error, setError] = useState("");
@@ -105,6 +106,7 @@ export default function BrainPage() {
       if (result.socialCampaigns) setSocialCampaigns(result.socialCampaigns as DbCampaign[]);
       if (result.adCampaigns) setAdCampaigns(result.adCampaigns as DbCampaign[]);
       if (result.websiteKitPieces) setWebsiteKitPieces(result.websiteKitPieces as WebsiteKitPiece[]);
+      if (result.emailPieces) setEmailPieces(result.emailPieces as WebsiteKitPiece[]);
       if (result.productName) setProductName(result.productName);
       if (result.productStatus) setProductStatus(result.productStatus);
       setHasWebsite(result.hasWebsite ?? false);
@@ -159,6 +161,7 @@ export default function BrainPage() {
         if (reloaded.socialCampaigns) setSocialCampaigns(reloaded.socialCampaigns as DbCampaign[]);
         if (reloaded.adCampaigns) setAdCampaigns(reloaded.adCampaigns as DbCampaign[]);
         if (reloaded.websiteKitPieces) setWebsiteKitPieces(reloaded.websiteKitPieces as WebsiteKitPiece[]);
+        if (reloaded.emailPieces) setEmailPieces(reloaded.emailPieces as WebsiteKitPiece[]);
       }
 
       setStatus("done");
@@ -499,6 +502,29 @@ export default function BrainPage() {
                 </p>
               </div>
             )}
+          </section>
+        )}
+
+        {/* Email Copy */}
+        {emailPieces.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-xl font-bold">Email Copy</h2>
+            <div className="mt-6 space-y-4">
+              {emailPieces.map((piece) => (
+                <div key={piece.id} className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <TypePill type={piece.type} />
+                      <h3 className="mt-2 font-semibold">{piece.title}</h3>
+                    </div>
+                    <CopyButton text={piece.body} />
+                  </div>
+                  <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+                    {piece.body}
+                  </p>
+                </div>
+              ))}
+            </div>
           </section>
         )}
 

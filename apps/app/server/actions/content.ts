@@ -16,7 +16,6 @@ function mapContentType(contentType: string, channel: string): string {
     return "linkedin-post";
   }
   if (key === "thread") return "twitter-thread";
-  if (key === "video-hook") return "video-hook";
   if (key === "video-script") return "video-script";
   if (key === "image-prompt") return "image-prompt";
   if (key === "landing-page") return "landing-page-copy";
@@ -34,8 +33,6 @@ function getFormatInstructions(type: string): string {
       return "Write tweets. Max 280 characters each. Punchy, opinionated, curiosity-driven. No hashtags unless essential.";
     case "twitter-thread":
       return "Write a Twitter/X thread of 4-7 tweets. First tweet is the hook. Use numbered format (1/, 2/, etc). Last tweet has the CTA. Each tweet under 280 characters.";
-    case "video-hook":
-      return "Write video hook scripts — the first 3-5 seconds. Each should be a single punchy sentence or question designed to stop the scroll. Include a brief note on visual direction.";
     case "video-script":
       return "Write a 60-90 second video script. Include [VISUAL] cues. Hook in first 3 seconds. Problem, agitation, solution structure. End with clear CTA.";
     case "image-prompt":

@@ -64,13 +64,22 @@ export async function loadBrain(input: LoadBrainInput) {
     }
   });
 
-  // Fetch website kit pieces (no campaign_id)
+  // Fetch website kit pieces (no campaign_id, excluding emails)
   const { data: websiteKitPieces } = await supabase
     .from("content_pieces")
     .select("id, type, title, body, metadata, status, created_at")
     .eq("product_id", input.productId)
     .is("campaign_id", null)
-    .in("type", ["landing-page-copy", "email-sequence", "meta-description", "tagline"])
+    .in("type", ["landing-page-copy", "meta-description", "tagline"])
+    .order("created_at", { ascending: true });
+
+  // Fetch email pieces separately
+  const { data: emailPieces } = await supabase
+    .from("content_pieces")
+    .select("id, type, title, body, metadata, status, created_at")
+    .eq("product_id", input.productId)
+    .is("campaign_id", null)
+    .eq("type", "email-sequence")
     .order("created_at", { ascending: true });
 
   if (!generation || !generation.raw_output) {
@@ -80,6 +89,7 @@ export async function loadBrain(input: LoadBrainInput) {
       adCampaigns: adCampaigns ?? [],
       contentCounts: contentCountMap,
       websiteKitPieces: websiteKitPieces ?? [],
+      emailPieces: emailPieces ?? [],
       productName: product?.name ?? "",
       productStatus: product?.status ?? "active",
       hasWebsite: product?.has_website ?? false,
@@ -93,6 +103,7 @@ export async function loadBrain(input: LoadBrainInput) {
     adCampaigns: adCampaigns ?? [],
     contentCounts: contentCountMap,
     websiteKitPieces: websiteKitPieces ?? [],
+    emailPieces: emailPieces ?? [],
     productName: product?.name ?? "",
     productStatus: product?.status ?? "active",
     hasWebsite: product?.has_website ?? false,

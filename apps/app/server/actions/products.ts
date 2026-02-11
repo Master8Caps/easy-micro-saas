@@ -12,6 +12,7 @@ interface CreateProductInput {
   website_url: string;
   wants_ads: boolean;
   ad_platforms: string[];
+  content_formats: string[];
 }
 
 export async function createProduct(input: CreateProductInput) {
@@ -38,6 +39,7 @@ export async function createProduct(input: CreateProductInput) {
       website_url: input.website_url || null,
       wants_ads: input.wants_ads,
       ad_platforms: input.ad_platforms,
+      content_formats: input.content_formats,
       status: "active",
     })
     .select("id")

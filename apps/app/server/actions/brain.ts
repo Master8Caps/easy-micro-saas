@@ -286,10 +286,28 @@ function buildPrompt(product: {
   website_url?: string;
   wants_ads?: boolean;
   ad_platforms?: string[];
+  content_formats?: string[];
 }): string {
   const socialChannels = product.channels.filter(
     (c) => c.toLowerCase() !== "paid ads",
   );
+
+  // Build allowed content types from user preferences
+  const formats = product.content_formats ?? ["text", "images", "video"];
+  const allowedTypes: string[] = [];
+  if (formats.includes("text")) allowedTypes.push("text-post", "thread");
+  if (formats.includes("images")) allowedTypes.push("image-prompt");
+  if (formats.includes("video")) allowedTypes.push("video-script");
+  const contentTypesList = allowedTypes.join(", ");
+
+  // Build variety instruction based on selected formats
+  const varietyParts: string[] = [];
+  if (formats.includes("text")) varietyParts.push("text posts and threads");
+  if (formats.includes("images")) varietyParts.push("image posts");
+  if (formats.includes("video")) varietyParts.push("video scripts");
+  const varietyInstruction = varietyParts.length > 1
+    ? `Use a VARIETY of content types — include a mix of ${varietyParts.join(" and ")}.`
+    : `Focus on ${varietyParts[0]} content.`;
 
   let prompt = `You are a marketing strategist specializing in early-stage SaaS growth. Your job is to analyze a product brief and generate a structured marketing brain.
 
@@ -314,8 +332,8 @@ INSTRUCTIONS:
 1. Identify 2-3 distinct target avatars (ideal customer profiles). Each should be specific and actionable, not generic.
 2. For each avatar, generate 2-3 SOCIAL campaign angles with specific hooks. Each campaign targets one social channel and one avatar.
 3. Hooks should be ready to use as the opening line of a social post — specific, provocative, and curiosity-driven.
-4. Social content types must be one of: text-post, thread, video-hook, video-script, image-prompt
-5. Use a VARIETY of content types — do not default to text-post for everything. Include at least one image-prompt and one video-hook or video-script if the channels support it.`;
+4. Social content types must be one of: ${contentTypesList}
+5. ${varietyInstruction}`;
 
   if (product.wants_ads) {
     prompt += `
@@ -357,7 +375,7 @@ Respond with ONLY valid JSON in this exact structure:
       "angle": "The strategic angle for this campaign",
       "channel": "One specific social channel",
       "hook": "The opening line or hook — specific and ready to post",
-      "content_type": "One of: text-post, thread, video-hook, video-script, image-prompt",
+      "content_type": "One of: ${contentTypesList}",
       "why_it_works": "One sentence on why this angle resonates with this avatar"
     }
   ],`;

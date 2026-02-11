@@ -41,7 +41,6 @@ const typeLabels: Record<string, string> = {
   "linkedin-post": "Text Post",
   "twitter-post": "Text Post",
   "twitter-thread": "Thread",
-  "video-hook": "Video Hook",
   "video-script": "Video Script",
   "image-prompt": "Image Post",
   "landing-page-copy": "Landing Page",

@@ -25,7 +25,6 @@ const typeOptions = [
   { value: "linkedin-post", label: "LinkedIn Post" },
   { value: "twitter-post", label: "Tweet" },
   { value: "twitter-thread", label: "Thread" },
-  { value: "video-hook", label: "Video Hook" },
   { value: "video-script", label: "Video Script" },
   { value: "image-prompt", label: "Image Post" },
   { value: "landing-page-copy", label: "Landing Page" },

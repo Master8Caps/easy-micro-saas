@@ -33,6 +33,7 @@ export default function NewProductPage() {
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [wantsAds, setWantsAds] = useState(false);
   const [adPlatforms, setAdPlatforms] = useState<string[]>([]);
+  const [contentFormats, setContentFormats] = useState<string[]>(["text", "images", "video"]);
 
   function toggleChannel(channel: string) {
     setChannels((prev) =>
@@ -50,6 +51,14 @@ export default function NewProductPage() {
     );
   }
 
+  function toggleContentFormat(format: string) {
+    setContentFormats((prev) =>
+      prev.includes(format)
+        ? prev.filter((f) => f !== format)
+        : [...prev, format],
+    );
+  }
+
   async function handleSubmit() {
     setError("");
     setLoading(true);
@@ -64,6 +73,7 @@ export default function NewProductPage() {
       website_url: hasWebsite ? websiteUrl : "",
       wants_ads: wantsAds,
       ad_platforms: wantsAds ? adPlatforms : [],
+      content_formats: contentFormats,
     });
 
     if (result.error) {
@@ -248,6 +258,57 @@ export default function NewProductPage() {
             </p>
 
             <div className="mt-8 space-y-6">
+              {/* Content formats */}
+              <div>
+                <p className="text-sm font-medium text-zinc-200">
+                  What content formats do you want to create?
+                </p>
+                <p className="mt-0.5 text-xs text-zinc-500">
+                  Unselect any formats you don&apos;t plan to create.
+                </p>
+                <div className="mt-3 grid grid-cols-3 gap-3">
+                  {[
+                    { value: "text", label: "Text", desc: "Posts & threads" },
+                    { value: "images", label: "Images", desc: "AI image concepts" },
+                    { value: "video", label: "Video", desc: "Short-form scripts" },
+                  ].map((format) => {
+                    const selected = contentFormats.includes(format.value);
+                    return (
+                      <button
+                        key={format.value}
+                        onClick={() => toggleContentFormat(format.value)}
+                        className={`relative rounded-xl border p-4 text-left transition-colors ${
+                          selected
+                            ? "border-emerald-500/50 bg-emerald-500/5"
+                            : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
+                        }`}
+                      >
+                        {selected && (
+                          <svg
+                            className="absolute top-3 right-3 h-5 w-5 text-emerald-400"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                        <p className={`text-sm font-medium ${selected ? "text-zinc-100" : ""}`}>
+                          {format.label}
+                        </p>
+                        <p className={`mt-0.5 text-xs ${selected ? "text-zinc-400" : "text-zinc-500"}`}>
+                          {format.desc}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Website toggle */}
               <div className="rounded-xl border border-zinc-800 p-5">
                 <div className="flex items-center justify-between">
@@ -346,7 +407,7 @@ export default function NewProductPage() {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || contentFormats.length === 0}
                 className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200 disabled:opacity-30"
               >
                 {loading ? "Creating..." : "Generate Marketing Brain"}

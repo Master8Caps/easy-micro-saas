@@ -62,6 +62,7 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 - [x] User roles system (admin, free, paid) — migration 00002
 - [x] Content workstreams separation — migration 00004 (has_website, wants_ads, campaign categories, expanded content types)
 - [x] Archived separated from workflow status — migration 00005 (archived boolean on campaigns + content_pieces, removed from status constraint)
+- [x] Content format preferences — migration 00006 (content_formats column on products, video-hook removed from constraints)
 
 ### Marketing Site
 - [x] 7-section conversion page (hero, problem, value, how-it-works, proof, CTA, footer)
@@ -86,6 +87,7 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 - [x] 4-step intake form: product basics, goals, channels, extras
 - [x] Step 4: "Do you have a website?" toggle + URL input
 - [x] Step 4: "Do you want to run paid ads?" toggle + platform multi-select (Meta, Google, TikTok, LinkedIn Ads)
+- [x] Step 4: Content format preferences — multi-select cards (Text, Images, Video) with green checkmarks, all selected by default, at least one required
 - [x] "Paid Ads" removed from social channels list (7 organic channels remain)
 
 ### App — Marketing Brain Generation
@@ -99,10 +101,11 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 - [x] Fix: Brain page reloads data from DB after first-time generation
 
 ### App — Brain Page UI
-- [x] Three distinct sections: Target Avatars, Social Campaigns, Ad Campaigns, Website Kit
-- [x] Ad Campaigns and Website Kit sections conditionally shown based on product settings
+- [x] Five distinct sections: Target Avatars, Social Campaigns, Ad Campaigns, Email Copy, Website Kit
+- [x] Email Copy section separated from Website Kit (email-sequence pieces shown independently)
+- [x] Ad Campaigns, Email Copy, and Website Kit sections conditionally shown based on product settings / data
 - [x] Colored channel pills (LinkedIn blue, X gray, Reddit orange, etc.)
-- [x] TypePill with distinct indigo styling (Text Post, Image Post, Thread, Video Hook, etc.)
+- [x] TypePill with distinct indigo styling (Text Post, Image Post, Thread, Video Script, etc.)
 - [x] Sorted channels A-Z
 - [x] Active/Archived status pill + archive/reactivate toggle (admin only)
 - [x] Regenerate brain button (admin only)
@@ -110,7 +113,8 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 ### App — Content Generation
 - [x] Per-campaign content generation (2-3 pieces per campaign via Claude)
 - [x] Bulk "Generate All" for social and ad campaigns separately
-- [x] Content-type-specific prompts (LinkedIn posts, tweets, threads, video hooks, scripts, image prompts, landing pages, emails, ad copy)
+- [x] Content-type-specific prompts (LinkedIn posts, tweets, threads, video scripts, image prompts, landing pages, emails, ad copy)
+- [x] Content format preferences respected — brain prompt dynamically builds content types list from user's selected formats (text/images/video)
 - [x] Inline content preview on brain page (expandable)
 - [x] Copy-to-clipboard with "Copied!" feedback
 
@@ -142,7 +146,7 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 - [x] Product archive cascades: sets `archived=true` on all campaigns and content pieces (preserves their workflow status)
 - [x] Product reactivate cascades: sets `archived=false` on all campaigns and content pieces
 - [x] Archive toggle button on each content piece (content page + campaign panel)
-- [x] "Show archived" filter on content page (hidden by default)
+- [x] Archive toggle is exclusive view — shows either active or archived content, not mixed
 
 ### App — Product Delete (Admin Only)
 - [x] `deleteProduct()` server action with admin role check (server-side enforcement)
@@ -164,7 +168,7 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 
 ### App — UI Components
 - [x] `ChannelPill` — platform-colored (LinkedIn, X, Reddit, Product Hunt, Indie Hackers, Email, Blog, Meta, Google, TikTok, LinkedIn Ads)
-- [x] `TypePill` — indigo tint, format-specific labels (Text Post, Thread, Video Hook, Image Post, Landing Page, Email Sequence, Meta Description, Tagline, etc.)
+- [x] `TypePill` — indigo tint, format-specific labels (Text Post, Thread, Video Script, Image Post, Landing Page, Email Sequence, Meta Description, Tagline, etc.)
 - [x] `StatusPill` — active/published (emerald), draft (amber), archived (zinc), ready (blue)
 - [x] `StatusSelect` — colored dropdown that looks like a pill but is selectable (Draft/Ready/Published only)
 - [x] `ArchivedBadge` — gray "Archived" pill, shown alongside workflow status
@@ -181,7 +185,11 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
    - `archived` column exists on campaigns and content_pieces (defaults to false)
    - Any previously archived content pieces are migrated (archived=true, status reverted to draft)
    - content_pieces status constraint only allows draft/ready/published
-2. **Archive cascade** — Archive a product from the brain page. Verify:
+2. **Run migration 00006** — Run `00006_content_formats.sql` in Supabase SQL Editor. Verify:
+   - `content_formats` column exists on products (defaults to `{text,images,video}`)
+   - Any existing `video-hook` campaigns migrated to `video-script`
+   - CHECK constraints on campaigns and content_pieces no longer include `video-hook`
+3. **Archive cascade** — Archive a product from the brain page. Verify:
    - All its campaigns get `archived=true` (status unchanged)
    - All its content pieces get `archived=true` (status unchanged)
    - Reactivating the product sets `archived=false` on campaigns and content
@@ -194,29 +202,40 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 4. **Campaign panel archiving** — Open a campaign slide-over, verify:
    - Archive toggle + badge work on content pieces within the panel
 5. **New product with website + ads** — Create a product, enable website and ads on step 4, generate brain. Verify:
-   - Social campaigns section populates with varied content types
+   - Content format cards show on Step 4 with green checkmarks (all selected by default)
+   - Deselecting a format removes its checkmark, card style changes to unselected
+   - Cannot proceed with zero formats selected
+   - Social campaigns section populates with varied content types matching selected formats
    - Ad campaigns section populates with retargeting + cold traffic angles
-   - Website kit section populates (landing page, emails, meta desc, taglines)
-   - All three sections load immediately (not empty on first generation)
-6. **Content generation** — Click "Generate Content" on a social campaign, verify 2-3 pieces appear
-7. **Campaigns page** — Verify:
+   - Email Copy section populates with welcome emails (separate from Website Kit)
+   - Website kit section populates (landing page, meta desc, taglines — no emails)
+   - All sections load immediately (not empty on first generation)
+6. **Content format filtering** — Create products with different format selections:
+   - Text only: only text-post and thread campaigns generated (no image-prompt, no video-script)
+   - Text + Images: text and image campaigns, no video scripts
+   - All formats: full mix of content types
+   - Existing products unaffected (default `{text,images,video}`)
+7. **Content generation** — Click "Generate Content" on a social campaign, verify 2-3 pieces appear
+8. **Campaigns page** — Verify:
    - Social / Email / Ads tabs display correctly (Email tab only when email campaigns exist)
    - Email campaigns appear under Email tab, not Social
    - Campaign count appears right-aligned next to tabs
    - Filters scope correctly, slide-over panel opens
-8. **Content page** — Verify:
+9. **Content page** — Verify:
    - Category pill tabs (All/Social/Email/Ads/Website) show with correct counts
    - Email sequences appear under Email category, not Website
    - Product, type, status dropdowns filter correctly
    - "Clear filters" button appears when any filter is active
    - Filtered piece count displays right-aligned on tab row
-9. **Admin: Delete product** — As admin on brain page:
+   - Archive toggle shows exclusive view: active content by default, only archived when toggled
+   - No `video-hook` option in type filter dropdown
+10. **Admin: Delete product** — As admin on brain page:
    - Red "Delete" button visible in header (not visible for non-admin)
    - Clicking shows confirmation dialog with product name
    - Cancel dismisses dialog, nothing deleted
    - Confirm deletes product + all campaigns, content, avatars, generations
    - Redirects to dashboard after deletion
-10. **Admin: Delete from dashboard** — As admin on dashboard:
+11. **Admin: Delete from dashboard** — As admin on dashboard:
     - Trash icon visible on each product card (not visible for non-admin)
     - Clicking shows confirmation dialog
     - Confirm deletes product and refreshes the list
@@ -263,7 +282,8 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 | 00002 | `00002_add_roles_and_waitlist.sql` | User roles + waitlist table | Applied |
 | 00003 | `00003_add_generations_update_policy.sql` | Fix: RLS update policy on generations | Applied |
 | 00004 | `00004_content_workstreams.sql` | Content workstreams — has_website, wants_ads, campaign categories, expanded content types | Applied |
-| 00005 | `00005_separate_archived_flag.sql` | Separate archived from status — archived boolean on campaigns + content_pieces | Pending |
+| 00005 | `00005_separate_archived_flag.sql` | Separate archived from status — archived boolean on campaigns + content_pieces | Applied |
+| 00006 | `00006_content_formats.sql` | Content format preferences + remove video-hook — content_formats column on products, migrate video-hook→video-script, update constraints | Applied |
 
 ---
 
@@ -296,3 +316,7 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 | 2026-02-11 | Pill tabs for category filters | Segmented control (All/Social/Email/Ads/Website) replaces dropdown for cleaner UI |
 | 2026-02-11 | Archive icon toggle replaces checkbox | Compact icon button with active state, declutters filter bar |
 | 2026-02-11 | Count badge right-aligned, not in filter row | Filtered count visually separated from filter controls to avoid ambiguity |
+| 2026-02-11 | Archive toggle = exclusive views | Active and archived content shown separately, not mixed — cleaner mental model |
+| 2026-02-11 | Email Copy separated from Website Kit on brain page | Email sequences are a distinct deliverable, not part of the website kit section |
+| 2026-02-11 | Video-hook removed, consolidated to video-script | Video scripts already include a hook — separate video-hook type was redundant |
+| 2026-02-11 | Content format preferences at intake | Users choose text/images/video at product creation; brain prompt respects selection; default all selected |

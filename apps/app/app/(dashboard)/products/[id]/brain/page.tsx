@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { generateBrain } from "@/server/actions/brain";
 import { loadBrain } from "@/server/actions/brain-load";
-import { updateProductStatus } from "@/server/actions/products";
+import { updateProductStatus, deleteProduct } from "@/server/actions/products";
 import {
   generateContentForCampaign,
   generateContentBulk,
@@ -81,8 +81,11 @@ export default function BrainPage() {
   const [hasWebsite, setHasWebsite] = useState(false);
   const [wantsAds, setWantsAds] = useState(false);
   const [error, setError] = useState("");
+  const [productName, setProductName] = useState("");
   const [productStatus, setProductStatus] = useState<string>("active");
   const [togglingStatus, setTogglingStatus] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Content generation state
   const [contentByCampaign, setContentByCampaign] = useState<Record<string, ContentPiece[]>>({});
@@ -102,6 +105,7 @@ export default function BrainPage() {
       if (result.socialCampaigns) setSocialCampaigns(result.socialCampaigns as DbCampaign[]);
       if (result.adCampaigns) setAdCampaigns(result.adCampaigns as DbCampaign[]);
       if (result.websiteKitPieces) setWebsiteKitPieces(result.websiteKitPieces as WebsiteKitPiece[]);
+      if (result.productName) setProductName(result.productName);
       if (result.productStatus) setProductStatus(result.productStatus);
       setHasWebsite(result.hasWebsite ?? false);
       setWantsAds(result.wantsAds ?? false);
@@ -193,6 +197,18 @@ export default function BrainPage() {
       setProductStatus(newStatus);
     }
     setTogglingStatus(false);
+  }
+
+  async function handleDeleteProduct() {
+    setDeleting(true);
+    const result = await deleteProduct(productId);
+    if (result.error) {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+      alert(result.error);
+      return;
+    }
+    router.push("/");
   }
 
   const handleGenerateContent = useCallback(
@@ -326,6 +342,14 @@ export default function BrainPage() {
               <p className="mt-2 text-lg text-zinc-400">{output.positioning_summary}</p>
             </div>
             <div className="flex shrink-0 gap-2">
+              {isAdmin && (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="rounded-lg border border-red-500/30 px-4 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+                >
+                  Delete
+                </button>
+              )}
               {isAdmin && (
                 <button
                   onClick={handleToggleStatus}
@@ -519,6 +543,37 @@ export default function BrainPage() {
           </button>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="mx-4 w-full max-w-md rounded-xl border border-zinc-700 bg-zinc-900 p-6 shadow-2xl">
+            <h3 className="font-heading text-lg font-bold text-white">Delete Product</h3>
+            <p className="mt-3 text-sm text-zinc-400">
+              Are you sure you want to delete{" "}
+              <span className="font-medium text-zinc-200">{productName || "this product"}</span>?
+              This will permanently delete all campaigns, content, and analytics data.
+            </p>
+            <p className="mt-2 text-sm font-medium text-red-400">This cannot be undone.</p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+                className="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteProduct}
+                disabled={deleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-500 disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Delete permanently"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

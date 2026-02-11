@@ -20,7 +20,7 @@ export async function loadBrain(input: LoadBrainInput) {
   // Fetch product with new fields
   const { data: product } = await supabase
     .from("products")
-    .select("status, has_website, wants_ads")
+    .select("name, status, has_website, wants_ads")
     .eq("id", input.productId)
     .single();
 
@@ -80,6 +80,7 @@ export async function loadBrain(input: LoadBrainInput) {
       adCampaigns: adCampaigns ?? [],
       contentCounts: contentCountMap,
       websiteKitPieces: websiteKitPieces ?? [],
+      productName: product?.name ?? "",
       productStatus: product?.status ?? "active",
       hasWebsite: product?.has_website ?? false,
       wantsAds: product?.wants_ads ?? false,
@@ -92,6 +93,7 @@ export async function loadBrain(input: LoadBrainInput) {
     adCampaigns: adCampaigns ?? [],
     contentCounts: contentCountMap,
     websiteKitPieces: websiteKitPieces ?? [],
+    productName: product?.name ?? "",
     productStatus: product?.status ?? "active",
     hasWebsite: product?.has_website ?? false,
     wantsAds: product?.wants_ads ?? false,

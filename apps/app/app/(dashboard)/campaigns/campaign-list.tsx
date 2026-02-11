@@ -24,18 +24,23 @@ interface CampaignListProps {
 }
 
 export function CampaignList({ campaigns, contentCounts }: CampaignListProps) {
-  const [activeTab, setActiveTab] = useState<"social" | "ad">("social");
+  const [activeTab, setActiveTab] = useState<"social" | "email" | "ad">("social");
   const [productFilter, setProductFilter] = useState("");
   const [channelFilter, setChannelFilter] = useState("");
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignRow | null>(
     null,
   );
 
-  const socialCampaigns = campaigns.filter((c) => (c.category ?? "social") === "social");
+  const socialCampaigns = campaigns.filter((c) => (c.category ?? "social") === "social" && c.channel !== "Email");
+  const emailCampaigns = campaigns.filter((c) => (c.category ?? "social") === "social" && c.channel === "Email");
   const adCampaigns = campaigns.filter((c) => c.category === "ad");
   const hasAds = adCampaigns.length > 0;
+  const hasEmail = emailCampaigns.length > 0;
 
-  const activeCampaigns = activeTab === "social" ? socialCampaigns : adCampaigns;
+  const activeCampaigns =
+    activeTab === "email" ? emailCampaigns :
+    activeTab === "ad" ? adCampaigns :
+    socialCampaigns;
 
   // Build unique product and channel lists for filters from active tab
   const products = Array.from(
@@ -58,34 +63,64 @@ export function CampaignList({ campaigns, contentCounts }: CampaignListProps) {
 
   return (
     <>
-      {/* Tabs */}
-      {hasAds && (
-        <div className="mb-6 flex gap-1 rounded-lg border border-zinc-800 bg-zinc-900/50 p-1 w-fit">
-          <button
-            onClick={() => { setActiveTab("social"); setProductFilter(""); setChannelFilter(""); }}
-            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
-              activeTab === "social"
-                ? "bg-white text-zinc-950"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            Social ({socialCampaigns.length})
-          </button>
-          <button
-            onClick={() => { setActiveTab("ad"); setProductFilter(""); setChannelFilter(""); }}
-            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
-              activeTab === "ad"
-                ? "bg-white text-zinc-950"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            Ads ({adCampaigns.length})
-          </button>
-        </div>
-      )}
+      {/* Tabs + count */}
+      <div className="mb-4 flex items-center justify-between">
+        {(hasAds || hasEmail) ? (
+          <div className="flex gap-1 rounded-lg border border-zinc-800 bg-zinc-900/50 p-1">
+            <button
+              onClick={() => { setActiveTab("social"); setProductFilter(""); setChannelFilter(""); }}
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                activeTab === "social"
+                  ? "bg-white text-zinc-950"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              Social
+              <span className={`ml-1.5 ${activeTab === "social" ? "text-zinc-500" : "text-zinc-600"}`}>
+                {socialCampaigns.length}
+              </span>
+            </button>
+            {hasEmail && (
+              <button
+                onClick={() => { setActiveTab("email"); setProductFilter(""); setChannelFilter(""); }}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  activeTab === "email"
+                    ? "bg-white text-zinc-950"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                Email
+                <span className={`ml-1.5 ${activeTab === "email" ? "text-zinc-500" : "text-zinc-600"}`}>
+                  {emailCampaigns.length}
+                </span>
+              </button>
+            )}
+            {hasAds && (
+              <button
+                onClick={() => { setActiveTab("ad"); setProductFilter(""); setChannelFilter(""); }}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  activeTab === "ad"
+                    ? "bg-white text-zinc-950"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                Ads
+                <span className={`ml-1.5 ${activeTab === "ad" ? "text-zinc-500" : "text-zinc-600"}`}>
+                  {adCampaigns.length}
+                </span>
+              </button>
+            )}
+          </div>
+        ) : (
+          <div />
+        )}
+        <span className="text-sm text-zinc-500">
+          {filtered.length} campaign{filtered.length === 1 ? "" : "s"}
+        </span>
+      </div>
 
       {/* Filters */}
-      <div className="mb-6 flex flex-wrap gap-3">
+      <div className="mb-6 flex flex-wrap items-center gap-3">
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
@@ -110,9 +145,6 @@ export function CampaignList({ campaigns, contentCounts }: CampaignListProps) {
             </option>
           ))}
         </select>
-        <span className="flex items-center text-sm text-zinc-500">
-          {filtered.length} campaign{filtered.length === 1 ? "" : "s"}
-        </span>
       </div>
 
       {/* Campaign cards */}

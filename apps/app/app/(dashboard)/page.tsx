@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { StatusPill } from "@/components/pills";
+import { ProductDeleteButton } from "@/components/product-delete-button";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -67,7 +68,10 @@ export default async function DashboardPage() {
                       {product.description}
                     </p>
                   </div>
-                  <StatusPill status={product.status} />
+                  <div className="flex items-center gap-2">
+                    <StatusPill status={product.status} />
+                    <ProductDeleteButton productId={product.id} productName={product.name} />
+                  </div>
                 </div>
               </Link>
             ))}

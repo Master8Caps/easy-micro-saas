@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ChannelPill, TypePill, StatusSelect, ArchivedBadge, ArchiveToggle } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
 import { updateContentPieceStatus, toggleContentPieceArchived } from "@/server/actions/content";
@@ -43,14 +43,16 @@ const statusOptions = [
   { value: "published", label: "Published" },
 ];
 
-const categoryOptions = [
-  { value: "", label: "All categories" },
+const categoryTabs = [
+  { value: "", label: "All" },
   { value: "social", label: "Social" },
+  { value: "email", label: "Email" },
   { value: "ad", label: "Ads" },
   { value: "website", label: "Website" },
 ];
 
 function getCategory(piece: ContentPieceRow): string {
+  if (piece.type === "email-sequence") return "email";
   if (!piece.campaign_id) return "website";
   return piece.campaigns?.category ?? "social";
 }
@@ -70,6 +72,17 @@ export function ContentList({
   const [showArchived, setShowArchived] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
+  // Compute category counts (respecting archived visibility but not other filters)
+  const categoryCounts = useMemo(() => {
+    const visible = pieces.filter((p) => showArchived || !p.archived);
+    const counts: Record<string, number> = { "": visible.length };
+    for (const p of visible) {
+      const cat = getCategory(p);
+      counts[cat] = (counts[cat] ?? 0) + 1;
+    }
+    return counts;
+  }, [pieces, showArchived]);
+
   const filtered = pieces.filter((p) => {
     if (!showArchived && p.archived) return false;
     if (productFilter && p.product_id !== productFilter) return false;
@@ -78,6 +91,15 @@ export function ContentList({
     if (categoryFilter && getCategory(p) !== categoryFilter) return false;
     return true;
   });
+
+  const hasActiveFilters = productFilter || typeFilter || statusFilter || showArchived;
+
+  function clearFilters() {
+    setProductFilter("");
+    setTypeFilter("");
+    setStatusFilter("");
+    setShowArchived(false);
+  }
 
   async function handleStatusChange(pieceId: string, newStatus: string) {
     const result = await updateContentPieceStatus(
@@ -102,19 +124,35 @@ export function ContentList({
 
   return (
     <>
-      {/* Filters */}
-      <div className="mb-6 flex flex-wrap gap-3">
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
-        >
-          {categoryOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
+      {/* Row 1: Category tabs + count */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex gap-1 rounded-lg border border-zinc-800 bg-zinc-900/50 p-1">
+          {categoryTabs.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setCategoryFilter(tab.value)}
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                categoryFilter === tab.value
+                  ? "bg-white text-zinc-950"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              {tab.label}
+              {(categoryCounts[tab.value] ?? 0) > 0 && (
+                <span className={`ml-1.5 ${categoryFilter === tab.value ? "text-zinc-500" : "text-zinc-600"}`}>
+                  {categoryCounts[tab.value]}
+                </span>
+              )}
+            </button>
           ))}
-        </select>
+        </div>
+        <span className="text-sm text-zinc-500">
+          {filtered.length} piece{filtered.length === 1 ? "" : "s"}
+        </span>
+      </div>
+
+      {/* Row 2: Secondary filters */}
+      <div className="mb-6 flex flex-wrap items-center gap-3">
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
@@ -149,18 +187,28 @@ export function ContentList({
             </option>
           ))}
         </select>
-        <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-400">
-          <input
-            type="checkbox"
-            checked={showArchived}
-            onChange={(e) => setShowArchived(e.target.checked)}
-            className="rounded border-zinc-600 bg-zinc-800 text-indigo-500 focus:ring-indigo-500/30"
-          />
-          Show archived
-        </label>
-        <span className="flex items-center text-sm text-zinc-500">
-          {filtered.length} piece{filtered.length === 1 ? "" : "s"}
-        </span>
+        <button
+          onClick={() => setShowArchived(!showArchived)}
+          title={showArchived ? "Hide archived" : "Show archived"}
+          className={`rounded-lg border p-2 transition-colors ${
+            showArchived
+              ? "border-zinc-600 bg-zinc-800 text-zinc-300"
+              : "border-zinc-700 text-zinc-500 hover:text-zinc-300"
+          }`}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
+            <path fillRule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clipRule="evenodd" />
+          </svg>
+        </button>
+        {hasActiveFilters && (
+          <button
+            onClick={clearFilters}
+            className="text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
 
       {/* Content list */}

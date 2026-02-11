@@ -85,3 +85,39 @@ export async function updateProductStatus(productId: string, status: "active" | 
 
   return { success: true };
 }
+
+export async function deleteProduct(productId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Admin check — only admins can delete products
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin") {
+    return { error: "Only admins can delete products" };
+  }
+
+  // Delete the product — ON DELETE CASCADE handles campaigns, avatars,
+  // generations, content_pieces, links, and clicks automatically
+  const { error } = await supabase
+    .from("products")
+    .delete()
+    .eq("id", productId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
+}

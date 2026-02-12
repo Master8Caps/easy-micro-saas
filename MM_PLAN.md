@@ -52,6 +52,9 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 - [x] Vercel deployment (two projects — marketing + app)
 - [x] Git repo on GitHub (Master8Caps/micro-machine)
 
+### Data & Cache
+- [x] `revalidatePath` added to all mutating server actions (products, content) to fix stale data across page navigation
+
 ### Database & Auth
 - [x] Supabase project setup
 - [x] Database schema — 11 tables: profiles, products, generations, avatars, campaigns, content_pieces, links, clicks, customers, subscriptions, waitlist
@@ -117,6 +120,9 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 - [x] Content format preferences respected — brain prompt dynamically builds content types list from user's selected formats (text/images/video)
 - [x] Inline content preview on brain page (expandable)
 - [x] Copy-to-clipboard with "Copied!" feedback
+- [x] Fix: "Generate All" skips campaigns that already have content (no more duplicates)
+- [x] Fix: "Generate All" button shows dynamic label — "Generate Remaining (N)" when some done, "All Generated" when complete
+- [x] Fix: Single "Regenerate Content" replaces old pieces instead of appending duplicates (deletes then inserts)
 
 ### App — Campaigns Page
 - [x] Social / Email / Ads tab bar (Email and Ads tabs shown only when those campaigns exist)
@@ -147,6 +153,13 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 - [x] Product reactivate cascades: sets `archived=false` on all campaigns and content pieces
 - [x] Archive toggle button on each content piece (content page + campaign panel)
 - [x] Archive toggle is exclusive view — shows either active or archived content, not mixed
+- [x] Dashboard shows Active Products and Archived Products as separate sections
+- [x] Archived products styled dimmer but still visible and clickable on dashboard
+- [x] Campaigns page filters out archived campaigns (only shows active)
+- [x] Dashboard stats (products, campaigns, content) count only active/non-archived items
+- [x] Dedicated Archive page in sidebar nav — shows archived products with expandable campaign details
+- [x] Archive page: clickable campaigns open slide-over panel (reuses CampaignPanel) with content pieces
+- [x] Archive page: admin "Reactivate Product" button per product
 
 ### App — Product Delete (Admin Only)
 - [x] `deleteProduct()` server action with admin role check (server-side enforcement)
@@ -181,64 +194,48 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 
 ## Things to Test Now
 
-1. **Run migration 00005** — Run `00005_separate_archived_flag.sql` in Supabase SQL Editor. Verify:
-   - `archived` column exists on campaigns and content_pieces (defaults to false)
-   - Any previously archived content pieces are migrated (archived=true, status reverted to draft)
-   - content_pieces status constraint only allows draft/ready/published
-2. **Run migration 00006** — Run `00006_content_formats.sql` in Supabase SQL Editor. Verify:
-   - `content_formats` column exists on products (defaults to `{text,images,video}`)
-   - Any existing `video-hook` campaigns migrated to `video-script`
-   - CHECK constraints on campaigns and content_pieces no longer include `video-hook`
-3. **Archive cascade** — Archive a product from the brain page. Verify:
-   - All its campaigns get `archived=true` (status unchanged)
-   - All its content pieces get `archived=true` (status unchanged)
-   - Reactivating the product sets `archived=false` on campaigns and content
-3. **Content page archiving** — Verify:
-   - StatusSelect only shows Draft/Ready/Published (no Archived option)
-   - Archive icon toggle button appears on each content piece (replaces old checkbox)
-   - Clicking archive toggle shows the "Archived" badge next to the status
-   - Archived pieces hidden by default, visible when archive icon is toggled on
-   - A published piece can be archived and still shows "Published, Archived"
-4. **Campaign panel archiving** — Open a campaign slide-over, verify:
-   - Archive toggle + badge work on content pieces within the panel
-5. **New product with website + ads** — Create a product, enable website and ads on step 4, generate brain. Verify:
-   - Content format cards show on Step 4 with green checkmarks (all selected by default)
-   - Deselecting a format removes its checkmark, card style changes to unselected
-   - Cannot proceed with zero formats selected
-   - Social campaigns section populates with varied content types matching selected formats
-   - Ad campaigns section populates with retargeting + cold traffic angles
-   - Email Copy section populates with welcome emails (separate from Website Kit)
-   - Website kit section populates (landing page, meta desc, taglines — no emails)
-   - All sections load immediately (not empty on first generation)
-6. **Content format filtering** — Create products with different format selections:
-   - Text only: only text-post and thread campaigns generated (no image-prompt, no video-script)
-   - Text + Images: text and image campaigns, no video scripts
-   - All formats: full mix of content types
-   - Existing products unaffected (default `{text,images,video}`)
-7. **Content generation** — Click "Generate Content" on a social campaign, verify 2-3 pieces appear
-8. **Campaigns page** — Verify:
-   - Social / Email / Ads tabs display correctly (Email tab only when email campaigns exist)
-   - Email campaigns appear under Email tab, not Social
-   - Campaign count appears right-aligned next to tabs
-   - Filters scope correctly, slide-over panel opens
-9. **Content page** — Verify:
-   - Category pill tabs (All/Social/Email/Ads/Website) show with correct counts
-   - Email sequences appear under Email category, not Website
-   - Product, type, status dropdowns filter correctly
-   - "Clear filters" button appears when any filter is active
-   - Filtered piece count displays right-aligned on tab row
-   - Archive toggle shows exclusive view: active content by default, only archived when toggled
-   - No `video-hook` option in type filter dropdown
-10. **Admin: Delete product** — As admin on brain page:
-   - Red "Delete" button visible in header (not visible for non-admin)
-   - Clicking shows confirmation dialog with product name
-   - Cancel dismisses dialog, nothing deleted
-   - Confirm deletes product + all campaigns, content, avatars, generations
-   - Redirects to dashboard after deletion
-11. **Admin: Delete from dashboard** — As admin on dashboard:
-    - Trash icon visible on each product card (not visible for non-admin)
-    - Clicking shows confirmation dialog
-    - Confirm deletes product and refreshes the list
+1. **Dashboard layout** — Verify:
+   - "Active Products" section shows non-archived products with status pills
+   - "Archived Products" section appears below when archived products exist
+   - Archived product cards are visually dimmer but still clickable (link to brain page)
+   - When no active products exist, empty state with "Create Product" button shows
+   - Stats cards (Products, Campaigns, Content) count only active/non-archived items
+   - "New Product" button in header always visible
+2. **Archive cascade + revalidation** — Archive a product from the brain page. Verify:
+   - Product immediately moves to "Archived Products" section on dashboard (no flicker/stale data)
+   - All its campaigns disappear from the Campaigns page
+   - All its content pieces disappear from the Content page (active view)
+   - Product appears on the Archive page
+   - Reactivating from brain page or Archive page reverses all of the above without page refresh needed
+3. **Archive page** — Verify:
+   - Archive page accessible from sidebar nav
+   - Shows archived products with campaign + content piece counts
+   - Clicking a product expands to show its archived campaigns
+   - Admin "Reactivate Product" button visible (not for non-admin)
+   - Reactivating removes the product from Archive page, returns it to dashboard
+4. **Archive page — campaign panel** — Verify:
+   - Clicking an archived campaign opens the slide-over panel (same as Campaigns page)
+   - Panel loads and displays content pieces for that campaign
+   - Generate/regenerate content button works (admin only)
+   - Status select, archive toggle, copy button all work on content pieces
+   - Close button / backdrop click / Escape key dismiss the panel
+5. **Generate All — no duplicates** — On a brain page with some campaigns that already have content:
+   - Button shows "Generate Remaining Social Content (N)" with count of campaigns without content
+   - Clicking only generates for campaigns that don't have content yet
+   - Campaigns that already have content are untouched
+   - When all campaigns have content, button shows "All Social Content Generated" and is disabled
+   - Same behavior for "Generate All Ad Creatives"
+6. **Regenerate Content — replaces** — On a campaign that already has content:
+   - Click "Regenerate Content" on an individual campaign card
+   - Old content pieces are replaced (not duplicated)
+   - Content page shows the new pieces, not old + new
+7. **Campaigns page** — Verify:
+   - Only non-archived campaigns appear
+   - Content piece counts per campaign exclude archived pieces
+   - Tabs, filters, and slide-over panel all work correctly
+8. **Content page** — Verify:
+   - Archive toggle shows exclusive view (active by default, archived when toggled)
+   - Status changes and archive toggles take effect without needing manual page refresh
 
 ---
 
@@ -265,7 +262,6 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 - [ ] Weekly digest emails (Resend/Postmark integration)
 
 ### Polish / UX
-- [ ] Dashboard: filter to show/hide archived products
 - [ ] Brain page: edit avatars inline (refine pain points, channels)
 - [ ] Content page: bulk status change (select multiple → mark as published)
 - [ ] Website kit: structured editing (edit headline, benefits individually instead of raw text)
@@ -320,3 +316,9 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 | 2026-02-11 | Email Copy separated from Website Kit on brain page | Email sequences are a distinct deliverable, not part of the website kit section |
 | 2026-02-11 | Video-hook removed, consolidated to video-script | Video scripts already include a hook — separate video-hook type was redundant |
 | 2026-02-11 | Content format preferences at intake | Users choose text/images/video at product creation; brain prompt respects selection; default all selected |
+| 2026-02-12 | revalidatePath on all mutations | Server actions must invalidate Next.js cache to prevent stale data across page navigation |
+| 2026-02-12 | Generate All skips existing content | Bulk generation only targets campaigns without content; prevents duplicate pieces |
+| 2026-02-12 | Regenerate replaces, not appends | Single campaign regeneration deletes old pieces first; clean replacement instead of accumulation |
+| 2026-02-12 | Dashboard shows active + archived sections | Archived products remain visible on dashboard in a dimmer "Archived Products" section |
+| 2026-02-12 | Dedicated Archive page with drill-down | Sidebar nav item; expandable product cards with campaign details and slide-over panel for content |
+| 2026-02-12 | Archive page reuses CampaignPanel | Consistent UX — clicking a campaign anywhere opens the same slide-over with content pieces |

@@ -13,7 +13,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Dashboard",
+  title: "Micro Machine",
   description: "Your go-to-market engine.",
 };
 

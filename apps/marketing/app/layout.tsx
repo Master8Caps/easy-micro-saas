@@ -13,7 +13,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Your Go-To-Market Engine",
+  title: "Micro Machine — Your Go-To-Market Engine",
   description:
     "Turn a product brief into targeted campaigns, content, and tracking. Find your first 100 users faster.",
 };

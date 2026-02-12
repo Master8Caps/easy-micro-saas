@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
+import { createTrackedLink } from "./links";
 
 const anthropic = new Anthropic();
 
@@ -135,7 +136,7 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
   // Fetch campaign
   const { data: campaign } = await supabase
     .from("campaigns")
-    .select("id, avatar_id, angle, channel, hook, content_type")
+    .select("id, avatar_id, angle, channel, hook, content_type, category, destination_url")
     .eq("id", input.campaignId)
     .single();
 
@@ -153,7 +154,7 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
   // Fetch product
   const { data: product } = await supabase
     .from("products")
-    .select("name, description, market")
+    .select("name, description, market, website_url")
     .eq("id", input.productId)
     .single();
 
@@ -215,6 +216,25 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
 
     if (insertError) return { error: insertError.message };
 
+    // Auto-generate tracked links if destination URL is available
+    const destinationUrl = campaign.destination_url || product.website_url;
+    if (destinationUrl && savedPieces) {
+      await Promise.allSettled(
+        savedPieces.map((piece) =>
+          createTrackedLink({
+            productId: input.productId,
+            campaignId: input.campaignId,
+            contentPieceId: piece.id,
+            destinationUrl,
+            channel: campaign.channel,
+            category: campaign.category ?? "social",
+            angle: campaign.angle,
+            contentTitle: piece.title ?? "",
+          }),
+        ),
+      );
+    }
+
     revalidatePath("/content");
 
     return { pieces: savedPieces ?? [] };
@@ -269,7 +289,7 @@ export async function loadContentForCampaign(campaignId: string) {
 
   const { data, error } = await supabase
     .from("content_pieces")
-    .select("id, type, title, body, metadata, status, archived, created_at")
+    .select("id, type, title, body, metadata, status, archived, created_at, links(id, slug, click_count)")
     .eq("campaign_id", campaignId)
     .order("created_at", { ascending: false });
 

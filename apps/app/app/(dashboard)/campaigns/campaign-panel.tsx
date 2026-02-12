@@ -10,6 +10,13 @@ import {
   updateContentPieceStatus,
   toggleContentPieceArchived,
 } from "@/server/actions/content";
+import { updateCampaignDestinationUrl } from "@/server/actions/links";
+
+interface TrackedLink {
+  id: string;
+  slug: string;
+  click_count: number;
+}
 
 interface ContentPiece {
   id: string;
@@ -20,6 +27,7 @@ interface ContentPiece {
   status: string;
   archived: boolean;
   created_at: string;
+  links?: TrackedLink[];
 }
 
 interface CampaignPanelProps {
@@ -31,6 +39,7 @@ interface CampaignPanelProps {
     hook: string;
     content_type: string;
     status: string;
+    destination_url?: string | null;
     products: { name: string } | null;
     avatars: { name: string } | null;
   };
@@ -43,6 +52,20 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [expandedPieceId, setExpandedPieceId] = useState<string | null>(null);
+  const [destUrl, setDestUrl] = useState(campaign.destination_url ?? "");
+  const [editingUrl, setEditingUrl] = useState(false);
+  const [savingUrl, setSavingUrl] = useState(false);
+
+  const baseUrl = typeof window !== "undefined"
+    ? window.location.origin
+    : process.env.NEXT_PUBLIC_APP_URL || "";
+
+  const handleSaveUrl = useCallback(async () => {
+    setSavingUrl(true);
+    const result = await updateCampaignDestinationUrl(campaign.id, destUrl);
+    if (result.success) setEditingUrl(false);
+    setSavingUrl(false);
+  }, [campaign.id, destUrl]);
 
   useEffect(() => {
     async function load() {
@@ -129,6 +152,51 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
             <p className="mt-1 text-sm italic text-zinc-400">
               &ldquo;{campaign.hook}&rdquo;
             </p>
+
+            {/* Destination URL */}
+            <div className="mt-3 border-t border-zinc-800 pt-3">
+              <p className="mb-1 text-xs font-medium text-zinc-500">Destination URL</p>
+              {editingUrl ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="url"
+                    value={destUrl}
+                    onChange={(e) => setDestUrl(e.target.value)}
+                    placeholder="https://yoursite.com/page"
+                    className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-zinc-500 focus:outline-none"
+                  />
+                  <button
+                    onClick={handleSaveUrl}
+                    disabled={savingUrl}
+                    className="rounded-md bg-indigo-500/20 px-3 py-1.5 text-xs font-medium text-indigo-300 transition-colors hover:bg-indigo-500/30 disabled:opacity-50"
+                  >
+                    {savingUrl ? "..." : "Save"}
+                  </button>
+                  <button
+                    onClick={() => { setEditingUrl(false); setDestUrl(campaign.destination_url ?? ""); }}
+                    className="rounded-md px-2 py-1.5 text-xs text-zinc-500 hover:text-zinc-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {destUrl ? (
+                    <span className="truncate text-sm text-blue-400">{destUrl}</span>
+                  ) : (
+                    <span className="text-sm text-zinc-600">Not set (uses product URL)</span>
+                  )}
+                  <button
+                    onClick={() => setEditingUrl(true)}
+                    className="shrink-0 rounded-md p-1 text-zinc-500 transition-colors hover:text-zinc-300"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -257,6 +325,22 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                     {/* Expanded body */}
                     {isExpanded && (
                       <div className="border-t border-zinc-800 px-5 pb-5 pt-4">
+                        {/* Tracked link */}
+                        {piece.links && piece.links.length > 0 && (
+                          <div className="mb-3 flex items-center gap-2 rounded-md bg-zinc-800/50 px-3 py-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-blue-400">
+                              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                            </svg>
+                            <span className="min-w-0 flex-1 truncate font-mono text-xs text-blue-400">
+                              {baseUrl}/r/{piece.links[0].slug}
+                            </span>
+                            <span className="shrink-0 text-xs text-zinc-500">
+                              {piece.links[0].click_count} click{piece.links[0].click_count === 1 ? "" : "s"}
+                            </span>
+                            <CopyButton text={`${baseUrl}/r/${piece.links[0].slug}`} />
+                          </div>
+                        )}
                         <div className="flex justify-end mb-2">
                           <CopyButton text={piece.body} />
                         </div>

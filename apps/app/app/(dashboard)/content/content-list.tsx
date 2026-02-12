@@ -5,6 +5,12 @@ import { ChannelPill, TypePill, StatusSelect, ArchivedBadge, ArchiveToggle } fro
 import { CopyButton } from "@/components/copy-button";
 import { updateContentPieceStatus, toggleContentPieceArchived } from "@/server/actions/content";
 
+interface TrackedLink {
+  id: string;
+  slug: string;
+  click_count: number;
+}
+
 interface ContentPieceRow {
   id: string;
   product_id: string;
@@ -18,6 +24,7 @@ interface ContentPieceRow {
   created_at: string;
   products: { name: string } | null;
   campaigns: { angle: string; channel: string; category?: string } | null;
+  links?: TrackedLink[];
 }
 
 const typeOptions = [
@@ -90,6 +97,10 @@ export function ContentList({
     if (categoryFilter && getCategory(p) !== categoryFilter) return false;
     return true;
   });
+
+  const baseUrl = typeof window !== "undefined"
+    ? window.location.origin
+    : process.env.NEXT_PUBLIC_APP_URL || "";
 
   const hasActiveFilters = productFilter || typeFilter || statusFilter || showArchived;
 
@@ -257,6 +268,23 @@ export function ContentList({
                   />
                 </div>
               </div>
+
+              {/* Tracked link */}
+              {piece.links && piece.links.length > 0 && (
+                <div className="mt-2 flex items-center gap-2 rounded-md bg-zinc-800/50 px-3 py-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-blue-400">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                  </svg>
+                  <span className="min-w-0 flex-1 truncate font-mono text-xs text-blue-400">
+                    {baseUrl}/r/{piece.links[0].slug}
+                  </span>
+                  <span className="shrink-0 text-xs text-zinc-500">
+                    {piece.links[0].click_count} click{piece.links[0].click_count === 1 ? "" : "s"}
+                  </span>
+                  <CopyButton text={`${baseUrl}/r/${piece.links[0].slug}`} />
+                </div>
+              )}
 
               {/* Body preview / expand */}
               <button

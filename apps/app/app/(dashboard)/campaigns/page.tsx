@@ -7,7 +7,7 @@ export default async function CampaignsPage() {
   const { data: campaigns } = await supabase
     .from("campaigns")
     .select(
-      "id, product_id, angle, channel, hook, content_type, status, category, created_at, products(name), avatars(name)",
+      "id, product_id, angle, channel, hook, content_type, status, category, destination_url, created_at, products(name), avatars(name)",
     )
     .eq("archived", false)
     .order("created_at", { ascending: false });

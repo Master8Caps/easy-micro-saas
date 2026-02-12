@@ -84,7 +84,7 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 - [x] Product list with StatusPill (green active, amber draft, gray archived)
 - [x] Campaigns page (placeholder → real data)
 - [x] Content page (placeholder → real data)
-- [x] Analytics page (placeholder — "coming soon")
+- [x] Analytics page — real dashboard with summary cards, 30-day chart, top links, clicks by channel
 
 ### App — Product Intake
 - [x] 4-step intake form: product basics, goals, channels, extras
@@ -179,6 +179,22 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 - [x] Status dropdown (StatusSelect): available to all users
 - [x] Non-admin users see "Generated" badge instead of regenerate buttons
 
+### App — Link Tracking & Analytics
+- [x] Campaign destination URL — per-campaign URL field with product website_url fallback
+- [x] Migration 00007: `destination_url` column on campaigns table
+- [x] Tracked link generation — auto-creates unique `/r/{slug}` redirect links when content is generated (if destination URL exists)
+- [x] nanoid slug generation (8-char lowercase alphanumeric)
+- [x] Auto UTM parameters — utm_source (channel), utm_medium (category), utm_campaign (angle), utm_content (title)
+- [x] Redirect endpoint `/r/[slug]` — looks up link in DB, logs click (user agent, referer, IP hash, country, device type), appends UTM params, 302 redirects
+- [x] Service role Supabase client for click logging (bypasses RLS per schema design)
+- [x] Click counter auto-increment via existing DB trigger (clicks insert → links.click_count++)
+- [x] Destination URL input on campaign panel (inline edit with save/cancel)
+- [x] Tracked link display on content pieces — both campaign panel and content page (blue mono link + click count + copy button)
+- [x] "Tracked" badge on campaign cards when destination URL is set
+- [x] Analytics dashboard — summary cards (total clicks, 7-day, 30-day, active links), 30-day bar chart, top 10 links table, clicks by channel with progress bars
+- [x] Analytics product filter dropdown
+- [x] Content page query includes links data via Supabase FK join
+
 ### App — UI Components
 - [x] `ChannelPill` — platform-colored (LinkedIn, X, Reddit, Product Hunt, Indie Hackers, Email, Blog, Meta, Google, TikTok, LinkedIn Ads)
 - [x] `TypePill` — indigo tint, format-specific labels (Text Post, Thread, Video Script, Image Post, Landing Page, Email Sequence, Meta Description, Tagline, etc.)
@@ -194,48 +210,46 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 
 ## Things to Test Now
 
-1. **Dashboard layout** — Verify:
-   - "Active Products" section shows non-archived products with status pills
-   - "Archived Products" section appears below when archived products exist
-   - Archived product cards are visually dimmer but still clickable (link to brain page)
-   - When no active products exist, empty state with "Create Product" button shows
-   - Stats cards (Products, Campaigns, Content) count only active/non-archived items
-   - "New Product" button in header always visible
-2. **Archive cascade + revalidation** — Archive a product from the brain page. Verify:
-   - Product immediately moves to "Archived Products" section on dashboard (no flicker/stale data)
-   - All its campaigns disappear from the Campaigns page
-   - All its content pieces disappear from the Content page (active view)
-   - Product appears on the Archive page
-   - Reactivating from brain page or Archive page reverses all of the above without page refresh needed
-3. **Archive page** — Verify:
-   - Archive page accessible from sidebar nav
-   - Shows archived products with campaign + content piece counts
-   - Clicking a product expands to show its archived campaigns
-   - Admin "Reactivate Product" button visible (not for non-admin)
-   - Reactivating removes the product from Archive page, returns it to dashboard
-4. **Archive page — campaign panel** — Verify:
-   - Clicking an archived campaign opens the slide-over panel (same as Campaigns page)
-   - Panel loads and displays content pieces for that campaign
-   - Generate/regenerate content button works (admin only)
-   - Status select, archive toggle, copy button all work on content pieces
-   - Close button / backdrop click / Escape key dismiss the panel
-5. **Generate All — no duplicates** — On a brain page with some campaigns that already have content:
-   - Button shows "Generate Remaining Social Content (N)" with count of campaigns without content
-   - Clicking only generates for campaigns that don't have content yet
-   - Campaigns that already have content are untouched
-   - When all campaigns have content, button shows "All Social Content Generated" and is disabled
-   - Same behavior for "Generate All Ad Creatives"
-6. **Regenerate Content — replaces** — On a campaign that already has content:
-   - Click "Regenerate Content" on an individual campaign card
-   - Old content pieces are replaced (not duplicated)
-   - Content page shows the new pieces, not old + new
-7. **Campaigns page** — Verify:
-   - Only non-archived campaigns appear
-   - Content piece counts per campaign exclude archived pieces
-   - Tabs, filters, and slide-over panel all work correctly
-8. **Content page** — Verify:
-   - Archive toggle shows exclusive view (active by default, archived when toggled)
-   - Status changes and archive toggles take effect without needing manual page refresh
+> **Pre-requisite:** Run migration `00007_campaign_destination_url.sql` in Supabase SQL editor before testing.
+
+1. **Campaign destination URL** — Open a campaign in the slide-over panel. Verify:
+   - A "Destination URL" section appears below the hook in the panel header
+   - Shows "Not set (uses product URL)" when empty, with a pencil edit icon
+   - Clicking edit shows an input field with Save/Cancel buttons
+   - Entering a URL and saving persists it (close and reopen panel to confirm)
+   - Clearing the URL and saving resets to "Not set" state
+   - Campaigns page cards show a small blue "Tracked" badge when destination URL is set
+2. **Tracked link auto-generation** — Set a destination URL on a campaign, then generate content. Verify:
+   - After generation completes, each content piece has a tracked link shown (blue monospace `/r/xxxxx` format)
+   - Links display a click count (should be 0 for new links)
+   - Copy button next to the tracked link copies the full URL to clipboard
+   - The tracked link appears both in the campaign panel (expanded piece) and on the Content page
+3. **Tracked link fallback** — On a product that has a `website_url` set but a campaign with NO destination URL:
+   - Generate content for that campaign
+   - Tracked links should still be created using the product's website URL as the destination
+4. **No destination URL** — On a campaign with no destination URL and a product with no website URL:
+   - Generate content for that campaign
+   - No tracked links should appear (no errors, content generation works normally)
+5. **Redirect endpoint** — Copy a tracked link and open it in a new browser tab. Verify:
+   - You are redirected to the destination URL
+   - The destination URL has UTM parameters appended (utm_source, utm_medium, utm_campaign, utm_content)
+   - After clicking, go back to the content piece — click count should increment
+6. **Analytics page** — Navigate to Analytics in the sidebar. Verify:
+   - Summary cards show: Total Clicks, Last 7 Days, Last 30 Days, Active Links
+   - If no links exist, shows an empty state message
+   - If links exist with clicks, the 30-day bar chart renders
+   - Top Performing Links table shows links sorted by click count with copy buttons
+   - Clicks by Channel section shows a breakdown with progress bars
+   - Product filter dropdown filters all data to a specific product
+7. **Content page — tracked links** — On the Content page, verify:
+   - Content pieces with tracked links show the link row (blue link + click count + copy button)
+   - Content pieces without tracked links show no link row (no empty/broken state)
+   - Links data loads correctly across category filters (Social/Email/Ads/Website tabs)
+8. **Existing features still work** — Quick smoke test:
+   - Dashboard loads with Active/Archived sections
+   - Campaign panel generate/regenerate still works
+   - Content status changes and archive toggles still work
+   - Archive page still loads and works
 
 ---
 
@@ -244,21 +258,18 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 ### Immediate (High Priority)
 - [ ] Stripe integration — billing, subscription plans, webhook handler
 - [ ] Usage limits by role (free: X products/generations, paid: unlimited)
-- [ ] Analytics page — click tracking dashboard (currently placeholder)
+- [ ] Content calendar view (weekly view of what to post and where)
 
 ### Short Term
-- [ ] Connect redirect endpoint to database (replace console logging with real click tracking)
-- [ ] Link generation with automatic UTMs per content piece
-- [ ] Content calendar view (weekly view of what to post and where)
 - [ ] "Mark as posted" tracking on content pieces
 - [ ] Performance scoring model (by avatar, angle, channel)
 - [ ] Weekly performance summary / digest
+- [ ] Assisted posting workflow (copy + reminders)
 
 ### Medium Term
 - [ ] Self-learning algorithm — feed winning patterns back into content generation
 - [ ] Regeneration logic based on top-performing content
 - [ ] pgvector embeddings for semantic content similarity
-- [ ] Assisted posting workflow (copy + reminders)
 - [ ] Weekly digest emails (Resend/Postmark integration)
 
 ### Polish / UX
@@ -280,6 +291,7 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 | 00004 | `00004_content_workstreams.sql` | Content workstreams — has_website, wants_ads, campaign categories, expanded content types | Applied |
 | 00005 | `00005_separate_archived_flag.sql` | Separate archived from status — archived boolean on campaigns + content_pieces | Applied |
 | 00006 | `00006_content_formats.sql` | Content format preferences + remove video-hook — content_formats column on products, migrate video-hook→video-script, update constraints | Applied |
+| 00007 | `00007_campaign_destination_url.sql` | Campaign destination URL — destination_url column on campaigns for tracked link generation | Pending |
 
 ---
 
@@ -322,3 +334,10 @@ Micro Machine is an internal-first SaaS product that turns a simple product brie
 | 2026-02-12 | Dashboard shows active + archived sections | Archived products remain visible on dashboard in a dimmer "Archived Products" section |
 | 2026-02-12 | Dedicated Archive page with drill-down | Sidebar nav item; expandable product cards with campaign details and slide-over panel for content |
 | 2026-02-12 | Archive page reuses CampaignPanel | Consistent UX — clicking a campaign anywhere opens the same slide-over with content pieces |
+| 2026-02-12 | Per-campaign destination URLs with product fallback | Each campaign can have its own landing page; falls back to product website_url when not set |
+| 2026-02-12 | Tracked links separate from AI content body | Links displayed as copyable UI element, not embedded in generated text — works for all content types, user places link where they want |
+| 2026-02-12 | Auto-generate tracked links on content generation | Links created automatically when content is generated (if destination URL available) — no manual step |
+| 2026-02-12 | nanoid 8-char slugs for tracked links | Short, clean, collision-resistant; lowercase alphanumeric only |
+| 2026-02-12 | Service role client for click logging | Clicks table has no client-side insert RLS policy by design; service role key bypasses RLS for server-side click inserts |
+| 2026-02-12 | Privacy-safe click logging | IP addresses hashed (SHA-256 truncated); country from Vercel header; no PII stored |
+| 2026-02-12 | No charting library for v1 analytics | CSS-based bar chart + data tables; keeps bundle small, avoids dependency for simple v1 |

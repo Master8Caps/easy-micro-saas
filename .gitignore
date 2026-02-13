@@ -28,6 +28,14 @@ dist
 # OS
 .DS_Store
 Thumbs.db
+nul
+
+# Internal
+MM_PLAN.md
+.claude/
+
+# Database migrations
+supabase/migrations/
 
 # Debug logs
 npm-debug.log*

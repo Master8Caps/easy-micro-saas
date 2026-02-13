@@ -8,16 +8,6 @@ function getDeviceType(ua: string): string {
   return "desktop";
 }
 
-function appendUtmParams(url: string, link: Record<string, string>): string {
-  const parsed = new URL(url);
-  if (link.utm_source) parsed.searchParams.set("utm_source", link.utm_source);
-  if (link.utm_medium) parsed.searchParams.set("utm_medium", link.utm_medium);
-  if (link.utm_campaign) parsed.searchParams.set("utm_campaign", link.utm_campaign);
-  if (link.utm_content) parsed.searchParams.set("utm_content", link.utm_content);
-  if (link.utm_term) parsed.searchParams.set("utm_term", link.utm_term);
-  return parsed.toString();
-}
-
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
@@ -28,7 +18,7 @@ export async function GET(
   // Look up the link
   const { data: link, error } = await supabase
     .from("links")
-    .select("id, destination_url, utm_source, utm_medium, utm_campaign, utm_content, utm_term")
+    .select("id, destination_url")
     .eq("slug", slug)
     .single();
 
@@ -55,8 +45,5 @@ export async function GET(
     device_type: deviceType,
   }).then(() => {});
 
-  // Build destination with UTM params
-  const destination = appendUtmParams(link.destination_url, link);
-
-  return NextResponse.redirect(destination, 302);
+  return NextResponse.redirect(link.destination_url, 302);
 }

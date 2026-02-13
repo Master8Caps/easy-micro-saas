@@ -143,7 +143,7 @@ export function ContentList({
     <>
       {/* Row 1: Category tabs + count */}
       <div className="mb-4 flex items-center justify-between">
-        <div className="flex gap-1 rounded-lg border border-zinc-800 bg-zinc-900/50 p-1">
+        <div className="flex gap-1 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1">
           {categoryTabs.map((tab) => (
             <button
               key={tab.value}
@@ -173,7 +173,7 @@ export function ContentList({
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
         >
           <option value="">All products</option>
           {products.map((p) => (
@@ -185,7 +185,7 @@ export function ContentList({
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
         >
           {typeOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -196,7 +196,7 @@ export function ContentList({
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
         >
           {statusOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -209,8 +209,8 @@ export function ContentList({
           title={showArchived ? "View active content" : "View archived"}
           className={`rounded-lg border p-2 transition-colors ${
             showArchived
-              ? "border-zinc-600 bg-zinc-800 text-zinc-300"
-              : "border-zinc-700 text-zinc-500 hover:text-zinc-300"
+              ? "border-white/[0.1] bg-white/[0.05] text-zinc-300"
+              : "border-white/[0.06] text-zinc-500 hover:text-zinc-300"
           }`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -236,7 +236,7 @@ export function ContentList({
           return (
             <div
               key={piece.id}
-              className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6"
+              className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6"
             >
               {/* Product name at top */}
               {piece.products && (
@@ -278,12 +278,12 @@ export function ContentList({
 
               {/* Tracked link */}
               {piece.links && piece.links.length > 0 && (
-                <div className="mt-2 flex items-center gap-2 rounded-md bg-zinc-800/50 px-3 py-1.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-blue-400">
+                <div className="mt-2 flex items-center gap-2 rounded-md bg-white/[0.03] px-3 py-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-indigo-400">
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
                   </svg>
-                  <span className="min-w-0 flex-1 truncate font-mono text-xs text-blue-400">
+                  <span className="min-w-0 flex-1 truncate font-mono text-xs text-indigo-400">
                     {baseUrl}/r/{piece.links[0].slug}
                   </span>
                   <span className="shrink-0 text-xs text-zinc-500">

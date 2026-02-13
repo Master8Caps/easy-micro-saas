@@ -109,7 +109,7 @@ export function AnalyticsDashboard({
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
         >
           <option value="">All products</option>
           {products.map((p) => (
@@ -121,9 +121,9 @@ export function AnalyticsDashboard({
       </div>
 
       {!hasData ? (
-        <div className="rounded-xl border border-dashed border-zinc-700 p-12 text-center">
+        <div className="rounded-xl border border-dashed border-white/[0.08] p-12 text-center">
           <h2 className="text-lg font-semibold">No tracked links yet</h2>
-          <p className="mt-2 text-zinc-400">
+          <p className="mt-2 text-sm text-zinc-500">
             Set a destination URL on a campaign and generate content to create
             tracked links. Analytics will appear here once links are clicked.
           </p>
@@ -139,7 +139,7 @@ export function AnalyticsDashboard({
           </div>
 
           {/* Daily clicks chart */}
-          <div className="mb-8 rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+          <div className="mb-8 rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
             <h3 className="mb-4 text-sm font-medium text-zinc-400">
               Clicks — Last 30 Days
             </h3>
@@ -151,7 +151,7 @@ export function AnalyticsDashboard({
                   title={`${day.date}: ${day.count} click${day.count === 1 ? "" : "s"}`}
                 >
                   <div
-                    className="w-full rounded-t bg-blue-500/60 transition-colors group-hover:bg-blue-400/80"
+                    className="w-full rounded-t bg-indigo-500/60 transition-colors group-hover:bg-indigo-400/80"
                     style={{
                       height: `${Math.max((day.count / maxDailyClicks) * 100, day.count > 0 ? 4 : 0)}%`,
                       minHeight: day.count > 0 ? "4px" : "0px",
@@ -169,7 +169,7 @@ export function AnalyticsDashboard({
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Top links table */}
             <div className="lg:col-span-2">
-              <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
                 <h3 className="mb-4 text-sm font-medium text-zinc-400">
                   Top Performing Links
                 </h3>
@@ -177,7 +177,7 @@ export function AnalyticsDashboard({
                   {filteredLinks.slice(0, 10).map((link) => (
                     <div
                       key={link.id}
-                      className="flex items-center gap-3 rounded-lg bg-zinc-800/30 px-4 py-3"
+                      className="flex items-center gap-3 rounded-lg bg-white/[0.03] px-4 py-3"
                     >
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-zinc-200">
@@ -186,7 +186,7 @@ export function AnalyticsDashboard({
                             "Untitled"}
                         </p>
                         <div className="mt-1 flex items-center gap-2">
-                          <span className="font-mono text-xs text-blue-400">
+                          <span className="font-mono text-xs text-indigo-400">
                             /r/{link.slug}
                           </span>
                           {link.products && (
@@ -195,7 +195,7 @@ export function AnalyticsDashboard({
                             </span>
                           )}
                           {link.campaigns?.channel && (
-                            <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-zinc-500">
+                            <span className="rounded bg-white/[0.05] px-1.5 py-0.5 text-xs text-zinc-500">
                               {link.campaigns.channel}
                             </span>
                           )}
@@ -215,7 +215,7 @@ export function AnalyticsDashboard({
 
             {/* Clicks by channel */}
             <div>
-              <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
                 <h3 className="mb-4 text-sm font-medium text-zinc-400">
                   Clicks by Channel
                 </h3>
@@ -236,9 +236,9 @@ export function AnalyticsDashboard({
                               {count} ({pct}%)
                             </span>
                           </div>
-                          <div className="h-2 w-full rounded-full bg-zinc-800">
+                          <div className="h-2 w-full rounded-full bg-white/[0.06]">
                             <div
-                              className="h-2 rounded-full bg-blue-500/60"
+                              className="h-2 rounded-full bg-indigo-500/60"
                               style={{ width: `${pct}%` }}
                             />
                           </div>
@@ -266,9 +266,9 @@ function SummaryCard({
   value: number;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
-      <p className="text-xs font-medium text-zinc-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold tabular-nums">{value.toLocaleString()}</p>
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+      <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">{label}</p>
+      <p className="mt-2 text-2xl font-bold tabular-nums">{value.toLocaleString()}</p>
     </div>
   );
 }

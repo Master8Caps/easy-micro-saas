@@ -41,8 +41,8 @@ export default async function AnalyticsPage() {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">Analytics</h1>
-        <p className="mt-1 text-zinc-400">
+        <h1 className="text-2xl font-bold tracking-tight">Analytics</h1>
+        <p className="mt-1 text-sm text-zinc-500">
           Track clicks, engagement, and performance across campaigns.
         </p>
       </div>

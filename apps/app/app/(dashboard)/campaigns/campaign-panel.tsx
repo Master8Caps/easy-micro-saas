@@ -130,9 +130,9 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
       />
 
       {/* Panel */}
-      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-2xl flex-col border-l border-zinc-800 bg-zinc-950 shadow-2xl">
+      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-2xl flex-col border-l border-white/[0.06] bg-zinc-950 shadow-2xl">
         {/* Panel header */}
-        <div className="flex items-start justify-between border-b border-zinc-800 p-6">
+        <div className="flex items-start justify-between border-b border-white/[0.06] p-6">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <ChannelPill channel={campaign.channel} />
@@ -154,7 +154,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
             </p>
 
             {/* Destination URL */}
-            <div className="mt-3 border-t border-zinc-800 pt-3">
+            <div className="mt-3 border-t border-white/[0.06] pt-3">
               <p className="mb-1 text-xs font-medium text-zinc-500">Destination URL</p>
               {editingUrl ? (
                 <div className="flex items-center gap-2">
@@ -163,7 +163,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                     value={destUrl}
                     onChange={(e) => setDestUrl(e.target.value)}
                     placeholder="https://yoursite.com/page"
-                    className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-zinc-500 focus:outline-none"
+                    className="flex-1 rounded-md border border-white/[0.06] bg-white/[0.03] px-2.5 py-1.5 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-indigo-500/50 focus:outline-none"
                   />
                   <button
                     onClick={handleSaveUrl}
@@ -182,7 +182,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
               ) : (
                 <div className="flex items-center gap-2">
                   {destUrl ? (
-                    <span className="truncate rounded-md bg-zinc-800/50 px-3 py-1.5 font-mono text-xs text-blue-400">{destUrl}</span>
+                    <span className="truncate rounded-md bg-white/[0.03] px-3 py-1.5 font-mono text-xs text-indigo-400">{destUrl}</span>
                   ) : (
                     <span className="text-sm text-zinc-600">Not set (uses product URL)</span>
                   )}
@@ -200,7 +200,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
           </div>
           <button
             onClick={onClose}
-            className="ml-4 rounded-lg p-2 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+            className="ml-4 rounded-lg p-2 text-zinc-400 transition-colors hover:bg-white/[0.05] hover:text-zinc-200"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -253,13 +253,13 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
           {/* Loading state */}
           {loading && (
             <div className="flex justify-center py-12">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-700 border-t-white" />
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
             </div>
           )}
 
           {/* Empty state */}
           {!loading && !hasContent && (
-            <div className="rounded-xl border border-dashed border-zinc-700 p-8 text-center">
+            <div className="rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
               <p className="text-sm text-zinc-500">
                 {isAdmin
                   ? "No content generated yet. Click the button above to generate."
@@ -277,14 +277,14 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                 return (
                   <div
                     key={piece.id}
-                    className="rounded-xl border border-zinc-800 bg-zinc-900/50"
+                    className="rounded-xl border border-white/[0.06] bg-white/[0.02]"
                   >
                     {/* Compact header — always visible */}
                     <button
                       onClick={() =>
                         setExpandedPieceId(isExpanded ? null : piece.id)
                       }
-                      className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-zinc-800/30"
+                      className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-white/[0.03]"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -324,15 +324,15 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
 
                     {/* Expanded body */}
                     {isExpanded && (
-                      <div className="border-t border-zinc-800 px-5 pb-5 pt-4">
+                      <div className="border-t border-white/[0.06] px-5 pb-5 pt-4">
                         {/* Tracked link */}
                         {piece.links && piece.links.length > 0 && (
-                          <div className="mb-3 flex items-center gap-2 rounded-md bg-zinc-800/50 px-3 py-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-blue-400">
+                          <div className="mb-3 flex items-center gap-2 rounded-md bg-white/[0.03] px-3 py-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-indigo-400">
                               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
                               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
                             </svg>
-                            <span className="min-w-0 flex-1 truncate font-mono text-xs text-blue-400">
+                            <span className="min-w-0 flex-1 truncate font-mono text-xs text-indigo-400">
                               {baseUrl}/r/{piece.links[0].slug}
                             </span>
                             <span className="shrink-0 text-xs text-zinc-500">
@@ -348,7 +348,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                           {piece.body}
                         </p>
                         {piece.metadata?.notes && (
-                          <p className="mt-3 border-t border-zinc-800 pt-3 text-xs text-zinc-500">
+                          <p className="mt-3 border-t border-white/[0.06] pt-3 text-xs text-zinc-500">
                             <strong className="text-zinc-400">Notes:</strong>{" "}
                             {piece.metadata.notes}
                           </p>

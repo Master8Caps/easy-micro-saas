@@ -68,7 +68,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
       {/* Tabs + count */}
       <div className="mb-4 flex items-center justify-between">
         {(hasAds || hasEmail) ? (
-          <div className="flex gap-1 rounded-lg border border-zinc-800 bg-zinc-900/50 p-1">
+          <div className="flex gap-1 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1">
             <button
               onClick={() => { setActiveTab("social"); setProductFilter(""); setChannelFilter(""); }}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -126,7 +126,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
         >
           <option value="">All products</option>
           {products.map(([id, name]) => (
@@ -138,7 +138,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
         <select
           value={channelFilter}
           onChange={(e) => setChannelFilter(e.target.value)}
-          className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
         >
           <option value="">All {activeTab === "ad" ? "platforms" : "channels"}</option>
           {channels.map((ch) => (
@@ -158,7 +158,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
             <button
               key={campaign.id}
               onClick={() => setSelectedCampaign(campaign)}
-              className="block w-full rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 text-left transition-colors hover:border-zinc-700 hover:bg-zinc-900"
+              className="block w-full rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 text-left transition-all hover:border-white/[0.1] hover:bg-white/[0.03]"
             >
               {/* Product name prominently at top */}
               {campaign.products && (
@@ -189,7 +189,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
                   </span>
                 )}
                 {campaign.destination_url && (
-                  <span className="flex items-center gap-1 text-xs text-blue-400/70">
+                  <span className="flex items-center gap-1 text-xs text-indigo-400/70">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
                       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />

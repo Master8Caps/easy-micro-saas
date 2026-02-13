@@ -71,13 +71,13 @@ export function ArchiveList({
         return (
           <div
             key={product.id}
-            className="rounded-xl border border-zinc-800 bg-zinc-900/50"
+            className="rounded-xl border border-white/[0.06] bg-white/[0.02]"
           >
             <button
               onClick={() =>
                 setExpandedProduct(isExpanded ? null : product.id)
               }
-              className="w-full rounded-xl p-6 text-left transition-colors hover:bg-zinc-900"
+              className="w-full rounded-xl p-6 text-left transition-colors hover:bg-white/[0.03]"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -120,7 +120,7 @@ export function ArchiveList({
             </button>
 
             {isExpanded && (
-              <div className="border-t border-zinc-800 p-6">
+              <div className="border-t border-white/[0.06] p-6">
                 {isAdmin && (
                   <div className="mb-4">
                     <button
@@ -144,7 +144,7 @@ export function ArchiveList({
                       <button
                         key={campaign.id}
                         onClick={() => setSelectedCampaign(campaign)}
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-800/30 p-4 text-left transition-colors hover:border-zinc-700 hover:bg-zinc-800/50"
+                        className="w-full rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 text-left transition-all hover:border-white/[0.1] hover:bg-white/[0.03]"
                       >
                         <div className="flex flex-wrap items-center gap-2">
                           <ChannelPill channel={campaign.channel} />

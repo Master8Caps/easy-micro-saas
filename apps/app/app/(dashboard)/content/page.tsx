@@ -20,8 +20,8 @@ export default async function ContentPage() {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">Content</h1>
-        <p className="mt-1 text-zinc-400">
+        <h1 className="text-2xl font-bold tracking-tight">Content</h1>
+        <p className="mt-1 text-sm text-zinc-500">
           Browse and manage generated content pieces.
         </p>
       </div>
@@ -32,9 +32,9 @@ export default async function ContentPage() {
           products={(products ?? []) as { id: string; name: string }[]}
         />
       ) : (
-        <div className="rounded-xl border border-dashed border-zinc-700 p-12 text-center">
+        <div className="rounded-xl border border-dashed border-white/[0.08] p-12 text-center">
           <h2 className="text-lg font-semibold">No content yet</h2>
-          <p className="mt-2 text-zinc-400">
+          <p className="mt-2 text-sm text-zinc-500">
             Generate content from your campaign angles on each product&apos;s
             brain page.
           </p>

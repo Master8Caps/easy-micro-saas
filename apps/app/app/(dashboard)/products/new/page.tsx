@@ -102,7 +102,7 @@ export default function NewProductPage() {
               <div
                 key={s}
                 className={`h-1 flex-1 rounded-full ${
-                  s <= step ? "bg-white" : "bg-zinc-800"
+                  s <= step ? "bg-white" : "bg-white/[0.06]"
                 }`}
               />
             ))}
@@ -129,7 +129,7 @@ export default function NewProductPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. InvoiceBot"
-                  className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                  className="mt-1 block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
                 />
               </div>
 
@@ -142,7 +142,7 @@ export default function NewProductPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="e.g. Automated invoicing for freelancers"
-                  className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                  className="mt-1 block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
                 />
               </div>
 
@@ -155,7 +155,7 @@ export default function NewProductPage() {
                   onChange={(e) => setMarket(e.target.value)}
                   rows={3}
                   placeholder="e.g. Freelance designers and developers who waste hours every month creating and following up on invoices. They need something that handles it automatically."
-                  className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                  className="mt-1 block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
                 />
               </div>
             </div>
@@ -188,14 +188,14 @@ export default function NewProductPage() {
                 onChange={(e) => setGoals(e.target.value)}
                 rows={4}
                 placeholder="e.g. Get 50 signups from freelancers, validate that automated invoice reminders are the killer feature, figure out if LinkedIn or Twitter is the better channel."
-                className="mt-1 block w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                className="mt-1 block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
               />
             </div>
 
             <div className="mt-8 flex gap-3">
               <button
                 onClick={() => setStep(1)}
-                className="rounded-lg border border-zinc-700 px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
+                className="rounded-lg border border-white/[0.06] px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
               >
                 Back
               </button>
@@ -233,7 +233,7 @@ export default function NewProductPage() {
                         className={`rounded-lg border px-3 py-2 text-left text-xs font-medium transition-colors ${
                           channels.includes(channel)
                             ? "border-white bg-white/10 text-zinc-100"
-                            : "border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-300"
+                            : "border-white/[0.06] text-zinc-400 hover:border-white/[0.1] hover:text-zinc-300"
                         }`}
                       >
                         {channel}
@@ -247,7 +247,7 @@ export default function NewProductPage() {
             <div className="mt-8 flex gap-3">
               <button
                 onClick={() => setStep(2)}
-                className="rounded-lg border border-zinc-700 px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
+                className="rounded-lg border border-white/[0.06] px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
               >
                 Back
               </button>
@@ -294,7 +294,7 @@ export default function NewProductPage() {
                         className={`relative rounded-xl border p-4 text-left transition-colors ${
                           selected
                             ? "border-emerald-500/50 bg-emerald-500/5"
-                            : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
+                            : "border-white/[0.06] text-zinc-400 hover:border-white/[0.1]"
                         }`}
                       >
                         {selected && (
@@ -324,7 +324,7 @@ export default function NewProductPage() {
               </div>
 
               {/* Website toggle */}
-              <div className="rounded-xl border border-zinc-800 p-5">
+              <div className="rounded-xl border border-white/[0.06] p-5">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-zinc-200">
@@ -357,14 +357,14 @@ export default function NewProductPage() {
                       value={websiteUrl}
                       onChange={(e) => setWebsiteUrl(e.target.value)}
                       placeholder="https://yourproduct.com"
-                      className="block w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                      className="block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
                     />
                   </div>
                 )}
               </div>
 
               {/* Ads toggle */}
-              <div className="rounded-xl border border-zinc-800 p-5">
+              <div className="rounded-xl border border-white/[0.06] p-5">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-zinc-200">
@@ -399,7 +399,7 @@ export default function NewProductPage() {
                         className={`rounded-lg border px-3 py-2 text-left text-sm font-medium transition-colors ${
                           adPlatforms.includes(platform)
                             ? "border-white bg-white/10 text-zinc-100"
-                            : "border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-300"
+                            : "border-white/[0.06] text-zinc-400 hover:border-white/[0.1] hover:text-zinc-300"
                         }`}
                       >
                         {platform}
@@ -415,7 +415,7 @@ export default function NewProductPage() {
             <div className="mt-8 flex gap-3">
               <button
                 onClick={() => setStep(3)}
-                className="rounded-lg border border-zinc-700 px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
+                className="rounded-lg border border-white/[0.06] px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
               >
                 Back
               </button>

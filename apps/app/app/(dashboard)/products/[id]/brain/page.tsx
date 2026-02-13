@@ -271,7 +271,7 @@ export default function BrainPage() {
   if (status === "loading") {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-white" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
       </div>
     );
   }
@@ -280,7 +280,7 @@ export default function BrainPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-white" />
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
           <h1 className="mt-6 font-heading text-2xl font-bold">
             Generating your Marketing Brain
           </h1>
@@ -374,7 +374,7 @@ export default function BrainPage() {
                 <button
                   onClick={handleToggleStatus}
                   disabled={togglingStatus}
-                  className="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-300 disabled:opacity-50"
+                  className="rounded-lg border border-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/[0.05] hover:text-zinc-300 disabled:opacity-50"
                 >
                   {productStatus === "active" ? "Archive" : "Reactivate"}
                 </button>
@@ -382,7 +382,7 @@ export default function BrainPage() {
               {isAdmin && (
                 <button
                   onClick={handleRegenerate}
-                  className="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
+                  className="rounded-lg border border-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
                 >
                   Regenerate
                 </button>
@@ -396,7 +396,7 @@ export default function BrainPage() {
           <h2 className="text-xl font-bold">Target Avatars</h2>
           <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {output.avatars.map((avatar) => (
-              <div key={avatar.name} className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <div key={avatar.name} className="flex flex-col rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
                 <h3 className="text-lg font-semibold">{avatar.name}</h3>
                 <p className="mt-2 text-sm text-zinc-400">{avatar.description}</p>
 
@@ -419,7 +419,7 @@ export default function BrainPage() {
                 </div>
 
                 <div className="mt-auto pt-4">
-                  <div className="rounded-lg bg-zinc-800/50 p-3">
+                  <div className="rounded-lg bg-white/[0.03] p-3">
                     <p className="text-xs text-zinc-500">
                       <strong className="text-zinc-400">Role:</strong> {avatar.icp_details.role}
                     </p>
@@ -525,7 +525,7 @@ export default function BrainPage() {
                 })}
               </div>
             ) : (
-              <div className="mt-6 rounded-xl border border-dashed border-zinc-700 p-8 text-center">
+              <div className="mt-6 rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
                 <p className="text-sm text-zinc-500">
                   No ad campaigns generated yet. Try regenerating the brain above.
                 </p>
@@ -540,7 +540,7 @@ export default function BrainPage() {
             <h2 className="text-xl font-bold">Email Copy</h2>
             <div className="mt-6 space-y-4">
               {emailPieces.map((piece) => (
-                <div key={piece.id} className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+                <div key={piece.id} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <TypePill type={piece.type} />
@@ -564,7 +564,7 @@ export default function BrainPage() {
             {websiteKitPieces.length > 0 ? (
               <div className="mt-6 space-y-4">
                 {websiteKitPieces.map((piece) => (
-                  <div key={piece.id} className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+                  <div key={piece.id} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <TypePill type={piece.type} />
@@ -579,7 +579,7 @@ export default function BrainPage() {
                 ))}
               </div>
             ) : (
-              <div className="mt-6 rounded-xl border border-dashed border-zinc-700 p-8 text-center">
+              <div className="mt-6 rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
                 <p className="text-sm text-zinc-500">
                   No website kit generated yet. Try regenerating the brain above.
                 </p>
@@ -592,7 +592,7 @@ export default function BrainPage() {
         <div className="flex gap-4">
           <button
             onClick={() => router.push("/")}
-            className="rounded-lg border border-zinc-700 px-6 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
+            className="rounded-lg border border-white/[0.06] px-6 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
           >
             Back to Dashboard
           </button>
@@ -602,7 +602,7 @@ export default function BrainPage() {
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="mx-4 w-full max-w-md rounded-xl border border-zinc-700 bg-zinc-900 p-6 shadow-2xl">
+          <div className="mx-4 w-full max-w-md rounded-xl border border-white/[0.06] bg-zinc-950 p-6 shadow-2xl">
             <h3 className="font-heading text-lg font-bold text-white">Delete Product</h3>
             <p className="mt-3 text-sm text-zinc-400">
               Are you sure you want to delete{" "}
@@ -614,7 +614,7 @@ export default function BrainPage() {
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={deleting}
-                className="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                className="rounded-lg border border-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05] disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -654,7 +654,7 @@ function CampaignCard({
   onToggleExpand: () => void;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
       <div className="flex flex-wrap items-center gap-2">
         <ChannelPill channel={campaign.channel} />
         <TypePill type={campaign.content_type} />
@@ -664,7 +664,7 @@ function CampaignCard({
       <p className="mt-2 text-sm italic text-zinc-300">&ldquo;{campaign.hook}&rdquo;</p>
 
       {/* Content generation section */}
-      <div className="mt-4 flex items-center justify-between border-t border-zinc-800 pt-4">
+      <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-4">
         <div>
           {pieces && pieces.length > 0 && (
             <button
@@ -704,7 +704,7 @@ function CampaignCard({
       {/* Inline content preview */}
       {isExpanded &&
         pieces?.map((piece) => (
-          <div key={piece.id} className="mt-3 rounded-lg bg-zinc-800/50 p-4">
+          <div key={piece.id} className="mt-3 rounded-lg bg-white/[0.03] p-4">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium text-zinc-400">{piece.title}</p>

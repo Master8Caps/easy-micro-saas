@@ -65,7 +65,7 @@ export function ProductDeleteButton({
             e.stopPropagation();
           }}
         >
-          <div className="mx-4 w-full max-w-md rounded-xl border border-zinc-700 bg-zinc-900 p-6 shadow-2xl">
+          <div className="mx-4 w-full max-w-md rounded-xl border border-white/[0.06] bg-zinc-950 p-6 shadow-2xl">
             <h3 className="font-heading text-lg font-bold text-white">Delete Product</h3>
             <p className="mt-3 text-sm text-zinc-400">
               Are you sure you want to delete{" "}
@@ -81,7 +81,7 @@ export function ProductDeleteButton({
                   setShowConfirm(false);
                 }}
                 disabled={deleting}
-                className="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                className="rounded-lg border border-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05] disabled:opacity-50"
               >
                 Cancel
               </button>

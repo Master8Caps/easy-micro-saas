@@ -27,12 +27,13 @@ export async function getUserWithRole() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, status")
     .eq("id", user.id)
     .single();
 
   return {
     user,
     role: (profile?.role ?? "free") as "admin" | "paid" | "free",
+    status: (profile?.status ?? "waitlist") as "waitlist" | "active",
   };
 }

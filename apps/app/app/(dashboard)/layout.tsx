@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getUserWithRole, requireAuth } from "@/server/auth";
 import { SignOutButton } from "@/components/sign-out-button";
 import { SidebarNav } from "@/components/sidebar-nav";
@@ -10,7 +11,11 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await requireAuth();
-  const { role } = await getUserWithRole();
+  const { role, status } = await getUserWithRole();
+
+  if (status === "waitlist") {
+    redirect("/waitlist");
+  }
 
   return (
     <UserProvider email={user.email ?? ""} role={role}>

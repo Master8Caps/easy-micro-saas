@@ -1,62 +1,72 @@
 import { AnimateOnScroll } from "./animate-on-scroll";
-import { GlowCard } from "./glow-card";
 
 const steps = [
   {
     number: "1",
     title: "Brief",
     description:
-      "Tell us about your product, your market, and your goals. Takes about five minutes.",
+      "Tell us about your product, market, and goals. Takes about five minutes.",
   },
   {
     number: "2",
     title: "Generate",
     description:
-      "Get avatars, campaign angles, a content calendar, and ready-to-publish posts — all tailored to your product.",
+      "Get avatars, campaign angles, and ready-to-publish content — all tailored to your product.",
   },
   {
     number: "3",
     title: "Execute & learn",
     description:
-      "Publish content, track every click, see what resonates, and let the system improve your next batch.",
+      "Publish content, track every click, and see what resonates. Then iterate.",
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section
-      id="how-it-works"
-      className="border-t border-zinc-800/50 px-6 py-24"
-    >
-      <div className="mx-auto max-w-5xl">
+    <section id="how-it-works" className="relative px-6 py-24 md:py-32">
+      {/* Subtle divider */}
+      <div className="pointer-events-none absolute left-1/2 top-0 h-px w-2/3 -translate-x-1/2 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+
+      <div className="mx-auto max-w-6xl">
         <AnimateOnScroll>
           <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight md:text-5xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-400">
+              How it works
+            </p>
+            <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
               Three steps to real traction
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-zinc-400 md:text-lg">
-              No complex setup. No integrations required. Start generating
-              campaigns in minutes.
+            <p className="mx-auto mt-4 max-w-xl text-zinc-400">
+              No complex setup. No integrations. Start generating campaigns in minutes.
             </p>
           </div>
         </AnimateOnScroll>
 
-        <div className="mt-16 grid gap-8 md:grid-cols-3">
-          {steps.map((step, i) => (
-            <AnimateOnScroll key={step.number} delay={i * 120} className="h-full">
-              <GlowCard className="p-6">
-                <div className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  {step.number}
+        <div className="relative mt-16">
+          {/* Single continuous purple line behind the numbers */}
+          <div className="pointer-events-none absolute top-8 left-[16.67%] right-[16.67%] hidden h-px bg-gradient-to-r from-indigo-500/30 via-violet-500/30 to-indigo-500/30 md:block" />
+
+          <div className="grid gap-12 md:grid-cols-3 md:gap-8">
+            {steps.map((step, i) => (
+              <AnimateOnScroll key={step.number} delay={i * 120}>
+                <div className="relative text-center">
+                  {/* Step number — solid bg masks the line behind it */}
+                  <div className="relative z-10 mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/[0.06] bg-zinc-950">
+                    <span className="font-heading text-2xl font-bold bg-gradient-to-br from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+                      {step.number}
+                    </span>
+                  </div>
+
+                  <h3 className="text-lg font-semibold text-zinc-100">
+                    {step.title}
+                  </h3>
+                  <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-zinc-500">
+                    {step.description}
+                  </p>
                 </div>
-                <h3 className="mt-4 text-xl font-semibold text-zinc-100">
-                  {step.title}
-                </h3>
-                <p className="mt-3 leading-relaxed text-zinc-400">
-                  {step.description}
-                </p>
-              </GlowCard>
-            </AnimateOnScroll>
-          ))}
+              </AnimateOnScroll>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -24,14 +24,14 @@ export function GlowCard({ children, className = "" }: GlowCardProps) {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setOpacity(1)}
       onMouseLeave={() => setOpacity(0)}
-      className={`group relative h-full overflow-hidden rounded-xl border border-blue-500/20 bg-zinc-900/50 transition-colors hover:border-blue-400/40 ${className}`}
+      className={`group relative h-full overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] transition-all duration-300 hover:border-indigo-500/25 hover:bg-white/[0.04] ${className}`}
     >
       {/* Cursor glow */}
       <div
-        className="pointer-events-none absolute -inset-px rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        className="pointer-events-none absolute -inset-px rounded-xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{
           opacity,
-          background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(56,189,248,0.1), transparent 60%)`,
+          background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(129,140,248,0.08), transparent 60%)`,
         }}
       />
       <div className="relative">{children}</div>

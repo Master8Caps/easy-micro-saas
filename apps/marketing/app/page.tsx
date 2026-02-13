@@ -1,3 +1,4 @@
+import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { Problem } from "@/components/problem";
 import { Value } from "@/components/value";
@@ -8,14 +9,17 @@ import { Footer } from "@/components/footer";
 
 export default function HomePage() {
   return (
-    <main>
-      <Hero />
-      <Problem />
-      <Value />
-      <HowItWorks />
-      <Proof />
-      <CTA />
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <Problem />
+        <Value />
+        <HowItWorks />
+        <Proof />
+        <CTA />
+      </main>
       <Footer />
-    </main>
+    </>
   );
 }

@@ -415,7 +415,7 @@ export async function loadContentForCampaign(campaignId: string) {
 
   const { data, error } = await supabase
     .from("content_pieces")
-    .select("id, type, title, body, metadata, status, archived, posted_at, created_at, links(id, slug, click_count)")
+    .select("id, type, title, body, metadata, status, archived, posted_at, scheduled_for, created_at, links(id, slug, click_count)")
     .eq("campaign_id", campaignId)
     .order("created_at", { ascending: false });
 
@@ -423,10 +423,11 @@ export async function loadContentForCampaign(campaignId: string) {
   return { pieces: data ?? [] };
 }
 
-// ── Update content piece status ──────────────────────
+// ── Update content piece lifecycle status ────────────
 export async function updateContentPieceStatus(
   pieceId: string,
-  status: "draft" | "ready" | "published",
+  newStatus: "draft" | "approved" | "scheduled" | "posted",
+  scheduledFor?: string | null,
 ) {
   const supabase = await createClient();
 
@@ -436,14 +437,41 @@ export async function updateContentPieceStatus(
 
   if (!user) return { error: "Not authenticated" };
 
+  const updates: {
+    status: string;
+    posted_at?: string | null;
+    scheduled_for?: string | null;
+  } = { status: newStatus };
+
+  switch (newStatus) {
+    case "draft":
+      updates.posted_at = null;
+      updates.scheduled_for = null;
+      break;
+    case "approved":
+      updates.posted_at = null;
+      updates.scheduled_for = null;
+      break;
+    case "scheduled":
+      if (!scheduledFor) return { error: "Date is required for scheduling" };
+      updates.scheduled_for = scheduledFor;
+      updates.posted_at = null;
+      break;
+    case "posted":
+      updates.posted_at = new Date().toISOString();
+      break;
+  }
+
   const { error } = await supabase
     .from("content_pieces")
-    .update({ status })
+    .update(updates)
     .eq("id", pieceId);
 
   if (error) return { error: error.message };
 
   revalidatePath("/content");
+  revalidatePath("/schedule");
+  revalidatePath("/campaigns");
 
   return { success: true };
 }
@@ -474,32 +502,6 @@ export async function toggleContentPieceArchived(
   return { success: true };
 }
 
-// ── Mark content piece as posted / unposted ─────────
-export async function markContentPiecePosted(
-  pieceId: string,
-  posted: boolean,
-) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Not authenticated" };
-
-  const { error } = await supabase
-    .from("content_pieces")
-    .update({ posted_at: posted ? new Date().toISOString() : null })
-    .eq("id", pieceId);
-
-  if (error) return { error: error.message };
-
-  revalidatePath("/content");
-  revalidatePath("/schedule");
-
-  return { success: true };
-}
-
 // ── Update content piece scheduled date ─────────────
 export async function updateContentPieceSchedule(
   pieceId: string,
@@ -513,9 +515,14 @@ export async function updateContentPieceSchedule(
 
   if (!user) return { error: "Not authenticated" };
 
+  const updates = {
+    scheduled_for: scheduledFor,
+    status: scheduledFor ? "scheduled" : "approved",
+  };
+
   const { error } = await supabase
     .from("content_pieces")
-    .update({ scheduled_for: scheduledFor })
+    .update(updates)
     .eq("id", pieceId);
 
   if (error) return { error: error.message };

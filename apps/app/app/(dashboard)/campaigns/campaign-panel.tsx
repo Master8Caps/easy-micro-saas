@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ChannelPill, TypePill, StatusSelect, ArchivedBadge, ArchiveToggle } from "@/components/pills";
+import { ChannelPill, TypePill, ArchivedBadge, ArchiveToggle } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
-import { PostedToggle } from "@/components/posted-toggle";
+import { LifecycleAction } from "@/components/lifecycle-action";
 import { useUser } from "@/components/user-context";
 import {
   generateContentForCampaign,
   loadContentForCampaign,
-  updateContentPieceStatus,
   toggleContentPieceArchived,
 } from "@/server/actions/content";
 import { updateCampaignDestinationUrl } from "@/server/actions/links";
@@ -28,6 +27,7 @@ interface ContentPiece {
   status: string;
   archived: boolean;
   posted_at: string | null;
+  scheduled_for: string | null;
   created_at: string;
   links?: TrackedLink[];
 }
@@ -98,18 +98,6 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
     }
     setGenerating(false);
   }, [campaign.id, campaign.product_id]);
-
-  async function handleStatusChange(pieceId: string, newStatus: string) {
-    const result = await updateContentPieceStatus(
-      pieceId,
-      newStatus as "draft" | "ready" | "published",
-    );
-    if (result.success) {
-      setPieces((prev) =>
-        prev.map((p) => (p.id === pieceId ? { ...p, status: newStatus } : p)),
-      );
-    }
-  }
 
   async function handleArchiveToggle(pieceId: string, currentArchived: boolean) {
     const result = await toggleContentPieceArchived(pieceId, !currentArchived);
@@ -312,14 +300,11 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                         className="flex shrink-0 items-center gap-1.5"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <PostedToggle
+                        <LifecycleAction
                           pieceId={piece.id}
-                          posted={!!piece.posted_at}
+                          status={piece.status}
+                          scheduledFor={piece.scheduled_for}
                           postedAt={piece.posted_at}
-                        />
-                        <StatusSelect
-                          value={piece.status}
-                          onChange={(v) => handleStatusChange(piece.id, v)}
                         />
                         {piece.archived && <ArchivedBadge />}
                         <ArchiveToggle

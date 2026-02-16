@@ -81,6 +81,9 @@ const statusStyles: Record<string, string> = {
   archived: "border-zinc-600/30 bg-zinc-600/10 text-zinc-500",
   ready: "border-blue-500/30 bg-blue-500/10 text-blue-400",
   published: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
+  approved: "border-blue-500/30 bg-blue-500/10 text-blue-400",
+  scheduled: "border-violet-500/30 bg-violet-500/10 text-violet-400",
+  posted: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
 };
 
 export function StatusPill({ status }: { status: string }) {
@@ -91,34 +94,6 @@ export function StatusPill({ status }: { status: string }) {
     >
       {label}
     </span>
-  );
-}
-
-// ── Status select (colored dropdown) ────────────────
-const statusSelectColors: Record<string, string> = {
-  draft: "border-amber-500/30 bg-amber-500/10 text-amber-400",
-  ready: "border-blue-500/30 bg-blue-500/10 text-blue-400",
-  published: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
-};
-
-export function StatusSelect({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (newStatus: string) => void;
-}) {
-  const style = statusSelectColors[value] ?? statusSelectColors.draft;
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className={`cursor-pointer appearance-none rounded-full border px-2.5 py-0.5 text-xs font-medium focus:outline-none ${style}`}
-    >
-      <option value="draft" className="bg-zinc-900 text-zinc-200">Draft</option>
-      <option value="ready" className="bg-zinc-900 text-zinc-200">Ready</option>
-      <option value="published" className="bg-zinc-900 text-zinc-200">Published</option>
-    </select>
   );
 }
 

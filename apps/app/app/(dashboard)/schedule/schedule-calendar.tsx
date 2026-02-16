@@ -4,7 +4,8 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ChannelPill, TypePill } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
-import { PostedToggle } from "@/components/posted-toggle";
+import { LifecycleAction } from "@/components/lifecycle-action";
+import { DatePicker } from "@/components/date-picker";
 import { updateContentPieceSchedule } from "@/server/actions/content";
 
 interface SchedulePiece {
@@ -99,7 +100,7 @@ export function ScheduleCalendar({
       const piece = unscheduled.find((p) => p.id === pieceId);
       if (piece) {
         setUnscheduled((prev) => prev.filter((p) => p.id !== pieceId));
-        setScheduled((prev) => [...prev, { ...piece, scheduled_for: date }]);
+        setScheduled((prev) => [...prev, { ...piece, scheduled_for: date, status: "scheduled" }]);
       }
     }
   }
@@ -110,9 +111,35 @@ export function ScheduleCalendar({
       const piece = scheduled.find((p) => p.id === pieceId);
       if (piece) {
         setScheduled((prev) => prev.filter((p) => p.id !== pieceId));
-        setUnscheduled((prev) => [{ ...piece, scheduled_for: null }, ...prev]);
+        setUnscheduled((prev) => [{ ...piece, scheduled_for: null, status: "approved" }, ...prev]);
       }
     }
+  }
+
+  function handleLifecycleChange(pieceId: string, newStatus: string, scheduledFor?: string | null, postedAt?: string | null) {
+    setScheduled((prev) =>
+      prev.map((p) =>
+        p.id === pieceId
+          ? {
+              ...p,
+              status: newStatus,
+              scheduled_for: newStatus === "scheduled" ? (scheduledFor ?? p.scheduled_for) : newStatus === "draft" || newStatus === "approved" ? null : p.scheduled_for,
+              posted_at: newStatus === "posted" ? (postedAt ?? new Date().toISOString()) : newStatus === "draft" || newStatus === "approved" || newStatus === "scheduled" ? null : p.posted_at,
+            }
+          : p,
+      ),
+    );
+    setUnscheduled((prev) =>
+      prev.map((p) =>
+        p.id === pieceId
+          ? {
+              ...p,
+              status: newStatus,
+              posted_at: newStatus === "posted" ? (postedAt ?? new Date().toISOString()) : newStatus === "draft" || newStatus === "approved" || newStatus === "scheduled" ? null : p.posted_at,
+            }
+          : p,
+      ),
+    );
   }
 
   function navigateWeek(direction: "prev" | "next") {
@@ -202,6 +229,7 @@ export function ScheduleCalendar({
                       )
                     }
                     onUnschedule={() => handleUnschedule(piece.id)}
+                    onLifecycleChange={(s, sf, pa) => handleLifecycleChange(piece.id, s, sf, pa)}
                   />
                 ))}
               </div>
@@ -253,6 +281,7 @@ export function ScheduleCalendar({
                 key={piece.id}
                 piece={piece}
                 onSchedule={(date) => handleSchedule(piece.id, date)}
+                onLifecycleChange={(s, sf, pa) => handleLifecycleChange(piece.id, s, sf, pa)}
               />
             ))}
           </div>
@@ -268,14 +297,16 @@ function CalendarCard({
   expanded,
   onToggleExpand,
   onUnschedule,
+  onLifecycleChange,
 }: {
   piece: SchedulePiece;
   expanded: boolean;
   onToggleExpand: () => void;
   onUnschedule: () => void;
+  onLifecycleChange: (newStatus: string, scheduledFor?: string | null, postedAt?: string | null) => void;
 }) {
   return (
-    <div className="rounded-lg border border-white/[0.06] bg-white/[0.03]">
+    <div className={`rounded-lg border bg-white/[0.03] ${piece.status === "posted" ? "border-emerald-500/20 opacity-70" : "border-white/[0.06]"}`}>
       <button
         onClick={onToggleExpand}
         className="w-full p-2 text-left"
@@ -286,10 +317,12 @@ function CalendarCard({
           )}
           <div className="flex-1" />
           <div onClick={(e) => e.stopPropagation()}>
-            <PostedToggle
+            <LifecycleAction
               pieceId={piece.id}
-              posted={!!piece.posted_at}
+              status={piece.status}
+              scheduledFor={piece.scheduled_for}
               postedAt={piece.posted_at}
+              onStatusChange={onLifecycleChange}
             />
           </div>
         </div>
@@ -334,10 +367,14 @@ function CalendarCard({
 function UnscheduledCard({
   piece,
   onSchedule,
+  onLifecycleChange,
 }: {
   piece: SchedulePiece;
   onSchedule: (date: string) => void;
+  onLifecycleChange: (newStatus: string, scheduledFor?: string | null, postedAt?: string | null) => void;
 }) {
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   return (
     <div className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
       <div className="min-w-0 flex-1">
@@ -357,20 +394,31 @@ function UnscheduledCard({
           {piece.body}
         </p>
       </div>
-      <div className="flex shrink-0 items-center gap-2">
-        <PostedToggle
+      <div className="relative flex shrink-0 items-center gap-2">
+        <LifecycleAction
           pieceId={piece.id}
-          posted={!!piece.posted_at}
+          status={piece.status}
+          scheduledFor={piece.scheduled_for}
           postedAt={piece.posted_at}
+          onStatusChange={onLifecycleChange}
         />
-        <input
-          type="date"
-          onChange={(e) => {
-            if (e.target.value) onSchedule(e.target.value);
-          }}
-          className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1.5 text-xs text-zinc-300 focus:border-indigo-500/50 focus:outline-none [color-scheme:dark]"
-          title="Pick a date to schedule"
-        />
+        <button
+          onClick={() => setShowDatePicker(!showDatePicker)}
+          className="rounded-lg border border-violet-500/20 bg-violet-500/5 px-3 py-1.5 text-xs font-medium text-violet-400 transition-colors hover:bg-violet-500/15"
+        >
+          Schedule
+        </button>
+        {showDatePicker && (
+          <div className="absolute right-0 top-full z-50 mt-1">
+            <DatePicker
+              onChange={(date) => {
+                setShowDatePicker(false);
+                onSchedule(date);
+              }}
+              onClose={() => setShowDatePicker(false)}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

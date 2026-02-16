@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { ChannelPill, TypePill, StatusSelect, ArchivedBadge, ArchiveToggle } from "@/components/pills";
+import { ChannelPill, TypePill, ArchivedBadge, ArchiveToggle } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
-import { PostedToggle, PostedBadge } from "@/components/posted-toggle";
-import { updateContentPieceStatus, toggleContentPieceArchived } from "@/server/actions/content";
+import { LifecycleAction } from "@/components/lifecycle-action";
+import { toggleContentPieceArchived } from "@/server/actions/content";
 
 interface TrackedLink {
   id: string;
@@ -49,13 +49,8 @@ const typeOptions = [
 const statusOptions = [
   { value: "", label: "All statuses" },
   { value: "draft", label: "Draft" },
-  { value: "ready", label: "Ready" },
-  { value: "published", label: "Published" },
-];
-
-const postedOptions = [
-  { value: "", label: "All" },
-  { value: "not-posted", label: "Not posted" },
+  { value: "approved", label: "Approved" },
+  { value: "scheduled", label: "Scheduled" },
   { value: "posted", label: "Posted" },
 ];
 
@@ -84,7 +79,6 @@ export function ContentList({
   const [productFilter, setProductFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [postedFilter, setPostedFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [showArchived, setShowArchived] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -96,8 +90,6 @@ export function ContentList({
       if (productFilter && p.product_id !== productFilter) return false;
       if (typeFilter && p.type !== typeFilter) return false;
       if (statusFilter && p.status !== statusFilter) return false;
-      if (postedFilter === "posted" && !p.posted_at) return false;
-      if (postedFilter === "not-posted" && p.posted_at) return false;
       return true;
     });
     const counts: Record<string, number> = { "": visible.length };
@@ -106,15 +98,13 @@ export function ContentList({
       counts[cat] = (counts[cat] ?? 0) + 1;
     }
     return counts;
-  }, [pieces, showArchived, productFilter, typeFilter, statusFilter, postedFilter]);
+  }, [pieces, showArchived, productFilter, typeFilter, statusFilter]);
 
   const filtered = pieces.filter((p) => {
     if (p.archived !== showArchived) return false;
     if (productFilter && p.product_id !== productFilter) return false;
     if (typeFilter && p.type !== typeFilter) return false;
     if (statusFilter && p.status !== statusFilter) return false;
-    if (postedFilter === "posted" && !p.posted_at) return false;
-    if (postedFilter === "not-posted" && p.posted_at) return false;
     if (categoryFilter && getCategory(p) !== categoryFilter) return false;
     return true;
   });
@@ -123,26 +113,33 @@ export function ContentList({
     ? window.location.origin
     : process.env.NEXT_PUBLIC_APP_URL || "";
 
-  const hasActiveFilters = productFilter || typeFilter || statusFilter || postedFilter || showArchived;
+  const hasActiveFilters = productFilter || typeFilter || statusFilter || showArchived;
 
   function clearFilters() {
     setProductFilter("");
     setTypeFilter("");
     setStatusFilter("");
-    setPostedFilter("");
     setShowArchived(false);
   }
 
-  async function handleStatusChange(pieceId: string, newStatus: string) {
-    const result = await updateContentPieceStatus(
-      pieceId,
-      newStatus as "draft" | "ready" | "published",
+  function handleLifecycleChange(
+    pieceId: string,
+    newStatus: string,
+    scheduledFor?: string | null,
+    postedAt?: string | null,
+  ) {
+    setPieces((prev) =>
+      prev.map((p) =>
+        p.id === pieceId
+          ? {
+              ...p,
+              status: newStatus,
+              scheduled_for: newStatus === "scheduled" ? (scheduledFor ?? p.scheduled_for) : newStatus === "draft" || newStatus === "approved" ? null : p.scheduled_for,
+              posted_at: newStatus === "posted" ? (postedAt ?? new Date().toISOString()) : newStatus === "draft" || newStatus === "approved" || newStatus === "scheduled" ? null : p.posted_at,
+            }
+          : p,
+      ),
     );
-    if (result.success) {
-      setPieces((prev) =>
-        prev.map((p) => (p.id === pieceId ? { ...p, status: newStatus } : p)),
-      );
-    }
   }
 
   async function handleArchiveToggle(pieceId: string, currentArchived: boolean) {
@@ -219,17 +216,6 @@ export function ContentList({
             </option>
           ))}
         </select>
-        <select
-          value={postedFilter}
-          onChange={(e) => setPostedFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
-        >
-          {postedOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
         <button
           onClick={() => setShowArchived(!showArchived)}
           title={showArchived ? "View active content" : "View archived"}
@@ -263,7 +249,7 @@ export function ContentList({
             <div
               key={piece.id}
               className={`rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-opacity ${
-                piece.posted_at ? "opacity-60" : ""
+                piece.status === "posted" ? "opacity-60" : ""
               }`}
             >
               {/* Product name at top */}
@@ -280,7 +266,6 @@ export function ContentList({
                       <ChannelPill channel={piece.campaigns.channel} />
                     )}
                     <TypePill type={piece.type} />
-                    {piece.posted_at && <PostedBadge postedAt={piece.posted_at} />}
                   </div>
                   {piece.title && (
                     <h3 className="mt-2 font-semibold">{piece.title}</h3>
@@ -292,15 +277,13 @@ export function ContentList({
                   )}
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  <PostedToggle
-                    pieceId={piece.id}
-                    posted={!!piece.posted_at}
-                    postedAt={piece.posted_at}
-                  />
                   <CopyButton text={piece.body} />
-                  <StatusSelect
-                    value={piece.status}
-                    onChange={(v) => handleStatusChange(piece.id, v)}
+                  <LifecycleAction
+                    pieceId={piece.id}
+                    status={piece.status}
+                    scheduledFor={piece.scheduled_for}
+                    postedAt={piece.posted_at}
+                    onStatusChange={(s, sf, pa) => handleLifecycleChange(piece.id, s, sf, pa)}
                   />
                   {piece.archived && <ArchivedBadge />}
                   <ArchiveToggle

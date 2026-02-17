@@ -126,7 +126,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
+          className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
         >
           <option value="">All products</option>
           {products.map(([id, name]) => (
@@ -138,7 +138,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
         <select
           value={channelFilter}
           onChange={(e) => setChannelFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
+          className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
         >
           <option value="">All {activeTab === "ad" ? "platforms" : "channels"}</option>
           {channels.map((ch) => (

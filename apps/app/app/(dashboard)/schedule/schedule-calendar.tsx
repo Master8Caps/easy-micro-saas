@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { ChannelPill, TypePill } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
 import { LifecycleAction } from "@/components/lifecycle-action";
-import { DatePicker } from "@/components/date-picker";
 import { updateContentPieceSchedule } from "@/server/actions/content";
 
 interface SchedulePiece {
@@ -94,17 +93,6 @@ export function ScheduleCalendar({
     return unscheduled.filter((p) => p.product_id === productFilter);
   }, [unscheduled, productFilter]);
 
-  async function handleSchedule(pieceId: string, date: string) {
-    const result = await updateContentPieceSchedule(pieceId, date);
-    if (result.success) {
-      const piece = unscheduled.find((p) => p.id === pieceId);
-      if (piece) {
-        setUnscheduled((prev) => prev.filter((p) => p.id !== pieceId));
-        setScheduled((prev) => [...prev, { ...piece, scheduled_for: date, status: "scheduled" }]);
-      }
-    }
-  }
-
   async function handleUnschedule(pieceId: string) {
     const result = await updateContentPieceSchedule(pieceId, null);
     if (result.success) {
@@ -117,13 +105,34 @@ export function ScheduleCalendar({
   }
 
   function handleLifecycleChange(pieceId: string, newStatus: string, scheduledFor?: string | null, postedAt?: string | null) {
+    // If a piece just got scheduled, move it from unscheduled to scheduled
+    if (newStatus === "scheduled" && scheduledFor) {
+      const fromUnscheduled = unscheduled.find((p) => p.id === pieceId);
+      if (fromUnscheduled) {
+        setUnscheduled((prev) => prev.filter((p) => p.id !== pieceId));
+        setScheduled((prev) => [...prev, { ...fromUnscheduled, status: newStatus, scheduled_for: scheduledFor, posted_at: null }]);
+        return;
+      }
+    }
+
+    // If a scheduled piece got unscheduled (reverted to draft/approved), move it back
+    if (newStatus === "draft" || newStatus === "approved") {
+      const fromScheduled = scheduled.find((p) => p.id === pieceId);
+      if (fromScheduled) {
+        setScheduled((prev) => prev.filter((p) => p.id !== pieceId));
+        setUnscheduled((prev) => [{ ...fromScheduled, status: newStatus, scheduled_for: null, posted_at: null }, ...prev]);
+        return;
+      }
+    }
+
+    // Otherwise update in place
     setScheduled((prev) =>
       prev.map((p) =>
         p.id === pieceId
           ? {
               ...p,
               status: newStatus,
-              scheduled_for: newStatus === "scheduled" ? (scheduledFor ?? p.scheduled_for) : newStatus === "draft" || newStatus === "approved" ? null : p.scheduled_for,
+              scheduled_for: newStatus === "scheduled" ? (scheduledFor ?? p.scheduled_for) : p.scheduled_for,
               posted_at: newStatus === "posted" ? (postedAt ?? new Date().toISOString()) : newStatus === "draft" || newStatus === "approved" || newStatus === "scheduled" ? null : p.posted_at,
             }
           : p,
@@ -247,7 +256,7 @@ export function ScheduleCalendar({
 
       {/* Unscheduled content pool */}
       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex items-center gap-4">
           <div>
             <h3 className="font-semibold">Unscheduled Content</h3>
             <p className="mt-0.5 text-xs text-zinc-500">
@@ -257,7 +266,7 @@ export function ScheduleCalendar({
           <select
             value={productFilter}
             onChange={(e) => setProductFilter(e.target.value)}
-            className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
+            className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
           >
             <option value="">All products</option>
             {products.map((p) => (
@@ -280,7 +289,6 @@ export function ScheduleCalendar({
               <UnscheduledCard
                 key={piece.id}
                 piece={piece}
-                onSchedule={(date) => handleSchedule(piece.id, date)}
                 onLifecycleChange={(s, sf, pa) => handleLifecycleChange(piece.id, s, sf, pa)}
               />
             ))}
@@ -366,15 +374,11 @@ function CalendarCard({
 // ── Unscheduled card (in pool below calendar) ───────
 function UnscheduledCard({
   piece,
-  onSchedule,
   onLifecycleChange,
 }: {
   piece: SchedulePiece;
-  onSchedule: (date: string) => void;
   onLifecycleChange: (newStatus: string, scheduledFor?: string | null, postedAt?: string | null) => void;
 }) {
-  const [showDatePicker, setShowDatePicker] = useState(false);
-
   return (
     <div className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
       <div className="min-w-0 flex-1">
@@ -402,23 +406,6 @@ function UnscheduledCard({
           postedAt={piece.posted_at}
           onStatusChange={onLifecycleChange}
         />
-        <button
-          onClick={() => setShowDatePicker(!showDatePicker)}
-          className="rounded-lg border border-violet-500/20 bg-violet-500/5 px-3 py-1.5 text-xs font-medium text-violet-400 transition-colors hover:bg-violet-500/15"
-        >
-          Schedule
-        </button>
-        {showDatePicker && (
-          <div className="absolute right-0 top-full z-50 mt-1">
-            <DatePicker
-              onChange={(date) => {
-                setShowDatePicker(false);
-                onSchedule(date);
-              }}
-              onClose={() => setShowDatePicker(false)}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

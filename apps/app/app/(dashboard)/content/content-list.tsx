@@ -185,7 +185,7 @@ export function ContentList({
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
+          className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
         >
           <option value="">All products</option>
           {products.map((p) => (
@@ -197,7 +197,7 @@ export function ContentList({
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
+          className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
         >
           {typeOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -208,7 +208,7 @@ export function ContentList({
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none"
+          className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
         >
           {statusOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>

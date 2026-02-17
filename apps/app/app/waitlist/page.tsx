@@ -20,9 +20,8 @@ export default async function WaitlistPage() {
               <stop offset="100%" stopColor="#a78bfa" />
             </linearGradient>
           </defs>
-          <path d="M2 7h7M2 16h5M2 25h7M2 7v18" fill="none" stroke="url(#wl-g)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M12 25V7l5.5 11L23 7v18" fill="none" stroke="url(#wl-g)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M30 10.5c0-2.2-1.2-3.5-3-3.5s-3 1.3-3 3.5c0 2.2 1.2 3 3 4s3 2 3 4.2c0 2.2-1.2 3.3-3 3.3s-3-1.1-3-3.3" fill="none" stroke="url(#wl-g)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+          <rect x="4" y="4" width="24" height="24" rx="6" fill="url(#wl-g)"/>
+          <path d="M10 10h12M10 16h9M10 22h12M10 10v12" stroke="#18181b" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
         </svg>
 
         <h1 className="mt-6 font-heading text-2xl font-bold">

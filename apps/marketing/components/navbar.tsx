@@ -27,7 +27,7 @@ export function Navbar() {
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32" className="shrink-0">
             <path d="M3,8 H9 M3,8 V24 M3,16 H8 M3,24 H9" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
             <path d="M12,24 V8 L16,14 L20,8 V24" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-            <path d="M28,10 C28,8 23,8 23,12 C23,16 28,16 28,20 C28,24 23,24 23,22" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+            <path d="M27,9 C23,9 23,16 25,16 C27,16 27,23 23,23" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
           </svg>
           <span className="font-heading text-sm font-semibold tracking-tight">
             Easy Micro SaaS

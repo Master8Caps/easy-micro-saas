@@ -379,14 +379,12 @@ export default function BrainPage() {
                   {productStatus === "active" ? "Archive" : "Reactivate"}
                 </button>
               )}
-              {isAdmin && (
-                <button
-                  onClick={handleRegenerate}
-                  className="rounded-lg border border-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
-                >
-                  Regenerate
-                </button>
-              )}
+              <button
+              onClick={handleRegenerate}
+              className="rounded-lg border border-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
+            >
+              Regenerate
+            </button>
             </div>
           </div>
         </div>
@@ -440,7 +438,7 @@ export default function BrainPage() {
         <section className="mb-12">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Social Campaigns</h2>
-            {isAdmin && sortedSocial.length > 0 && (
+            {sortedSocial.length > 0 && (
               <button
                 onClick={() => handleBulkGenerate(sortedSocial, setBulkGenerating)}
                 disabled={bulkGenerating || allSocialGenerated}
@@ -471,7 +469,6 @@ export default function BrainPage() {
                   pieces={pieces}
                   isGenerating={isGenerating}
                   isExpanded={isExpanded}
-                  isAdmin={isAdmin}
                   onGenerate={() => handleGenerateContent(campaign.id)}
                   onToggleExpand={() => toggleExpanded(campaign.id)}
                 />
@@ -485,7 +482,7 @@ export default function BrainPage() {
           <section className="mb-12">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold">Ad Campaigns</h2>
-              {isAdmin && sortedAds.length > 0 && (
+              {sortedAds.length > 0 && (
                 <button
                   onClick={() => handleBulkGenerate(sortedAds, setBulkAdGenerating)}
                   disabled={bulkAdGenerating || allAdsGenerated}
@@ -640,7 +637,6 @@ function CampaignCard({
   pieces,
   isGenerating,
   isExpanded,
-  isAdmin,
   onGenerate,
   onToggleExpand,
 }: {
@@ -649,7 +645,6 @@ function CampaignCard({
   pieces?: ContentPiece[];
   isGenerating: boolean;
   isExpanded: boolean;
-  isAdmin: boolean;
   onGenerate: () => void;
   onToggleExpand: () => void;
 }) {
@@ -677,28 +672,22 @@ function CampaignCard({
             </button>
           )}
         </div>
-        {isAdmin ? (
-          <button
-            onClick={onGenerate}
-            disabled={isGenerating}
-            className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-300 transition-colors hover:bg-indigo-500/20 disabled:opacity-50"
-          >
-            {isGenerating ? (
-              <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 animate-spin rounded-full border border-indigo-300/30 border-t-indigo-300" />
-                Generating...
-              </span>
-            ) : pieces && pieces.length > 0 ? (
-              "Regenerate Content"
-            ) : (
-              "Generate Content"
-            )}
-          </button>
-        ) : pieces && pieces.length > 0 ? (
-          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
-            Generated
-          </span>
-        ) : null}
+        <button
+          onClick={onGenerate}
+          disabled={isGenerating}
+          className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-300 transition-colors hover:bg-indigo-500/20 disabled:opacity-50"
+        >
+          {isGenerating ? (
+            <span className="flex items-center gap-1.5">
+              <span className="h-3 w-3 animate-spin rounded-full border border-indigo-300/30 border-t-indigo-300" />
+              Generating...
+            </span>
+          ) : pieces && pieces.length > 0 ? (
+            "Regenerate Content"
+          ) : (
+            "Generate Content"
+          )}
+        </button>
       </div>
 
       {/* Inline content preview */}

@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { ChannelPill, TypePill, ArchivedBadge, ArchiveToggle } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
 import { LifecycleAction } from "@/components/lifecycle-action";
-import { useUser } from "@/components/user-context";
 import {
   generateContentForCampaign,
   loadContentForCampaign,
@@ -49,7 +48,6 @@ interface CampaignPanelProps {
 }
 
 export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
-  const { role } = useUser();
   const [pieces, setPieces] = useState<ContentPiece[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -108,7 +106,6 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
     }
   }
 
-  const isAdmin = role === "admin";
   const hasContent = pieces.length > 0;
 
   return (
@@ -216,28 +213,22 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
             <h3 className="text-sm font-medium text-zinc-400">
               Content Pieces
             </h3>
-            {isAdmin ? (
-              <button
-                onClick={handleGenerate}
-                disabled={generating}
-                className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-4 py-2 text-sm font-medium text-indigo-300 transition-colors hover:bg-indigo-500/20 disabled:opacity-50"
-              >
-                {generating ? (
-                  <span className="flex items-center gap-2">
-                    <span className="h-3.5 w-3.5 animate-spin rounded-full border border-indigo-300/30 border-t-indigo-300" />
-                    Generating...
-                  </span>
-                ) : hasContent ? (
-                  "Regenerate Content"
-                ) : (
-                  "Generate Content"
-                )}
-              </button>
-            ) : hasContent ? (
-              <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
-                Generated
-              </span>
-            ) : null}
+            <button
+              onClick={handleGenerate}
+              disabled={generating}
+              className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-4 py-2 text-sm font-medium text-indigo-300 transition-colors hover:bg-indigo-500/20 disabled:opacity-50"
+            >
+              {generating ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border border-indigo-300/30 border-t-indigo-300" />
+                  Generating...
+                </span>
+              ) : hasContent ? (
+                "Regenerate Content"
+              ) : (
+                "Generate Content"
+              )}
+            </button>
           </div>
 
           {/* Loading state */}
@@ -251,9 +242,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
           {!loading && !hasContent && (
             <div className="rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
               <p className="text-sm text-zinc-500">
-                {isAdmin
-                  ? "No content generated yet. Click the button above to generate."
-                  : "No content generated for this campaign yet."}
+                No content generated yet. Click the button above to generate.
               </p>
             </div>
           )}

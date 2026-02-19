@@ -514,7 +514,6 @@ export default function BrainPage() {
                       pieces={pieces}
                       isGenerating={isGenerating}
                       isExpanded={isExpanded}
-                      isAdmin={isAdmin}
                       onGenerate={() => handleGenerateContent(campaign.id)}
                       onToggleExpand={() => toggleExpanded(campaign.id)}
                     />

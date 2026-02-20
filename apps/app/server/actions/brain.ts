@@ -133,6 +133,12 @@ export async function generateBrain(input: GenerateBrainInput) {
       })
       .eq("id", generation.id);
 
+    // Deactivate old avatars before inserting new ones
+    await supabase
+      .from("avatars")
+      .update({ is_active: false })
+      .eq("product_id", product.id);
+
     // Save avatars
     const avatarInserts = brainOutput.avatars.map((avatar) => ({
       product_id: product.id,

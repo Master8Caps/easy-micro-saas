@@ -13,6 +13,7 @@ import {
 import { ChannelPill, TypePill } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
 import { useUser } from "@/components/user-context";
+import { AvatarEditPanel } from "./avatar-edit-panel";
 
 interface Avatar {
   name: string;
@@ -32,6 +33,20 @@ interface BrainOutput {
   ad_campaigns?: unknown[];
   website_kit?: unknown;
   positioning_summary: string;
+}
+
+interface DbAvatar {
+  id: string;
+  name: string;
+  description: string;
+  pain_points: string[];
+  channels: string[];
+  icp_details: {
+    role: string;
+    context: string;
+    motivation: string;
+  };
+  is_active: boolean;
 }
 
 interface DbCampaign {
@@ -87,6 +102,8 @@ export default function BrainPage() {
   const [togglingStatus, setTogglingStatus] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [avatars, setAvatars] = useState<DbAvatar[]>([]);
+  const [editingAvatar, setEditingAvatar] = useState<DbAvatar | null>(null);
 
   // Content generation state
   const [contentByCampaign, setContentByCampaign] = useState<Record<string, ContentPiece[]>>({});
@@ -103,6 +120,7 @@ export default function BrainPage() {
 
       if (cancelled) return;
 
+      if (result.avatars) setAvatars(result.avatars as DbAvatar[]);
       if (result.socialCampaigns) setSocialCampaigns(result.socialCampaigns as DbCampaign[]);
       if (result.adCampaigns) setAdCampaigns(result.adCampaigns as DbCampaign[]);
       if (result.websiteKitPieces) setWebsiteKitPieces(result.websiteKitPieces as WebsiteKitPiece[]);
@@ -155,9 +173,10 @@ export default function BrainPage() {
 
       setOutput(genResult.output as BrainOutput);
 
-      // Reload saved data from DB (campaigns, ad campaigns, website kit)
+      // Reload saved data from DB (avatars, campaigns, ad campaigns, website kit)
       const reloaded = await loadBrain({ productId });
       if (!cancelled) {
+        if (reloaded.avatars) setAvatars(reloaded.avatars as DbAvatar[]);
         if (reloaded.socialCampaigns) setSocialCampaigns(reloaded.socialCampaigns as DbCampaign[]);
         if (reloaded.adCampaigns) setAdCampaigns(reloaded.adCampaigns as DbCampaign[]);
         if (reloaded.websiteKitPieces) setWebsiteKitPieces(reloaded.websiteKitPieces as WebsiteKitPiece[]);
@@ -184,10 +203,12 @@ export default function BrainPage() {
       setOutput(result.output as BrainOutput);
       // Reload data from DB
       const reloaded = await loadBrain({ productId });
+      if (reloaded.avatars) setAvatars(reloaded.avatars as DbAvatar[]);
       if (reloaded.socialCampaigns) setSocialCampaigns(reloaded.socialCampaigns as DbCampaign[]);
       if (reloaded.adCampaigns) setAdCampaigns(reloaded.adCampaigns as DbCampaign[]);
       if (reloaded.websiteKitPieces) setWebsiteKitPieces(reloaded.websiteKitPieces as WebsiteKitPiece[]);
       setContentByCampaign({});
+      setEditingAvatar(null);
       setStatus("done");
     }
   }, [productId]);
@@ -320,11 +341,7 @@ export default function BrainPage() {
 
   // Find avatar name for a campaign
   function getAvatarName(campaign: DbCampaign): string {
-    const rawCampaign = (output as BrainOutput & { campaigns: { avatar_name: string; angle: string }[] })
-      .campaigns?.find(
-        (rc: { angle: string }) => rc.angle === campaign.angle,
-      ) as { avatar_name?: string } | undefined;
-    return rawCampaign?.avatar_name ?? "";
+    return avatars.find((a) => a.id === campaign.avatar_id)?.name ?? "";
   }
 
   const sortedSocial = [...socialCampaigns].sort((a, b) => a.channel.localeCompare(b.channel));
@@ -390,11 +407,23 @@ export default function BrainPage() {
         </div>
 
         {/* Avatars */}
+        {avatars.length > 0 && (
         <section className="mb-12">
           <h2 className="text-xl font-bold">Target Avatars</h2>
           <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {output.avatars.map((avatar) => (
-              <div key={avatar.name} className="flex flex-col rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+            {avatars.map((avatar) => (
+              <div key={avatar.id} className="group relative flex flex-col rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+                {/* Edit button */}
+                <button
+                  onClick={() => setEditingAvatar(avatar)}
+                  className="absolute right-3 top-3 rounded-md p-1.5 text-zinc-600 opacity-0 transition-all hover:bg-white/[0.05] hover:text-zinc-300 group-hover:opacity-100"
+                  title="Edit avatar"
+                >
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                  </svg>
+                </button>
+
                 <h3 className="text-lg font-semibold">{avatar.name}</h3>
                 <p className="mt-2 text-sm text-zinc-400">{avatar.description}</p>
 
@@ -419,13 +448,13 @@ export default function BrainPage() {
                 <div className="mt-auto pt-4">
                   <div className="rounded-lg bg-white/[0.03] p-3">
                     <p className="text-xs text-zinc-500">
-                      <strong className="text-zinc-400">Role:</strong> {avatar.icp_details.role}
+                      <strong className="text-zinc-400">Role:</strong> {avatar.icp_details?.role}
                     </p>
                     <p className="mt-1 text-xs text-zinc-500">
-                      <strong className="text-zinc-400">Context:</strong> {avatar.icp_details.context}
+                      <strong className="text-zinc-400">Context:</strong> {avatar.icp_details?.context}
                     </p>
                     <p className="mt-1 text-xs text-zinc-500">
-                      <strong className="text-zinc-400">Motivation:</strong> {avatar.icp_details.motivation}
+                      <strong className="text-zinc-400">Motivation:</strong> {avatar.icp_details?.motivation}
                     </p>
                   </div>
                 </div>
@@ -433,6 +462,21 @@ export default function BrainPage() {
             ))}
           </div>
         </section>
+        )}
+
+        {/* Avatar Edit Panel */}
+        {editingAvatar && (
+          <AvatarEditPanel
+            avatar={editingAvatar}
+            onSave={(updated) => {
+              setAvatars((prev) =>
+                prev.map((a) => (a.id === updated.id ? updated : a)),
+              );
+              setEditingAvatar(null);
+            }}
+            onClose={() => setEditingAvatar(null)}
+          />
+        )}
 
         {/* Social Campaigns */}
         <section className="mb-12">

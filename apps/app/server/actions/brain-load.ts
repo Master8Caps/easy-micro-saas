@@ -34,6 +34,14 @@ export async function loadBrain(input: LoadBrainInput) {
     .limit(1)
     .single();
 
+  // Fetch avatars directly from DB
+  const { data: avatars } = await supabase
+    .from("avatars")
+    .select("id, name, description, pain_points, channels, icp_details, is_active")
+    .eq("product_id", input.productId)
+    .eq("is_active", true)
+    .order("created_at", { ascending: true });
+
   // Fetch social campaigns
   const { data: socialCampaigns } = await supabase
     .from("campaigns")
@@ -85,6 +93,7 @@ export async function loadBrain(input: LoadBrainInput) {
   if (!generation || !generation.raw_output) {
     return {
       output: null,
+      avatars: avatars ?? [],
       socialCampaigns: socialCampaigns ?? [],
       adCampaigns: adCampaigns ?? [],
       contentCounts: contentCountMap,
@@ -99,6 +108,7 @@ export async function loadBrain(input: LoadBrainInput) {
 
   return {
     output: generation.raw_output,
+    avatars: avatars ?? [],
     socialCampaigns: socialCampaigns ?? [],
     adCampaigns: adCampaigns ?? [],
     contentCounts: contentCountMap,

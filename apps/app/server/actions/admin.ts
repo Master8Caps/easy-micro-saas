@@ -76,7 +76,7 @@ export async function inviteUser(email: string) {
     process.env.NEXT_PUBLIC_APP_URL || "https://app.easymicrosaas.com";
 
   const { data, error } = await service.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${appUrl}/auth/callback`,
+    redirectTo: `${appUrl}/auth/callback?next=/setup`,
   });
 
   if (error) return { error: error.message };

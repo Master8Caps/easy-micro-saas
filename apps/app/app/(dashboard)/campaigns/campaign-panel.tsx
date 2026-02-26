@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { ChannelPill, TypePill, ArchivedBadge, ArchiveToggle } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
 import { LifecycleAction } from "@/components/lifecycle-action";
+import { RatingButtons } from "@/components/rating-buttons";
+import { EngagementPopover } from "@/components/engagement-popover";
 import {
   generateContentForCampaign,
   loadContentForCampaign,
@@ -29,6 +31,12 @@ interface ContentPiece {
   scheduled_for: string | null;
   created_at: string;
   links?: TrackedLink[];
+  rating: number | null;
+  engagement_views: number | null;
+  engagement_likes: number | null;
+  engagement_comments: number | null;
+  engagement_shares: number | null;
+  engagement_logged_at: string | null;
 }
 
 interface CampaignPanelProps {
@@ -289,6 +297,19 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                         className="flex shrink-0 items-center gap-1.5"
                         onClick={(e) => e.stopPropagation()}
                       >
+                        <RatingButtons pieceId={piece.id} initialRating={piece.rating} />
+                        {piece.status === "posted" && (
+                          <EngagementPopover
+                            pieceId={piece.id}
+                            initial={{
+                              views: piece.engagement_views,
+                              likes: piece.engagement_likes,
+                              comments: piece.engagement_comments,
+                              shares: piece.engagement_shares,
+                              loggedAt: piece.engagement_logged_at,
+                            }}
+                          />
+                        )}
                         <LifecycleAction
                           pieceId={piece.id}
                           status={piece.status}

@@ -35,7 +35,7 @@ export default async function SchedulePage({
   const { data: scheduledPieces } = await supabase
     .from("content_pieces")
     .select(
-      "id, product_id, campaign_id, type, title, body, status, posted_at, scheduled_for, archived, products(name), campaigns(channel, angle)",
+      "id, product_id, campaign_id, type, title, body, status, posted_at, scheduled_for, archived, rating, engagement_views, engagement_likes, engagement_comments, engagement_shares, engagement_logged_at, products(name), campaigns(channel, angle)",
     )
     .gte("scheduled_for", startDate)
     .lte("scheduled_for", endDate)
@@ -46,7 +46,7 @@ export default async function SchedulePage({
   const { data: unscheduledPieces } = await supabase
     .from("content_pieces")
     .select(
-      "id, product_id, campaign_id, type, title, body, status, posted_at, scheduled_for, archived, products(name), campaigns(channel, angle)",
+      "id, product_id, campaign_id, type, title, body, status, posted_at, scheduled_for, archived, rating, engagement_views, engagement_likes, engagement_comments, engagement_shares, engagement_logged_at, products(name), campaigns(channel, angle)",
     )
     .is("scheduled_for", null)
     .eq("archived", false)

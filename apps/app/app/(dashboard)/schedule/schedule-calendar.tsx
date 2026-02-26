@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { ChannelPill, TypePill } from "@/components/pills";
 import { CopyButton } from "@/components/copy-button";
 import { LifecycleAction } from "@/components/lifecycle-action";
+import { RatingButtons } from "@/components/rating-buttons";
+import { EngagementPopover } from "@/components/engagement-popover";
 import { updateContentPieceSchedule } from "@/server/actions/content";
 
 interface SchedulePiece {
@@ -18,6 +20,12 @@ interface SchedulePiece {
   posted_at: string | null;
   scheduled_for: string | null;
   archived: boolean;
+  rating: number | null;
+  engagement_views: number | null;
+  engagement_likes: number | null;
+  engagement_comments: number | null;
+  engagement_shares: number | null;
+  engagement_logged_at: string | null;
   products: { name: string } | null;
   campaigns: { channel: string; angle: string } | null;
 }
@@ -463,6 +471,19 @@ function ContentPanel({
               onStatusChange={onLifecycleChange}
             />
             <div className="flex items-center gap-2">
+              <RatingButtons pieceId={piece.id} initialRating={piece.rating} />
+              {piece.status === "posted" && (
+                <EngagementPopover
+                  pieceId={piece.id}
+                  initial={{
+                    views: piece.engagement_views,
+                    likes: piece.engagement_likes,
+                    comments: piece.engagement_comments,
+                    shares: piece.engagement_shares,
+                    loggedAt: piece.engagement_logged_at,
+                  }}
+                />
+              )}
               <CopyButton text={piece.body} />
               {piece.status === "scheduled" && (
                 <button

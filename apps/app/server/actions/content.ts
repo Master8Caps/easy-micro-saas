@@ -415,7 +415,7 @@ export async function loadContentForCampaign(campaignId: string) {
 
   const { data, error } = await supabase
     .from("content_pieces")
-    .select("id, type, title, body, metadata, status, archived, posted_at, scheduled_for, created_at, links(id, slug, click_count)")
+    .select("id, type, title, body, metadata, status, archived, posted_at, scheduled_for, created_at, rating, engagement_views, engagement_likes, engagement_comments, engagement_shares, engagement_logged_at, links(id, slug, click_count)")
     .eq("campaign_id", campaignId)
     .order("created_at", { ascending: false });
 
@@ -583,5 +583,68 @@ export async function updateContentPieceSchedule(
   revalidatePath("/content");
   revalidatePath("/schedule");
 
+  return { success: true };
+}
+
+// ── Update content piece rating ──────────────────────
+export async function updateContentRating(
+  pieceId: string,
+  rating: -1 | 0 | 1,
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Not authenticated" };
+
+  const { error } = await supabase
+    .from("content_pieces")
+    .update({ rating })
+    .eq("id", pieceId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/content");
+  revalidatePath("/campaigns");
+  revalidatePath("/schedule");
+  return { success: true };
+}
+
+// ── Update content piece engagement metrics ──────────
+export async function updateContentEngagement(
+  pieceId: string,
+  engagement: {
+    views?: number | null;
+    likes?: number | null;
+    comments?: number | null;
+    shares?: number | null;
+  },
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Not authenticated" };
+
+  const { error } = await supabase
+    .from("content_pieces")
+    .update({
+      engagement_views: engagement.views ?? null,
+      engagement_likes: engagement.likes ?? null,
+      engagement_comments: engagement.comments ?? null,
+      engagement_shares: engagement.shares ?? null,
+      engagement_logged_at: new Date().toISOString(),
+    })
+    .eq("id", pieceId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/content");
+  revalidatePath("/campaigns");
+  revalidatePath("/schedule");
   return { success: true };
 }

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { createTrackedLink } from "./links";
+import { loadLearningInsights, type LearningInsight } from "./learning";
 
 const anthropic = new Anthropic();
 
@@ -65,6 +66,39 @@ Write 2-3 variations with different angles (pain-point, benefit, social-proof).`
     default:
       return "Write content appropriate for the channel. Keep it specific and actionable.";
   }
+}
+
+// ── Performance context builder ──────────────────────
+function buildContentPerformanceContext(insights: LearningInsight): string {
+  const sections: string[] = [];
+
+  if (insights.totalPiecesWithSignals < 5) {
+    sections.push("NOTE: Limited performance data — treat as directional.\n");
+  }
+
+  if (insights.topPerformers.length > 0) {
+    const examples = insights.topPerformers.slice(0, 3).map(
+      (p) => `- "${p.bodySnippet}..." (${p.clicks} clicks, engagement: ${p.engagementRaw})`,
+    );
+    sections.push(`Top performing content for tone/style reference:\n${examples.join("\n")}`);
+  }
+
+  if (insights.patterns.styleCues.length > 0) {
+    sections.push(`Winning patterns: ${insights.patterns.styleCues.join(", ")}`);
+  }
+
+  const avoidLines: string[] = [];
+  for (const td of insights.thumbsDownPieces) {
+    avoidLines.push(`- "${td.angle}" style on ${td.channel}`);
+  }
+  for (const u of insights.underperformers.slice(0, 3)) {
+    avoidLines.push(`- "${u.angle}" approach on ${u.channel}`);
+  }
+  if (avoidLines.length > 0) {
+    sections.push(`Avoid these styles/approaches:\n${avoidLines.join("\n")}`);
+  }
+
+  return `\n\n## What's Working for This Product (Real Performance Data)\n${sections.join("\n\n")}\n\nGenerate content that builds on these winning patterns while staying fresh — don't copy, evolve.`;
 }
 
 // ── Prompt builder ───────────────────────────────────
@@ -283,9 +317,15 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
   const contentPieceType = mapContentType(campaign.content_type, campaign.channel);
 
   try {
-    const prompt = isAdCampaign
+    let prompt = isAdCampaign
       ? buildAdContentPrompt(campaign, avatar, product, product.content_formats ?? ["text"])
       : buildContentPrompt(campaign, avatar, product, contentPieceType);
+
+    // Inject performance context if available
+    const insights = await loadLearningInsights(input.productId);
+    if (insights) {
+      prompt += buildContentPerformanceContext(insights);
+    }
 
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",

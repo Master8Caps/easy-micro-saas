@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { computeEngagementRaw, computeCompositeScore } from "@/lib/score-utils";
 
 interface PerformanceInput {
   productId: string;
@@ -15,6 +16,7 @@ export interface CampaignScore {
   category: string;
   totalClicks: number;
   linkCount: number;
+  engagementRaw: number;
   normalizedScore: number;
 }
 
@@ -103,23 +105,71 @@ export async function loadPerformanceScores(
     });
   }
 
+  // Fetch content pieces with engagement + rating data
+  const { data: contentPieces } = await supabase
+    .from("content_pieces")
+    .select("id, campaign_id, rating, engagement_views, engagement_likes, engagement_comments, engagement_shares, engagement_logged_at")
+    .eq("product_id", input.productId);
+
+  // Aggregate engagement per campaign
+  const campaignEngagement = new Map<string, { raw: number; ratingSum: number; ratingCount: number }>();
+  for (const piece of contentPieces ?? []) {
+    if (!piece.campaign_id) continue;
+    // Filter by period if applicable
+    if (period !== "all" && piece.engagement_logged_at) {
+      const loggedAt = new Date(piece.engagement_logged_at);
+      const daysAgo = period === "7d" ? 7 : 30;
+      const since = new Date();
+      since.setDate(since.getDate() - daysAgo);
+      if (loggedAt < since) continue;
+    }
+    const raw = computeEngagementRaw(
+      piece.engagement_views,
+      piece.engagement_likes,
+      piece.engagement_comments,
+      piece.engagement_shares,
+    );
+    const current = campaignEngagement.get(piece.campaign_id) ?? { raw: 0, ratingSum: 0, ratingCount: 0 };
+    current.raw += raw;
+    if (piece.rating !== null) {
+      current.ratingSum += piece.rating;
+      current.ratingCount += 1;
+    }
+    campaignEngagement.set(piece.campaign_id, current);
+  }
+
   // 5. Build campaign scores with normalization
   const maxCampaignClicks = Math.max(
     ...Array.from(campaignClicks.values()).map((v) => v.clicks),
     1,
   );
+  const maxCampaignEngagement = Math.max(
+    ...Array.from(campaignEngagement.values()).map((v) => v.raw),
+    1,
+  );
 
   const campaignScores: CampaignScore[] = campaigns.map((c) => {
-    const data = campaignClicks.get(c.id) ?? { clicks: 0, linkCount: 0 };
+    const clickData = campaignClicks.get(c.id) ?? { clicks: 0, linkCount: 0 };
+    const engData = campaignEngagement.get(c.id) ?? { raw: 0, ratingSum: 0, ratingCount: 0 };
+    const avgRating = engData.ratingCount > 0 ? engData.ratingSum / engData.ratingCount : null;
+    const ratingForComposite = avgRating !== null ? (avgRating > 0.3 ? 1 : avgRating < -0.3 ? -1 : 0) : null;
+
     return {
       campaignId: c.id,
       avatarId: c.avatar_id,
       channel: c.channel,
       angle: c.angle,
       category: c.category,
-      totalClicks: data.clicks,
-      linkCount: data.linkCount,
-      normalizedScore: Math.round((data.clicks / maxCampaignClicks) * 100),
+      totalClicks: clickData.clicks,
+      linkCount: clickData.linkCount,
+      engagementRaw: engData.raw,
+      normalizedScore: computeCompositeScore({
+        clicks: clickData.clicks,
+        maxClicks: maxCampaignClicks,
+        engagementRaw: engData.raw,
+        maxEngagementRaw: maxCampaignEngagement,
+        rating: ratingForComposite,
+      }),
     };
   });
 
@@ -203,11 +253,13 @@ export async function loadPerformanceScores(
 
   const totalClicks = campaignScores.reduce((sum, c) => sum + c.totalClicks, 0);
 
+  const hasEngagement = Array.from(campaignEngagement.values()).some((e) => e.raw > 0);
+
   return {
     campaigns: campaignScores,
     avatars: avatarScores,
     channels: channelScores,
     totalClicks,
-    hasData: totalClicks > 0,
+    hasData: totalClicks > 0 || hasEngagement,
   };
 }

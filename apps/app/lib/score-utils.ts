@@ -27,3 +27,45 @@ export function scoreTextColor(color: string): string {
   };
   return map[color] ?? "text-zinc-500";
 }
+
+export interface CompositeInput {
+  clicks: number;
+  maxClicks: number;
+  engagementRaw: number;
+  maxEngagementRaw: number;
+  rating: number | null; // -1, 0, or 1
+}
+
+export function computeEngagementRaw(
+  views: number | null,
+  likes: number | null,
+  comments: number | null,
+  shares: number | null,
+): number {
+  return (
+    (views ?? 0) * 1 +
+    (likes ?? 0) * 3 +
+    (comments ?? 0) * 5 +
+    (shares ?? 0) * 4
+  );
+}
+
+export function computeCompositeScore(input: CompositeInput): number {
+  // Click signal (40%) — normalized 0-100
+  const clickSignal =
+    input.maxClicks > 0 ? (input.clicks / input.maxClicks) * 100 : 0;
+
+  // Engagement signal (40%) — normalized 0-100
+  const engagementSignal =
+    input.maxEngagementRaw > 0
+      ? (input.engagementRaw / input.maxEngagementRaw) * 100
+      : 0;
+
+  // Rating signal (20%) — thumbs up=100, neutral=50, thumbs down=0
+  const ratingSignal =
+    input.rating === 1 ? 100 : input.rating === -1 ? 0 : 50;
+
+  return Math.round(
+    clickSignal * 0.4 + engagementSignal * 0.4 + ratingSignal * 0.2,
+  );
+}

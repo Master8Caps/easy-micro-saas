@@ -390,7 +390,7 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 - [x] Active users table: email, role badge (admin=indigo, paid=emerald, free=zinc), join date
 - [x] Activate button calls existing `activateUser()` — updates profile status, sends activation email via Resend
 - [x] **Invite user** — email input + "Invite" button on users page
-- [x] `inviteUser()` server action — admin check, calls `auth.admin.inviteUserByEmail()`, sets profile to active (skips waitlist), Supabase sends branded invite template
+- [x] `inviteUser()` server action — admin check, calls `auth.admin.inviteUserByEmail()`, sets profile to `invited` (pending until setup), Supabase sends branded invite template
 - [x] Optimistic UI: activated user moves from waitlist to active table immediately
 - [x] Loading spinner on activate button while action is in flight
 - [x] Non-admins redirected to `/` on page load
@@ -403,6 +403,12 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 - [x] Sidebar order: Admin section above Settings, Settings directly above signed-in user info
 - [x] Sidebar stays fixed in viewport — `h-screen` layout with `overflow-y-auto` on both sidebar and main content
 - [x] Empty states for both tables with dashed border styling
+- [x] **Pending invites tracking** — invited users start with `status: 'invited'` instead of immediately `active`
+- [x] Migration 00017: added `invited` to `profiles.status` check constraint (`waitlist | invited | active`)
+- [x] `loadAdminUsers()` returns 3 groups: waitlisted, invited, active
+- [x] New "Pending Invites" section on admin users page (sky-blue badge) — shows email + invited date
+- [x] `activateInvitedUser()` server action — transitions `invited` → `active` on setup completion
+- [x] `/setup` page calls `activateInvitedUser()` after password + name set — auto-activates invited users
 - [x] Resend client lazy-initialized (`getResend()`) to prevent build-time errors on server components importing admin actions
 
 ### App — User Settings Page
@@ -613,7 +619,7 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 - [ ] Visit `/admin` as admin → see summary stat cards + recent signups table
 - [ ] Stat cards show correct counts (total users, active, waitlisted, products, generations, content, clicks, 7d generations)
 - [ ] Recent signups table shows last 10 users with status badges
-- [ ] Visit `/admin/users` → see invite form + waitlist table + active users table
+- [ ] Visit `/admin/users` → see invite form + pending invites + waitlist table + active users table
 - [x] Waitlist table shows email, name, source, signup date for each waitlisted user
 - [x] Active users table shows email, role badge (colored), join date
 - [x] Click "Activate" on a waitlisted user → spinner shows, user moves to active table
@@ -627,8 +633,14 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 - [ ] `/setup` page: mismatched passwords → error shown
 - [ ] `/setup` page: password < 6 chars → error shown
 - [ ] Invite duplicate email → error message shown
+- [ ] Invite user → new user appears in "Pending Invites" section (not Active Users)
+- [ ] Pending Invites section shows sky-blue count badge with correct number
+- [ ] Pending Invites table shows email and invited date for each pending user
+- [ ] Invited user clicks email link → completes `/setup` → moves from Pending Invites to Active Users
+- [ ] After setup completion, user no longer appears in Pending Invites on next page load
+- [ ] Empty Pending Invites shows "No pending invitations" placeholder
 - [ ] Empty waitlist shows "No users on the waitlist" placeholder
-- [ ] User counts (badges) on section headers are correct
+- [ ] User counts (badges) on all three sections are correct (pending, waitlist, active)
 - [ ] Settings appears directly above user info at bottom of sidebar (below Admin section)
 - [ ] Admin section appears above Settings (order: main nav → Admin → Settings → user info)
 
@@ -1022,7 +1034,7 @@ This is the current marketing module — avatars, campaigns, content generation,
 | 2026-02-20 | Slide-over panel for avatar editing | Same UX pattern as CampaignPanel; inline editing would be too cramped in 3-column grid especially for arrays (pain points) and multi-select (channels) |
 | 2026-02-20 | Admin section in sidebar | Separator + "ADMIN" label + sub-links replaces single flat "Users" link; Settings pinned to bottom of sidebar for all users |
 | 2026-02-20 | Admin split: system overview + users | `/admin` = platform stats (server component), `/admin/users` = user management (client component); separation of concerns |
-| 2026-02-20 | Invite users via Supabase admin API | `auth.admin.inviteUserByEmail()` sends branded invite template; invited users set to `status: 'active'` (skip waitlist) |
+| 2026-02-20 | Invite users via Supabase admin API | `auth.admin.inviteUserByEmail()` sends branded invite template; invited users set to `status: 'invited'` (pending until setup) |
 | 2026-02-20 | Lazy Resend initialization | `getResend()` singleton replaces top-level `new Resend()`; prevents build-time errors when server components import modules that transitively import Resend |
 | 2026-02-20 | Admin user list merges three data sources | Auth users (emails), profiles (role/status), waitlist (name/source) combined via service client; single server action returns complete picture |
 | 2026-02-20 | Email logo SVG → PNG | SVGs don't render in Gmail/Outlook; 80x80 PNG generated via sharp, hosted at `easymicrosaas.com/logo.png`; all 8 templates updated |
@@ -1032,3 +1044,4 @@ This is the current marketing module — avatars, campaigns, content generation,
 | 2026-02-20 | Initials avatar for v1 | No file upload infrastructure needed; `avatar_url` column exists for future Supabase Storage upload |
 | 2026-02-25 | Invite flow → /setup page | Invited users redirected to `/setup` to set name + password instead of landing on dashboard without credentials; uses `supabase.auth.updateUser({ password })` (no current password needed with active session) |
 | 2026-02-25 | Invite email hides raw Supabase URL | Fallback link text changed from raw `{{ .ConfirmationURL }}` to "click here to accept your invitation" — URL stays in href only |
+| 2026-02-27 | Pending invites tracking | Three-state status (`waitlist → invited → active`) instead of skipping straight to `active`; admins can see who hasn't accepted yet; `activateInvitedUser()` called on `/setup` completion for auto-activation |

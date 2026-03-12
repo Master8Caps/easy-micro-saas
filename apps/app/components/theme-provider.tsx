@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { updateThemePreference } from "@/lib/actions/theme";
 
 type Theme = "dark" | "light" | "system";
 
@@ -51,6 +52,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setThemeState(newTheme);
     localStorage.setItem("theme", newTheme);
     setResolvedTheme(applyTheme(newTheme));
+    // Non-blocking sync to Supabase
+    updateThemePreference(newTheme).catch(() => {});
   };
 
   return (

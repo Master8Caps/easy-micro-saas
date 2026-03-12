@@ -119,7 +119,7 @@ export default function AdminUsersPage() {
     const styles: Record<string, string> = {
       admin: "border-indigo-500/30 bg-indigo-500/10 text-indigo-400",
       paid: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
-      free: "border-zinc-500/30 bg-zinc-500/10 text-zinc-400",
+      free: "border-zinc-500/30 bg-zinc-500/10 text-content-secondary",
     };
     return (
       <span
@@ -136,19 +136,19 @@ export default function AdminUsersPage() {
         <h1 className="font-heading text-3xl font-bold tracking-tight">
           Users
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-content-muted">
           Manage waitlisted and active users
         </p>
 
         {/* Invite User */}
         <form
           onSubmit={handleInvite}
-          className="mt-8 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
+          className="mt-8 rounded-xl border border-line bg-surface-card p-4"
         >
           <div className="flex items-center gap-3">
             <label
               htmlFor="inviteEmail"
-              className="text-sm font-medium text-zinc-300"
+              className="text-sm font-medium text-content-secondary"
             >
               Invite user
             </label>
@@ -158,7 +158,7 @@ export default function AdminUsersPage() {
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
               placeholder="email@example.com"
-              className="flex-1 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+              className="flex-1 rounded-lg border border-line bg-surface-card px-3 py-2 text-sm text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
             />
             <button
               type="submit"
@@ -199,20 +199,20 @@ export default function AdminUsersPage() {
               </div>
 
               {invited.length === 0 ? (
-                <div className="mt-4 rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
-                  <p className="text-sm text-zinc-500">
+                <div className="mt-4 rounded-xl border border-dashed border-line p-8 text-center">
+                  <p className="text-sm text-content-muted">
                     No pending invitations
                   </p>
                 </div>
               ) : (
-                <div className="mt-4 overflow-hidden rounded-xl border border-white/[0.06]">
+                <div className="mt-4 overflow-hidden rounded-xl border border-line">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+                      <tr className="border-b border-line bg-surface-card">
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-content-muted">
                           Email
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-content-muted">
                           Invited
                         </th>
                       </tr>
@@ -221,12 +221,12 @@ export default function AdminUsersPage() {
                       {invited.map((user) => (
                         <tr
                           key={user.id}
-                          className="border-b border-white/[0.04] last:border-0"
+                          className="border-b border-line-subtle last:border-0"
                         >
-                          <td className="px-4 py-3 text-sm text-zinc-200">
+                          <td className="px-4 py-3 text-sm text-content-primary">
                             {user.email}
                           </td>
-                          <td className="px-4 py-3 text-sm text-zinc-500">
+                          <td className="px-4 py-3 text-sm text-content-muted">
                             {formatDate(user.created_at)}
                           </td>
                         </tr>
@@ -247,29 +247,29 @@ export default function AdminUsersPage() {
               </div>
 
               {waitlisted.length === 0 ? (
-                <div className="mt-4 rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
-                  <p className="text-sm text-zinc-500">
+                <div className="mt-4 rounded-xl border border-dashed border-line p-8 text-center">
+                  <p className="text-sm text-content-muted">
                     No users on the waitlist
                   </p>
                 </div>
               ) : (
-                <div className="mt-4 overflow-hidden rounded-xl border border-white/[0.06]">
+                <div className="mt-4 overflow-hidden rounded-xl border border-line">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+                      <tr className="border-b border-line bg-surface-card">
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-content-muted">
                           Email
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-content-muted">
                           Name
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-content-muted">
                           Source
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-content-muted">
                           Signed up
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-zinc-500">
+                        <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-content-muted">
                           Action
                         </th>
                       </tr>
@@ -278,18 +278,18 @@ export default function AdminUsersPage() {
                       {waitlisted.map((user) => (
                         <tr
                           key={user.id}
-                          className="border-b border-white/[0.04] last:border-0"
+                          className="border-b border-line-subtle last:border-0"
                         >
-                          <td className="px-4 py-3 text-sm text-zinc-200">
+                          <td className="px-4 py-3 text-sm text-content-primary">
                             {user.email}
                           </td>
-                          <td className="px-4 py-3 text-sm text-zinc-400">
+                          <td className="px-4 py-3 text-sm text-content-secondary">
                             {user.name || "—"}
                           </td>
-                          <td className="px-4 py-3 text-sm text-zinc-500">
+                          <td className="px-4 py-3 text-sm text-content-muted">
                             {user.source || "—"}
                           </td>
-                          <td className="px-4 py-3 text-sm text-zinc-500">
+                          <td className="px-4 py-3 text-sm text-content-muted">
                             {formatDate(user.created_at)}
                           </td>
                           <td className="px-4 py-3 text-right">
@@ -326,21 +326,21 @@ export default function AdminUsersPage() {
               </div>
 
               {active.length === 0 ? (
-                <div className="mt-4 rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
-                  <p className="text-sm text-zinc-500">No active users</p>
+                <div className="mt-4 rounded-xl border border-dashed border-line p-8 text-center">
+                  <p className="text-sm text-content-muted">No active users</p>
                 </div>
               ) : (
-                <div className="mt-4 overflow-hidden rounded-xl border border-white/[0.06]">
+                <div className="mt-4 overflow-hidden rounded-xl border border-line">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+                      <tr className="border-b border-line bg-surface-card">
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-content-muted">
                           Email
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-content-muted">
                           Role
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-content-muted">
                           Joined
                         </th>
                       </tr>
@@ -349,13 +349,13 @@ export default function AdminUsersPage() {
                       {active.map((user) => (
                         <tr
                           key={user.id}
-                          className="border-b border-white/[0.04] last:border-0"
+                          className="border-b border-line-subtle last:border-0"
                         >
-                          <td className="px-4 py-3 text-sm text-zinc-200">
+                          <td className="px-4 py-3 text-sm text-content-primary">
                             {user.email}
                           </td>
                           <td className="px-4 py-3">{roleBadge(user.role)}</td>
-                          <td className="px-4 py-3 text-sm text-zinc-500">
+                          <td className="px-4 py-3 text-sm text-content-muted">
                             {formatDate(user.created_at)}
                           </td>
                         </tr>

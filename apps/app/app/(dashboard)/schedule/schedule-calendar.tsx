@@ -187,7 +187,7 @@ export function ScheduleCalendar({
       <div className="flex items-center justify-between">
         <button
           onClick={() => navigateWeek("prev")}
-          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-2 text-sm text-zinc-300 transition-colors hover:border-white/[0.1] hover:bg-white/[0.03]"
+          className="rounded-lg border border-line bg-surface-card px-4 py-2 text-sm text-content-secondary transition-colors hover:border-line hover:bg-surface-card"
         >
           <span className="flex items-center gap-1.5">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -209,7 +209,7 @@ export function ScheduleCalendar({
         </div>
         <button
           onClick={() => navigateWeek("next")}
-          className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-2 text-sm text-zinc-300 transition-colors hover:border-white/[0.1] hover:bg-white/[0.03]"
+          className="rounded-lg border border-line bg-surface-card px-4 py-2 text-sm text-content-secondary transition-colors hover:border-line hover:bg-surface-card"
         >
           <span className="flex items-center gap-1.5">
             Next
@@ -230,18 +230,18 @@ export function ScheduleCalendar({
           return (
             <div
               key={day.date}
-              className={`flex min-h-[200px] flex-col rounded-xl border bg-white/[0.02] p-3 ${
+              className={`flex min-h-[200px] flex-col rounded-xl border bg-surface-card p-3 ${
                 isToday
                   ? "border-indigo-500/40"
-                  : "border-white/[0.06]"
+                  : "border-line"
               }`}
             >
               {/* Day header */}
-              <div className="mb-2 border-b border-white/[0.06] pb-2">
-                <p className={`text-xs font-medium ${isToday ? "text-indigo-400" : "text-zinc-500"}`}>
+              <div className="mb-2 border-b border-line pb-2">
+                <p className={`text-xs font-medium ${isToday ? "text-indigo-400" : "text-content-muted"}`}>
                   {day.label}
                 </p>
-                <p className={`text-lg font-bold ${isToday ? "text-indigo-300" : isPast ? "text-zinc-600" : ""}`}>
+                <p className={`text-lg font-bold ${isToday ? "text-indigo-300" : isPast ? "text-content-muted" : ""}`}>
                   {day.dayOfMonth}
                 </p>
               </div>
@@ -259,7 +259,7 @@ export function ScheduleCalendar({
 
               {/* Empty day indicator */}
               {pieces.length === 0 && (
-                <p className="py-4 text-center text-xs text-zinc-700">
+                <p className="py-4 text-center text-xs text-content-muted">
                   No content
                 </p>
               )}
@@ -269,18 +269,18 @@ export function ScheduleCalendar({
       </div>
 
       {/* Unscheduled content pool */}
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+      <div className="rounded-xl border border-line bg-surface-card p-6">
         <div className="mb-4 flex items-center gap-4">
           <div>
             <h3 className="font-semibold">Unscheduled Content</h3>
-            <p className="mt-0.5 text-xs text-zinc-500">
+            <p className="mt-0.5 text-xs text-content-muted">
               {filteredUnscheduled.length} piece{filteredUnscheduled.length === 1 ? "" : "s"} ready to schedule
             </p>
           </div>
           <select
             value={productFilter}
             onChange={(e) => setProductFilter(e.target.value)}
-            className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
+            className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
           >
             <option value="">All products</option>
             {products.map((p) => (
@@ -292,8 +292,8 @@ export function ScheduleCalendar({
         </div>
 
         {filteredUnscheduled.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
-            <p className="text-sm text-zinc-500">
+          <div className="rounded-xl border border-dashed border-line p-8 text-center">
+            <p className="text-sm text-content-muted">
               No unscheduled content. Everything is scheduled or archived.
             </p>
           </div>
@@ -340,8 +340,8 @@ function CalendarCard({
   return (
     <button
       onClick={onSelect}
-      className={`w-full rounded-lg border bg-white/[0.03] p-2 text-left transition-colors hover:bg-white/[0.06] ${
-        piece.status === "posted" ? "border-emerald-500/20 opacity-70" : "border-white/[0.06]"
+      className={`w-full rounded-lg border bg-surface-card p-2 text-left transition-colors hover:bg-surface-card-hover ${
+        piece.status === "posted" ? "border-emerald-500/20 opacity-70" : "border-line"
       }`}
     >
       {/* Row 1: channel pill + time */}
@@ -361,7 +361,7 @@ function CalendarCard({
       </div>
 
       {/* Row 2: title */}
-      <p className="mt-1 truncate text-xs font-medium text-zinc-300">
+      <p className="mt-1 truncate text-xs font-medium text-content-secondary">
         {piece.title ?? piece.campaigns?.angle ?? "Untitled"}
       </p>
 
@@ -369,7 +369,7 @@ function CalendarCard({
       <div className="mt-0.5 flex items-center gap-1.5">
         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusDot}`} />
         {piece.products && (
-          <p className="truncate text-[10px] text-zinc-600">
+          <p className="truncate text-[10px] text-content-muted">
             {piece.products.name}
           </p>
         )}
@@ -408,9 +408,9 @@ function ContentPanel({
       />
 
       {/* Panel */}
-      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-xl flex-col border-l border-white/[0.06] bg-zinc-950 shadow-2xl">
+      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-xl flex-col border-l border-line bg-surface-primary shadow-2xl">
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-white/[0.06] p-6">
+        <div className="flex items-start justify-between border-b border-line p-6">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               {piece.campaigns && (
@@ -419,7 +419,7 @@ function ContentPanel({
               <TypePill type={piece.type} />
             </div>
             {piece.products && (
-              <p className="mt-2 text-sm font-medium text-zinc-400">
+              <p className="mt-2 text-sm font-medium text-content-secondary">
                 {piece.products.name}
               </p>
             )}
@@ -427,7 +427,7 @@ function ContentPanel({
               {piece.title ?? piece.campaigns?.angle ?? "Untitled"}
             </h2>
             {piece.campaigns?.angle && piece.title && (
-              <p className="mt-1 text-sm italic text-zinc-400">
+              <p className="mt-1 text-sm italic text-content-secondary">
                 &ldquo;{piece.campaigns.angle}&rdquo;
               </p>
             )}
@@ -450,7 +450,7 @@ function ContentPanel({
           </div>
           <button
             onClick={onClose}
-            className="ml-4 rounded-lg p-2 text-zinc-400 transition-colors hover:bg-white/[0.05] hover:text-zinc-200"
+            className="ml-4 rounded-lg p-2 text-content-secondary transition-colors hover:bg-surface-card-hover hover:text-content-primary"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 6 6 18" />
@@ -488,7 +488,7 @@ function ContentPanel({
               {piece.status === "scheduled" && (
                 <button
                   onClick={onUnschedule}
-                  className="rounded-lg border border-white/[0.06] px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-white/[0.05] hover:text-zinc-200"
+                  className="rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-card-hover hover:text-content-primary"
                 >
                   Unschedule
                 </button>
@@ -497,8 +497,8 @@ function ContentPanel({
           </div>
 
           {/* Content body */}
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+          <div className="rounded-xl border border-line bg-surface-card p-5">
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-content-secondary">
               {piece.body}
             </p>
           </div>
@@ -517,7 +517,7 @@ function UnscheduledCard({
   onLifecycleChange: (newStatus: string, scheduledFor?: string | null, postedAt?: string | null) => void;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+    <div className="flex items-center gap-4 rounded-xl border border-line bg-surface-card p-4">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           {piece.campaigns && (
@@ -525,13 +525,13 @@ function UnscheduledCard({
           )}
           <TypePill type={piece.type} />
           {piece.products && (
-            <span className="text-xs text-zinc-500">{piece.products.name}</span>
+            <span className="text-xs text-content-muted">{piece.products.name}</span>
           )}
         </div>
-        <p className="mt-1.5 truncate text-sm font-medium text-zinc-300">
+        <p className="mt-1.5 truncate text-sm font-medium text-content-secondary">
           {piece.title ?? piece.campaigns?.angle ?? "Untitled"}
         </p>
-        <p className="mt-0.5 line-clamp-1 text-xs text-zinc-500">
+        <p className="mt-0.5 line-clamp-1 text-xs text-content-muted">
           {piece.body}
         </p>
       </div>

@@ -33,29 +33,29 @@ export default async function DashboardPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-content-muted">
             Welcome back. Here&apos;s your overview.
           </p>
         </div>
         <Link
           href="/products/new"
-          className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200"
+          className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary"
         >
           New Product
         </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-colors hover:bg-white/[0.03]">
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Products</p>
+        <div className="rounded-xl border border-line bg-surface-card p-6 transition-colors hover:bg-surface-card">
+          <p className="text-xs font-medium uppercase tracking-wider text-content-muted">Products</p>
           <p className="mt-2 text-3xl font-bold">{activeProducts?.length ?? 0}</p>
         </div>
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-colors hover:bg-white/[0.03]">
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Campaign Angles</p>
+        <div className="rounded-xl border border-line bg-surface-card p-6 transition-colors hover:bg-surface-card">
+          <p className="text-xs font-medium uppercase tracking-wider text-content-muted">Campaign Angles</p>
           <p className="mt-2 text-3xl font-bold">{campaignCount ?? 0}</p>
         </div>
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-colors hover:bg-white/[0.03]">
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Content Pieces</p>
+        <div className="rounded-xl border border-line bg-surface-card p-6 transition-colors hover:bg-surface-card">
+          <p className="text-xs font-medium uppercase tracking-wider text-content-muted">Content Pieces</p>
           <p className="mt-2 text-3xl font-bold">{contentCount ?? 0}</p>
         </div>
       </div>
@@ -63,18 +63,18 @@ export default async function DashboardPage() {
       {/* Active Products */}
       {activeProducts && activeProducts.length > 0 ? (
         <div className="mt-10">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Active Products</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-content-muted">Active Products</h2>
           <div className="mt-4 space-y-3">
             {activeProducts.map((product) => (
               <Link
                 key={product.id}
                 href={`/products/${product.id}/brain`}
-                className="block rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-all hover:border-white/[0.1] hover:bg-white/[0.03]"
+                className="block rounded-xl border border-line bg-surface-card p-6 transition-all hover:border-line hover:bg-surface-card"
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold">{product.name}</h3>
-                    <p className="mt-1 text-sm text-zinc-500">
+                    <p className="mt-1 text-sm text-content-muted">
                       {product.description}
                     </p>
                   </div>
@@ -88,15 +88,15 @@ export default async function DashboardPage() {
           </div>
         </div>
       ) : (
-        <div className="mt-10 rounded-xl border border-dashed border-white/[0.08] p-12 text-center">
+        <div className="mt-10 rounded-xl border border-dashed border-line p-12 text-center">
           <h2 className="text-lg font-semibold">No products yet</h2>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-content-muted">
             Create your first product to generate avatars, campaigns, and
             content.
           </p>
           <Link
             href="/products/new"
-            className="mt-6 inline-flex items-center justify-center rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200"
+            className="mt-6 inline-flex items-center justify-center rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary"
           >
             Create Product
           </Link>
@@ -106,18 +106,18 @@ export default async function DashboardPage() {
       {/* Archived Products */}
       {archivedProducts && archivedProducts.length > 0 && (
         <div className="mt-10">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-600">Archived</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-content-muted">Archived</h2>
           <div className="mt-4 space-y-3">
             {archivedProducts.map((product) => (
               <Link
                 key={product.id}
                 href={`/products/${product.id}/brain`}
-                className="block rounded-xl border border-white/[0.04] bg-white/[0.01] p-6 transition-all hover:border-white/[0.08] hover:bg-white/[0.02]"
+                className="block rounded-xl border border-line-subtle bg-surface-card p-6 transition-all hover:border-line hover:bg-surface-card"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-zinc-400">{product.name}</h3>
-                    <p className="mt-1 text-sm text-zinc-600">
+                    <h3 className="font-semibold text-content-secondary">{product.name}</h3>
+                    <p className="mt-1 text-sm text-content-muted">
                       {product.description}
                     </p>
                   </div>

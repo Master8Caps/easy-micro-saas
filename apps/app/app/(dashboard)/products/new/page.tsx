@@ -94,7 +94,7 @@ export default function NewProductPage() {
     <div className="flex min-h-screen items-center justify-center px-6">
       <div className="w-full max-w-lg">
         <div className="mb-8">
-          <p className="text-sm font-medium text-zinc-500">
+          <p className="text-sm font-medium text-content-muted">
             Step {step} of {TOTAL_STEPS}
           </p>
           <div className="mt-2 flex gap-2">
@@ -102,7 +102,7 @@ export default function NewProductPage() {
               <div
                 key={s}
                 className={`h-1 flex-1 rounded-full ${
-                  s <= step ? "bg-white" : "bg-white/[0.06]"
+                  s <= step ? "bg-white" : "bg-surface-card-hover"
                 }`}
               />
             ))}
@@ -114,14 +114,14 @@ export default function NewProductPage() {
             <h1 className="font-heading text-2xl font-bold">
               What are you building?
             </h1>
-            <p className="mt-2 text-sm text-zinc-400">
+            <p className="mt-2 text-sm text-content-secondary">
               Tell us about your product. Be specific — better input means
               better output.
             </p>
 
             <div className="mt-8 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-300">
+                <label className="block text-sm font-medium text-content-secondary">
                   Product name
                 </label>
                 <input
@@ -129,12 +129,12 @@ export default function NewProductPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. InvoiceBot"
-                  className="mt-1 block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                  className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-300">
+                <label className="block text-sm font-medium text-content-secondary">
                   One-line description
                 </label>
                 <input
@@ -142,12 +142,12 @@ export default function NewProductPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="e.g. Automated invoicing for freelancers"
-                  className="mt-1 block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                  className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-300">
+                <label className="block text-sm font-medium text-content-secondary">
                   Target market / problem being solved
                 </label>
                 <textarea
@@ -155,7 +155,7 @@ export default function NewProductPage() {
                   onChange={(e) => setMarket(e.target.value)}
                   rows={3}
                   placeholder="e.g. Freelance designers and developers who waste hours every month creating and following up on invoices. They need something that handles it automatically."
-                  className="mt-1 block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                  className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
                 />
               </div>
             </div>
@@ -163,7 +163,7 @@ export default function NewProductPage() {
             <button
               onClick={() => setStep(2)}
               disabled={!name || !description || !market}
-              className="mt-8 w-full rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200 disabled:opacity-30"
+              className="mt-8 w-full rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary disabled:opacity-30"
             >
               Continue
             </button>
@@ -175,12 +175,12 @@ export default function NewProductPage() {
             <h1 className="font-heading text-2xl font-bold">
               What are your goals?
             </h1>
-            <p className="mt-2 text-sm text-zinc-400">
+            <p className="mt-2 text-sm text-content-secondary">
               What does success look like in the next 30 days?
             </p>
 
             <div className="mt-8">
-              <label className="block text-sm font-medium text-zinc-300">
+              <label className="block text-sm font-medium text-content-secondary">
                 Goals
               </label>
               <textarea
@@ -188,21 +188,21 @@ export default function NewProductPage() {
                 onChange={(e) => setGoals(e.target.value)}
                 rows={4}
                 placeholder="e.g. Get 50 signups from freelancers, validate that automated invoice reminders are the killer feature, figure out if LinkedIn or Twitter is the better channel."
-                className="mt-1 block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
               />
             </div>
 
             <div className="mt-8 flex gap-3">
               <button
                 onClick={() => setStep(1)}
-                className="rounded-lg border border-white/[0.06] px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
+                className="rounded-lg border border-line px-4 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-card-hover"
               >
                 Back
               </button>
               <button
                 onClick={() => setStep(3)}
                 disabled={!goals}
-                className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200 disabled:opacity-30"
+                className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary disabled:opacity-30"
               >
                 Continue
               </button>
@@ -215,14 +215,14 @@ export default function NewProductPage() {
             <h1 className="font-heading text-2xl font-bold">
               Where do you want to reach people?
             </h1>
-            <p className="mt-2 text-sm text-zinc-400">
+            <p className="mt-2 text-sm text-content-secondary">
               Pick the channels you want to post on. Select at least one.
             </p>
 
             <div className="mt-8 space-y-5">
               {channelGroups.map((group) => (
                 <div key={group.label}>
-                  <p className="mb-2 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wider text-content-muted">
                     {group.label}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
@@ -232,8 +232,8 @@ export default function NewProductPage() {
                         onClick={() => toggleChannel(channel)}
                         className={`rounded-lg border px-3 py-2 text-left text-xs font-medium transition-colors ${
                           channels.includes(channel)
-                            ? "border-white bg-white/10 text-zinc-100"
-                            : "border-white/[0.06] text-zinc-400 hover:border-white/[0.1] hover:text-zinc-300"
+                            ? "border-white bg-white/10 text-content-primary"
+                            : "border-line text-content-secondary hover:border-line hover:text-content-secondary"
                         }`}
                       >
                         {channel}
@@ -247,14 +247,14 @@ export default function NewProductPage() {
             <div className="mt-8 flex gap-3">
               <button
                 onClick={() => setStep(2)}
-                className="rounded-lg border border-white/[0.06] px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
+                className="rounded-lg border border-line px-4 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-card-hover"
               >
                 Back
               </button>
               <button
                 onClick={() => setStep(4)}
                 disabled={channels.length === 0}
-                className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200 disabled:opacity-30"
+                className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary disabled:opacity-30"
               >
                 Continue
               </button>
@@ -267,17 +267,17 @@ export default function NewProductPage() {
             <h1 className="font-heading text-2xl font-bold">
               A couple more things...
             </h1>
-            <p className="mt-2 text-sm text-zinc-400">
+            <p className="mt-2 text-sm text-content-secondary">
               This helps us tailor your marketing brain to your situation.
             </p>
 
             <div className="mt-8 space-y-6">
               {/* Content formats */}
               <div>
-                <p className="text-sm font-medium text-zinc-200">
+                <p className="text-sm font-medium text-content-primary">
                   What content formats do you want to create?
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-500">
+                <p className="mt-0.5 text-xs text-content-muted">
                   Unselect any formats you don&apos;t plan to create.
                 </p>
                 <div className="mt-3 grid grid-cols-3 gap-3">
@@ -294,7 +294,7 @@ export default function NewProductPage() {
                         className={`relative rounded-xl border p-4 text-left transition-colors ${
                           selected
                             ? "border-emerald-500/50 bg-emerald-500/5"
-                            : "border-white/[0.06] text-zinc-400 hover:border-white/[0.1]"
+                            : "border-line text-content-secondary hover:border-line"
                         }`}
                       >
                         {selected && (
@@ -311,10 +311,10 @@ export default function NewProductPage() {
                             />
                           </svg>
                         )}
-                        <p className={`text-sm font-medium ${selected ? "text-zinc-100" : ""}`}>
+                        <p className={`text-sm font-medium ${selected ? "text-content-primary" : ""}`}>
                           {format.label}
                         </p>
-                        <p className={`mt-0.5 text-xs ${selected ? "text-zinc-400" : "text-zinc-500"}`}>
+                        <p className={`mt-0.5 text-xs ${selected ? "text-content-secondary" : "text-content-muted"}`}>
                           {format.desc}
                         </p>
                       </button>
@@ -324,13 +324,13 @@ export default function NewProductPage() {
               </div>
 
               {/* Website toggle */}
-              <div className="rounded-xl border border-white/[0.06] p-5">
+              <div className="rounded-xl border border-line p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-zinc-200">
+                    <p className="text-sm font-medium text-content-primary">
                       Do you have a website?
                     </p>
-                    <p className="mt-0.5 text-xs text-zinc-500">
+                    <p className="mt-0.5 text-xs text-content-muted">
                       We&apos;ll generate landing page copy, meta descriptions,
                       and email sequences.
                     </p>
@@ -344,7 +344,7 @@ export default function NewProductPage() {
                     <span
                       className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full transition-transform ${
                         hasWebsite
-                          ? "translate-x-5 bg-zinc-950"
+                          ? "translate-x-5 bg-surface-primary"
                           : "bg-zinc-400"
                       }`}
                     />
@@ -357,20 +357,20 @@ export default function NewProductPage() {
                       value={websiteUrl}
                       onChange={(e) => setWebsiteUrl(e.target.value)}
                       placeholder="https://yourproduct.com"
-                      className="block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                      className="block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-sm text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
                     />
                   </div>
                 )}
               </div>
 
               {/* Ads toggle */}
-              <div className="rounded-xl border border-white/[0.06] p-5">
+              <div className="rounded-xl border border-line p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-zinc-200">
+                    <p className="text-sm font-medium text-content-primary">
                       Do you want to run paid ads?
                     </p>
-                    <p className="mt-0.5 text-xs text-zinc-500">
+                    <p className="mt-0.5 text-xs text-content-muted">
                       We&apos;ll generate ad creatives and copy for your chosen
                       platforms.
                     </p>
@@ -384,7 +384,7 @@ export default function NewProductPage() {
                     <span
                       className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full transition-transform ${
                         wantsAds
-                          ? "translate-x-5 bg-zinc-950"
+                          ? "translate-x-5 bg-surface-primary"
                           : "bg-zinc-400"
                       }`}
                     />
@@ -398,8 +398,8 @@ export default function NewProductPage() {
                         onClick={() => toggleAdPlatform(platform)}
                         className={`rounded-lg border px-3 py-2 text-left text-sm font-medium transition-colors ${
                           adPlatforms.includes(platform)
-                            ? "border-white bg-white/10 text-zinc-100"
-                            : "border-white/[0.06] text-zinc-400 hover:border-white/[0.1] hover:text-zinc-300"
+                            ? "border-white bg-white/10 text-content-primary"
+                            : "border-line text-content-secondary hover:border-line hover:text-content-secondary"
                         }`}
                       >
                         {platform}
@@ -415,14 +415,14 @@ export default function NewProductPage() {
             <div className="mt-8 flex gap-3">
               <button
                 onClick={() => setStep(3)}
-                className="rounded-lg border border-white/[0.06] px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
+                className="rounded-lg border border-line px-4 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-card-hover"
               >
                 Back
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={loading || contentFormats.length === 0}
-                className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200 disabled:opacity-30"
+                className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary disabled:opacity-30"
               >
                 {loading ? "Creating..." : "Generate Marketing Brain"}
               </button>

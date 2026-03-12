@@ -138,24 +138,24 @@ export function DatePicker({
   return (
     <div
       ref={ref}
-      className="w-[280px] rounded-xl border border-white/[0.08] bg-zinc-900 p-4 shadow-2xl"
+      className="w-[280px] rounded-xl border border-line bg-surface-secondary p-4 shadow-2xl"
     >
       {/* Month header */}
-      <div className="mb-3 flex items-center justify-between border-b border-white/[0.06] pb-3">
+      <div className="mb-3 flex items-center justify-between border-b border-line pb-3">
         <button
           onClick={prevMonth}
-          className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-white/[0.05] hover:text-zinc-200"
+          className="rounded-md p-1.5 text-content-secondary transition-colors hover:bg-surface-card-hover hover:text-content-primary"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="m15 18-6-6 6-6" />
           </svg>
         </button>
-        <span className="text-sm font-semibold text-zinc-200">
+        <span className="text-sm font-semibold text-content-primary">
           {MONTHS[viewMonth]} {viewYear}
         </span>
         <button
           onClick={nextMonth}
-          className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-white/[0.05] hover:text-zinc-200"
+          className="rounded-md p-1.5 text-content-secondary transition-colors hover:bg-surface-card-hover hover:text-content-primary"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="m9 18 6-6-6-6" />
@@ -166,7 +166,7 @@ export function DatePicker({
       {/* Weekday headers */}
       <div className="mb-1 grid grid-cols-7 gap-0">
         {WEEKDAYS.map((wd) => (
-          <div key={wd} className="py-1 text-center text-xs font-medium text-zinc-600">
+          <div key={wd} className="py-1 text-center text-xs font-medium text-content-muted">
             {wd}
           </div>
         ))}
@@ -192,10 +192,10 @@ export function DatePicker({
                 isSelected
                   ? "bg-indigo-500/30 font-medium text-indigo-200"
                   : isToday
-                    ? "border border-indigo-500/30 font-medium text-zinc-200"
+                    ? "border border-indigo-500/30 font-medium text-content-primary"
                     : isPast
-                      ? "text-zinc-600 hover:bg-white/[0.04] hover:text-zinc-400"
-                      : "text-zinc-300 hover:bg-indigo-500/15 hover:text-indigo-200"
+                      ? "text-content-muted hover:bg-surface-card-hover hover:text-content-secondary"
+                      : "text-content-secondary hover:bg-indigo-500/15 hover:text-indigo-200"
               }`}
             >
               {day}
@@ -207,8 +207,8 @@ export function DatePicker({
       {/* Time selector — shown after day is selected */}
       {selectedDay && (
         <>
-          <div className="mt-3 border-t border-white/[0.06] pt-3">
-            <p className="mb-2 text-xs font-medium text-zinc-400">Time</p>
+          <div className="mt-3 border-t border-line pt-3">
+            <p className="mb-2 text-xs font-medium text-content-secondary">Time</p>
             <div
               ref={timeGridRef}
               className="grid max-h-[140px] grid-cols-3 gap-1 overflow-y-auto pr-1"
@@ -221,7 +221,7 @@ export function DatePicker({
                   className={`rounded-md px-2 py-1.5 text-xs transition-colors ${
                     selectedTime === slot.value
                       ? "bg-indigo-500/30 font-medium text-indigo-200"
-                      : "text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-200"
+                      : "text-content-secondary hover:bg-surface-card-hover hover:text-content-primary"
                   }`}
                 >
                   {slot.label}

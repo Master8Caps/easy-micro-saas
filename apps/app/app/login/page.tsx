@@ -79,18 +79,18 @@ export default function LoginPage() {
           <h1 className="mt-6 font-heading text-2xl font-bold">
             You&apos;re on the list
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+          <p className="mt-3 text-sm leading-relaxed text-content-secondary">
             Early access is opening soon. We&apos;ve saved your spot and
             will email you at{" "}
-            <span className="font-medium text-zinc-200">{email}</span>{" "}
+            <span className="font-medium text-content-primary">{email}</span>{" "}
             as soon as your account is ready.
           </p>
 
-          <div className="mt-8 rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+          <div className="mt-8 rounded-xl border border-line bg-surface-card p-5">
+            <p className="text-xs font-medium uppercase tracking-wider text-content-muted">
               What happens next?
             </p>
-            <p className="mt-2 text-sm text-zinc-400">
+            <p className="mt-2 text-sm text-content-secondary">
               We&apos;re onboarding users in small batches to ensure the best
               experience. You&apos;ll receive an email when your account is
               activated.
@@ -99,7 +99,7 @@ export default function LoginPage() {
 
           <button
             onClick={handleSignOut}
-            className="mt-8 text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+            className="mt-8 text-xs text-content-muted transition-colors hover:text-content-secondary"
           >
             Sign out
           </button>
@@ -115,7 +115,7 @@ export default function LoginPage() {
           <h1 className="font-heading text-2xl font-bold">
             {mode === "login" ? "Sign in" : "Create account"}
           </h1>
-          <p className="mt-2 text-sm text-zinc-400">
+          <p className="mt-2 text-sm text-content-secondary">
             {mode === "login"
               ? "Enter your credentials to access the dashboard."
               : "Create an account to get started."}
@@ -126,7 +126,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-zinc-300"
+              className="block text-sm font-medium text-content-secondary"
             >
               Email
             </label>
@@ -137,14 +137,14 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="mt-1 block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+              className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
             />
           </div>
 
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-zinc-300"
+              className="block text-sm font-medium text-content-secondary"
             >
               Password
             </label>
@@ -156,7 +156,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 6 characters"
-              className="mt-1 block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+              className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
             />
           </div>
 
@@ -167,7 +167,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200 disabled:opacity-50"
+            className="w-full rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary disabled:opacity-50"
           >
             {loading
               ? "Loading..."
@@ -177,13 +177,13 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-zinc-500">
+        <p className="mt-6 text-center text-sm text-content-muted">
           {mode === "login" ? (
             <>
               No account?{" "}
               <button
                 onClick={() => { setMode("signup"); setError(""); }}
-                className="text-zinc-300 underline hover:text-zinc-100"
+                className="text-content-secondary underline hover:text-content-primary"
               >
                 Create one
               </button>
@@ -193,7 +193,7 @@ export default function LoginPage() {
               Already have an account?{" "}
               <button
                 onClick={() => { setMode("login"); setError(""); }}
-                className="text-zinc-300 underline hover:text-zinc-100"
+                className="text-content-secondary underline hover:text-content-primary"
               >
                 Sign in
               </button>

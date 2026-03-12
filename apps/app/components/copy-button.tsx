@@ -16,7 +16,7 @@ export function CopyButton({ text, className }: { text: string; className?: stri
       onClick={handleCopy}
       className={
         className ??
-        "shrink-0 rounded p-1.5 text-zinc-500 transition-colors hover:bg-zinc-700 hover:text-zinc-300"
+        "shrink-0 rounded p-1.5 text-content-muted transition-colors hover:bg-surface-tertiary hover:text-content-secondary"
       }
       title="Copy to clipboard"
     >

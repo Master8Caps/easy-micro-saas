@@ -28,7 +28,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 hover:bg-white/[0.03] hover:text-zinc-200 transition-colors"
+      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-content-secondary hover:bg-surface-card hover:text-content-primary transition-colors"
       title={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
     >
       {resolvedTheme === "dark" ? (

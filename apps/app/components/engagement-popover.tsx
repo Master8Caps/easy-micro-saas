@@ -82,7 +82,7 @@ export function EngagementPopover({
         className={`flex items-center gap-1 rounded px-1.5 py-1 text-xs transition-colors ${
           hasData
             ? "text-indigo-400 bg-indigo-400/10 hover:bg-indigo-400/20"
-            : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05]"
+            : "text-content-muted hover:text-content-secondary hover:bg-surface-card-hover"
         }`}
         title={hasData ? summaryParts.join(" · ") : "Log engagement"}
       >
@@ -96,8 +96,8 @@ export function EngagementPopover({
       </button>
 
       {open && (
-        <div className="absolute bottom-full right-0 z-50 mb-2 w-56 rounded-xl border border-white/[0.1] bg-zinc-900 p-4 shadow-xl">
-          <p className="mb-3 text-xs font-medium text-zinc-300">Log Engagement</p>
+        <div className="absolute bottom-full right-0 z-50 mb-2 w-56 rounded-xl border border-line bg-surface-secondary p-4 shadow-xl">
+          <p className="mb-3 text-xs font-medium text-content-secondary">Log Engagement</p>
           <div className="space-y-2">
             {[
               { label: "Views", value: views, set: setViews },
@@ -106,14 +106,14 @@ export function EngagementPopover({
               { label: "Shares", value: shares, set: setShares },
             ].map(({ label, value, set }) => (
               <div key={label} className="flex items-center gap-2">
-                <label className="w-20 text-xs text-zinc-500">{label}</label>
+                <label className="w-20 text-xs text-content-muted">{label}</label>
                 <input
                   type="number"
                   min="0"
                   value={value}
                   onChange={(e) => set(e.target.value)}
                   placeholder="0"
-                  className="flex-1 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-xs text-zinc-200 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                  className="flex-1 rounded-lg border border-line bg-surface-card px-2 py-1 text-xs text-content-primary focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
                 />
               </div>
             ))}

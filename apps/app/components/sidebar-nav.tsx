@@ -111,8 +111,8 @@ const adminItems = [
 const linkClass = (active: boolean) =>
   `flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${
     active
-      ? "border-l-2 border-indigo-400 bg-indigo-500/[0.08] pl-[10px] font-medium text-zinc-100"
-      : "border-l-2 border-transparent text-zinc-400 hover:bg-white/[0.03] hover:text-zinc-200"
+      ? "border-l-2 border-indigo-400 bg-indigo-500/[0.08] pl-[10px] font-medium text-content-primary"
+      : "border-l-2 border-transparent text-content-secondary hover:bg-surface-card hover:text-content-primary"
   }`;
 
 function NavLink({
@@ -154,8 +154,8 @@ export function SidebarNav() {
         {/* Admin section (above settings) */}
         {role === "admin" && (
           <div className="mb-2">
-            <div className="border-t border-white/[0.06] px-3 pb-2 pt-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">
+            <div className="border-t border-line px-3 pb-2 pt-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-content-muted">
                 Admin
               </p>
             </div>

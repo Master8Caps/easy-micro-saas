@@ -167,11 +167,11 @@ export function LifecycleAction({
 
       {/* Revert dropdown */}
       {showRevert && status !== "draft" && (
-        <div className="absolute right-0 top-full z-50 mt-1 rounded-lg border border-white/[0.08] bg-zinc-900 py-1 shadow-xl">
+        <div className="absolute right-0 top-full z-50 mt-1 rounded-lg border border-line bg-surface-secondary py-1 shadow-xl">
           {status === "approved" && (
             <button
               onClick={() => transition("draft")}
-              className="block w-full px-3 py-1.5 text-left text-xs text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-200"
+              className="block w-full px-3 py-1.5 text-left text-xs text-content-secondary hover:bg-surface-card-hover hover:text-content-primary"
             >
               Back to Draft
             </button>
@@ -180,13 +180,13 @@ export function LifecycleAction({
             <>
               <button
                 onClick={() => setShowDatePicker(true)}
-                className="block w-full px-3 py-1.5 text-left text-xs text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-200"
+                className="block w-full px-3 py-1.5 text-left text-xs text-content-secondary hover:bg-surface-card-hover hover:text-content-primary"
               >
                 Change date
               </button>
               <button
                 onClick={() => transition("approved")}
-                className="block w-full px-3 py-1.5 text-left text-xs text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-200"
+                className="block w-full px-3 py-1.5 text-left text-xs text-content-secondary hover:bg-surface-card-hover hover:text-content-primary"
               >
                 Unschedule
               </button>
@@ -199,7 +199,7 @@ export function LifecycleAction({
                   ? transition("scheduled", scheduledFor)
                   : transition("approved")
               }
-              className="block w-full px-3 py-1.5 text-left text-xs text-zinc-400 hover:bg-white/[0.05] hover:text-zinc-200"
+              className="block w-full px-3 py-1.5 text-left text-xs text-content-secondary hover:bg-surface-card-hover hover:text-content-primary"
             >
               Undo post
             </button>

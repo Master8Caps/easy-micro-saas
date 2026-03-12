@@ -68,17 +68,17 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
       {/* Tabs + count */}
       <div className="mb-4 flex items-center justify-between">
         {(hasAds || hasEmail) ? (
-          <div className="flex gap-1 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1">
+          <div className="flex gap-1 rounded-lg border border-line bg-surface-card p-1">
             <button
               onClick={() => { setActiveTab("social"); setProductFilter(""); setChannelFilter(""); }}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 activeTab === "social"
                   ? "bg-white text-zinc-950"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  : "text-content-secondary hover:text-content-primary"
               }`}
             >
               Social
-              <span className={`ml-1.5 ${activeTab === "social" ? "text-zinc-500" : "text-zinc-600"}`}>
+              <span className={`ml-1.5 ${activeTab === "social" ? "text-content-muted" : "text-content-muted"}`}>
                 {activeTab === "social" ? filtered.length : socialCampaigns.length}
               </span>
             </button>
@@ -88,11 +88,11 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   activeTab === "email"
                     ? "bg-white text-zinc-950"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    : "text-content-secondary hover:text-content-primary"
                 }`}
               >
                 Email
-                <span className={`ml-1.5 ${activeTab === "email" ? "text-zinc-500" : "text-zinc-600"}`}>
+                <span className={`ml-1.5 ${activeTab === "email" ? "text-content-muted" : "text-content-muted"}`}>
                   {activeTab === "email" ? filtered.length : emailCampaigns.length}
                 </span>
               </button>
@@ -103,11 +103,11 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   activeTab === "ad"
                     ? "bg-white text-zinc-950"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    : "text-content-secondary hover:text-content-primary"
                 }`}
               >
                 Ads
-                <span className={`ml-1.5 ${activeTab === "ad" ? "text-zinc-500" : "text-zinc-600"}`}>
+                <span className={`ml-1.5 ${activeTab === "ad" ? "text-content-muted" : "text-content-muted"}`}>
                   {activeTab === "ad" ? filtered.length : adCampaigns.length}
                 </span>
               </button>
@@ -116,7 +116,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
         ) : (
           <div />
         )}
-        <span className="text-sm text-zinc-500">
+        <span className="text-sm text-content-muted">
           {filtered.length} campaign{filtered.length === 1 ? "" : "s"}
         </span>
       </div>
@@ -126,7 +126,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
+          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
         >
           <option value="">All products</option>
           {products.map(([id, name]) => (
@@ -138,7 +138,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
         <select
           value={channelFilter}
           onChange={(e) => setChannelFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
+          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
         >
           <option value="">All {activeTab === "ad" ? "platforms" : "channels"}</option>
           {channels.map((ch) => (
@@ -158,11 +158,11 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
             <button
               key={campaign.id}
               onClick={() => setSelectedCampaign(campaign)}
-              className="block w-full rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 text-left transition-all hover:border-white/[0.1] hover:bg-white/[0.03]"
+              className="block w-full rounded-xl border border-line bg-surface-card p-6 text-left transition-all hover:border-line hover:bg-surface-card"
             >
               {/* Product name prominently at top */}
               {campaign.products && (
-                <p className="mb-2 text-sm font-medium text-zinc-400">
+                <p className="mb-2 text-sm font-medium text-content-secondary">
                   {campaign.products.name}
                 </p>
               )}
@@ -171,20 +171,20 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
                 <ChannelPill channel={campaign.channel} />
                 <TypePill type={campaign.content_type} />
                 {campaign.avatars && (
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-content-muted">
                     for {campaign.avatars.name}
                   </span>
                 )}
               </div>
 
               <h3 className="mt-3 font-semibold">{campaign.angle}</h3>
-              <p className="mt-1 text-sm italic text-zinc-400">
+              <p className="mt-1 text-sm italic text-content-secondary">
                 &ldquo;{campaign.hook}&rdquo;
               </p>
 
               <div className="mt-3 flex items-center gap-3">
                 {count > 0 && (
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-content-muted">
                     {count} content piece{count === 1 ? "" : "s"} generated
                   </span>
                 )}
@@ -198,7 +198,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
                   </span>
                 )}
                 {(clickCounts[campaign.id] ?? 0) > 0 && (
-                  <span className="flex items-center gap-1 text-xs text-zinc-500">
+                  <span className="flex items-center gap-1 text-xs text-content-muted">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M15 15l-2 5L9 9l11 4-5 2z" />
                     </svg>

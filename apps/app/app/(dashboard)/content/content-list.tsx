@@ -258,7 +258,7 @@ export function ContentList({
     <>
       {/* Row 1: Category tabs + count */}
       <div className="mb-4 flex items-center justify-between">
-        <div className="flex gap-1 rounded-lg border border-white/[0.06] bg-white/[0.02] p-1">
+        <div className="flex gap-1 rounded-lg border border-line bg-surface-card p-1">
           {categoryTabs.map((tab) => (
             <button
               key={tab.value}
@@ -266,19 +266,19 @@ export function ContentList({
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 categoryFilter === tab.value
                   ? "bg-white text-zinc-950"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  : "text-content-secondary hover:text-content-primary"
               }`}
             >
               {tab.label}
               {(categoryCounts[tab.value] ?? 0) > 0 && (
-                <span className={`ml-1.5 ${categoryFilter === tab.value ? "text-zinc-500" : "text-zinc-600"}`}>
+                <span className={`ml-1.5 ${categoryFilter === tab.value ? "text-content-muted" : "text-content-muted"}`}>
                   {categoryCounts[tab.value]}
                 </span>
               )}
             </button>
           ))}
         </div>
-        <span className="text-sm text-zinc-500">
+        <span className="text-sm text-content-muted">
           {filtered.length} piece{filtered.length === 1 ? "" : "s"}
         </span>
       </div>
@@ -292,7 +292,7 @@ export function ContentList({
           className={`flex h-[38px] items-center gap-2 rounded-lg border px-3 text-sm transition-colors ${
             allFilteredSelected
               ? "border-indigo-500/30 bg-indigo-500/10 text-indigo-300"
-              : "border-white/[0.06] text-zinc-500 hover:text-zinc-300"
+              : "border-line text-content-muted hover:text-content-secondary"
           }`}
         >
           <span className={`flex h-4 w-4 items-center justify-center rounded border ${
@@ -318,7 +318,7 @@ export function ContentList({
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
+          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
         >
           <option value="">All products</option>
           {products.map((p) => (
@@ -330,7 +330,7 @@ export function ContentList({
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
+          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
         >
           {typeOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -341,7 +341,7 @@ export function ContentList({
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
+          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
         >
           {statusOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -354,8 +354,8 @@ export function ContentList({
           title={showArchived ? "View active content" : "View archived"}
           className={`rounded-lg border p-2 transition-colors ${
             showArchived
-              ? "border-white/[0.1] bg-white/[0.05] text-zinc-300"
-              : "border-white/[0.06] text-zinc-500 hover:text-zinc-300"
+              ? "border-line bg-surface-card-hover text-content-secondary"
+              : "border-line text-content-muted hover:text-content-secondary"
           }`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -366,7 +366,7 @@ export function ContentList({
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+            className="text-xs text-content-muted transition-colors hover:text-content-secondary"
           >
             Clear filters
           </button>
@@ -385,7 +385,7 @@ export function ContentList({
               className={`flex gap-4 rounded-xl border p-6 transition-all ${
                 isSelected
                   ? "border-indigo-500/30 bg-indigo-500/[0.04]"
-                  : "border-white/[0.06] bg-white/[0.02]"
+                  : "border-line bg-surface-card"
               } ${piece.status === "posted" ? "opacity-60" : ""}`}
             >
               {/* Checkbox */}
@@ -410,7 +410,7 @@ export function ContentList({
               <div className="min-w-0 flex-1">
                 {/* Product name at top */}
                 {piece.products && (
-                  <p className="mb-2 text-sm font-medium text-zinc-400">
+                  <p className="mb-2 text-sm font-medium text-content-secondary">
                     {piece.products.name}
                   </p>
                 )}
@@ -427,7 +427,7 @@ export function ContentList({
                       <h3 className="mt-2 font-semibold">{piece.title}</h3>
                     )}
                     {piece.campaigns?.angle && (
-                      <p className="mt-1 text-xs text-zinc-500">
+                      <p className="mt-1 text-xs text-content-muted">
                         {piece.campaigns.angle}
                       </p>
                     )}
@@ -464,7 +464,7 @@ export function ContentList({
 
                 {/* Tracked link */}
                 {piece.links && piece.links.length > 0 && (
-                  <div className="mt-2 flex items-center gap-2 rounded-md bg-white/[0.03] px-3 py-1.5">
+                  <div className="mt-2 flex items-center gap-2 rounded-md bg-surface-card px-3 py-1.5">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-indigo-400">
                       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
                       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
@@ -472,7 +472,7 @@ export function ContentList({
                     <span className="min-w-0 flex-1 truncate font-mono text-xs text-indigo-400">
                       {baseUrl}/r/{piece.links[0].slug}
                     </span>
-                    <span className="shrink-0 text-xs text-zinc-500">
+                    <span className="shrink-0 text-xs text-content-muted">
                       {piece.links[0].click_count} click{piece.links[0].click_count === 1 ? "" : "s"}
                     </span>
                     <CopyButton text={`${baseUrl}/r/${piece.links[0].slug}`} />
@@ -485,14 +485,14 @@ export function ContentList({
                   className="mt-3 w-full text-left"
                 >
                   <p
-                    className={`whitespace-pre-wrap text-sm leading-relaxed text-zinc-300 ${
+                    className={`whitespace-pre-wrap text-sm leading-relaxed text-content-secondary ${
                       isExpanded ? "" : "line-clamp-3"
                     }`}
                   >
                     {piece.body}
                   </p>
                   {!isExpanded && piece.body.length > 200 && (
-                    <span className="mt-1 inline-block text-xs text-zinc-500">
+                    <span className="mt-1 inline-block text-xs text-content-muted">
                       Click to expand...
                     </span>
                   )}
@@ -506,12 +506,12 @@ export function ContentList({
       {/* Bulk action toolbar */}
       {selectedIds.size > 0 && (
         <div className="fixed bottom-4 left-1/2 z-40 -translate-x-1/2">
-          <div className="flex items-center gap-3 rounded-xl border border-white/[0.1] bg-zinc-900 px-5 py-3 shadow-2xl">
-            <span className="text-sm font-medium text-zinc-300">
+          <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-secondary px-5 py-3 shadow-2xl">
+            <span className="text-sm font-medium text-content-secondary">
               {selectedIds.size} selected
             </span>
 
-            <div className="h-4 w-px bg-white/[0.1]" />
+            <div className="h-4 w-px bg-surface-card-hover" />
 
             {hasApprovable && (
               <button
@@ -553,11 +553,11 @@ export function ContentList({
               </button>
             )}
 
-            <div className="h-4 w-px bg-white/[0.1]" />
+            <div className="h-4 w-px bg-surface-card-hover" />
 
             <button
               onClick={() => setSelectedIds(new Set())}
-              className="rounded-md p-1 text-zinc-500 transition-colors hover:text-zinc-300"
+              className="rounded-md p-1 text-content-muted transition-colors hover:text-content-secondary"
               title="Clear selection"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

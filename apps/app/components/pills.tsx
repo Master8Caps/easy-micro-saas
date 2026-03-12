@@ -1,10 +1,10 @@
 // ── Channel pill colors ──────────────────────────────
 const channelStyles: Record<string, string> = {
   linkedin: "border-blue-500/30 bg-blue-500/10 text-blue-400",
-  "x / twitter": "border-zinc-400/30 bg-zinc-400/10 text-zinc-300",
-  "x/twitter": "border-zinc-400/30 bg-zinc-400/10 text-zinc-300",
-  twitter: "border-zinc-400/30 bg-zinc-400/10 text-zinc-300",
-  x: "border-zinc-400/30 bg-zinc-400/10 text-zinc-300",
+  "x / twitter": "border-zinc-400/30 bg-zinc-400/10 text-content-secondary",
+  "x/twitter": "border-zinc-400/30 bg-zinc-400/10 text-content-secondary",
+  twitter: "border-zinc-400/30 bg-zinc-400/10 text-content-secondary",
+  x: "border-zinc-400/30 bg-zinc-400/10 text-content-secondary",
   reddit: "border-orange-500/30 bg-orange-500/10 text-orange-400",
   "product hunt": "border-rose-500/30 bg-rose-500/10 text-rose-400",
   "indie hackers": "border-cyan-500/30 bg-cyan-500/10 text-cyan-400",
@@ -26,7 +26,7 @@ const channelStyles: Record<string, string> = {
 function getChannelStyle(channel: string) {
   return (
     channelStyles[channel.toLowerCase()] ??
-    "border-zinc-600/30 bg-zinc-600/10 text-zinc-400"
+    "border-zinc-600/30 bg-zinc-600/10 text-content-secondary"
   );
 }
 
@@ -78,7 +78,7 @@ export function TypePill({ type }: { type: string }) {
 const statusStyles: Record<string, string> = {
   active: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
   draft: "border-amber-500/30 bg-amber-500/10 text-amber-400",
-  archived: "border-zinc-600/30 bg-zinc-600/10 text-zinc-500",
+  archived: "border-zinc-600/30 bg-zinc-600/10 text-content-muted",
   ready: "border-blue-500/30 bg-blue-500/10 text-blue-400",
   published: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
   approved: "border-blue-500/30 bg-blue-500/10 text-blue-400",
@@ -100,7 +100,7 @@ export function StatusPill({ status }: { status: string }) {
 // ── Archived badge ──────────────────────────────────
 export function ArchivedBadge() {
   return (
-    <span className="rounded-full border border-zinc-600/30 bg-zinc-600/10 px-2 py-0.5 text-xs font-medium text-zinc-500">
+    <span className="rounded-full border border-zinc-600/30 bg-zinc-600/10 px-2 py-0.5 text-xs font-medium text-content-muted">
       Archived
     </span>
   );
@@ -118,7 +118,7 @@ export function ArchiveToggle({
     <button
       onClick={onToggle}
       title={archived ? "Unarchive" : "Archive"}
-      className="rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+      className="rounded-md p-1 text-content-muted transition-colors hover:bg-surface-tertiary hover:text-content-secondary"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

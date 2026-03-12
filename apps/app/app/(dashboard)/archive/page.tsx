@@ -39,7 +39,7 @@ export default async function ArchivePage() {
     <>
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight">Archive</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-content-muted">
           Archived products and their campaigns and content.
         </p>
       </div>
@@ -66,9 +66,9 @@ export default async function ArchivePage() {
           contentCounts={contentCountByProduct}
         />
       ) : (
-        <div className="rounded-xl border border-dashed border-white/[0.08] p-12 text-center">
+        <div className="rounded-xl border border-dashed border-line p-12 text-center">
           <h2 className="text-lg font-semibold">No archived products</h2>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-content-muted">
             Products you archive will appear here.
           </p>
         </div>

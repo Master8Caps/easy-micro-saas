@@ -16,7 +16,7 @@ export default async function SettingsPage() {
     <div className="py-4">
       <div className="mx-auto max-w-2xl">
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-content-muted">
           Manage your account and preferences
         </p>
 

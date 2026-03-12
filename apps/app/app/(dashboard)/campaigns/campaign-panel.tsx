@@ -125,32 +125,32 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
       />
 
       {/* Panel */}
-      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-2xl flex-col border-l border-white/[0.06] bg-zinc-950 shadow-2xl">
+      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-2xl flex-col border-l border-line bg-surface-primary shadow-2xl">
         {/* Panel header */}
-        <div className="flex items-start justify-between border-b border-white/[0.06] p-6">
+        <div className="flex items-start justify-between border-b border-line p-6">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <ChannelPill channel={campaign.channel} />
               <TypePill type={campaign.content_type} />
               {campaign.avatars && (
-                <span className="text-xs text-zinc-500">
+                <span className="text-xs text-content-muted">
                   for {campaign.avatars.name}
                 </span>
               )}
             </div>
             {campaign.products && (
-              <p className="mt-2 text-sm font-medium text-zinc-400">
+              <p className="mt-2 text-sm font-medium text-content-secondary">
                 {campaign.products.name}
               </p>
             )}
             <h2 className="mt-2 text-lg font-semibold">{campaign.angle}</h2>
-            <p className="mt-1 text-sm italic text-zinc-400">
+            <p className="mt-1 text-sm italic text-content-secondary">
               &ldquo;{campaign.hook}&rdquo;
             </p>
 
             {/* Destination URL */}
-            <div className="mt-3 border-t border-white/[0.06] pt-3">
-              <p className="mb-1 text-xs font-medium text-zinc-500">Destination URL</p>
+            <div className="mt-3 border-t border-line pt-3">
+              <p className="mb-1 text-xs font-medium text-content-muted">Destination URL</p>
               {editingUrl ? (
                 <div className="flex items-center gap-2">
                   <input
@@ -158,7 +158,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                     value={destUrl}
                     onChange={(e) => setDestUrl(e.target.value)}
                     placeholder="https://yoursite.com/page"
-                    className="flex-1 rounded-md border border-white/[0.06] bg-white/[0.03] px-2.5 py-1.5 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-indigo-500/50 focus:outline-none"
+                    className="flex-1 rounded-md border border-line bg-surface-card px-2.5 py-1.5 text-sm text-content-primary placeholder:text-content-muted focus:border-indigo-500/50 focus:outline-none"
                   />
                   <button
                     onClick={handleSaveUrl}
@@ -169,7 +169,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                   </button>
                   <button
                     onClick={() => { setEditingUrl(false); setDestUrl(campaign.destination_url ?? ""); }}
-                    className="rounded-md px-2 py-1.5 text-xs text-zinc-500 hover:text-zinc-300"
+                    className="rounded-md px-2 py-1.5 text-xs text-content-muted hover:text-content-secondary"
                   >
                     Cancel
                   </button>
@@ -177,13 +177,13 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
               ) : (
                 <div className="flex items-center gap-2">
                   {destUrl ? (
-                    <span className="truncate rounded-md bg-white/[0.03] px-3 py-1.5 font-mono text-xs text-indigo-400">{destUrl}</span>
+                    <span className="truncate rounded-md bg-surface-card px-3 py-1.5 font-mono text-xs text-indigo-400">{destUrl}</span>
                   ) : (
-                    <span className="text-sm text-zinc-600">Not set (uses product URL)</span>
+                    <span className="text-sm text-content-muted">Not set (uses product URL)</span>
                   )}
                   <button
                     onClick={() => setEditingUrl(true)}
-                    className="shrink-0 rounded-md p-1 text-zinc-500 transition-colors hover:text-zinc-300"
+                    className="shrink-0 rounded-md p-1 text-content-muted transition-colors hover:text-content-secondary"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
@@ -195,7 +195,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
           </div>
           <button
             onClick={onClose}
-            className="ml-4 rounded-lg p-2 text-zinc-400 transition-colors hover:bg-white/[0.05] hover:text-zinc-200"
+            className="ml-4 rounded-lg p-2 text-content-secondary transition-colors hover:bg-surface-card-hover hover:text-content-primary"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -218,7 +218,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
         <div className="flex-1 overflow-y-auto p-6">
           {/* Generate / status section */}
           <div className="mb-6 flex items-center justify-between">
-            <h3 className="text-sm font-medium text-zinc-400">
+            <h3 className="text-sm font-medium text-content-secondary">
               Content Pieces
             </h3>
             <button
@@ -248,8 +248,8 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
 
           {/* Empty state */}
           {!loading && !hasContent && (
-            <div className="rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
-              <p className="text-sm text-zinc-500">
+            <div className="rounded-xl border border-dashed border-line p-8 text-center">
+              <p className="text-sm text-content-muted">
                 No content generated yet. Click the button above to generate.
               </p>
             </div>
@@ -264,14 +264,14 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                 return (
                   <div
                     key={piece.id}
-                    className="rounded-xl border border-white/[0.06] bg-white/[0.02]"
+                    className="rounded-xl border border-line bg-surface-card"
                   >
                     {/* Compact header — always visible */}
                     <button
                       onClick={() =>
                         setExpandedPieceId(isExpanded ? null : piece.id)
                       }
-                      className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-white/[0.03]"
+                      className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-surface-card"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -283,13 +283,13 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className={`shrink-0 text-zinc-500 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                        className={`shrink-0 text-content-muted transition-transform ${isExpanded ? "rotate-90" : ""}`}
                       >
                         <path d="m9 18 6-6-6-6" />
                       </svg>
                       <div className="flex min-w-0 flex-1 items-center gap-2">
                         <TypePill type={piece.type} />
-                        <span className="truncate text-sm font-medium text-zinc-300">
+                        <span className="truncate text-sm font-medium text-content-secondary">
                           {piece.title ?? "Untitled"}
                         </span>
                       </div>
@@ -326,10 +326,10 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
 
                     {/* Expanded body */}
                     {isExpanded && (
-                      <div className="border-t border-white/[0.06] px-5 pb-5 pt-4">
+                      <div className="border-t border-line px-5 pb-5 pt-4">
                         {/* Tracked link */}
                         {piece.links && piece.links.length > 0 && (
-                          <div className="mb-3 flex items-center gap-2 rounded-md bg-white/[0.03] px-3 py-2">
+                          <div className="mb-3 flex items-center gap-2 rounded-md bg-surface-card px-3 py-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-indigo-400">
                               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
                               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
@@ -337,7 +337,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                             <span className="min-w-0 flex-1 truncate font-mono text-xs text-indigo-400">
                               {baseUrl}/r/{piece.links[0].slug}
                             </span>
-                            <span className="shrink-0 text-xs text-zinc-500">
+                            <span className="shrink-0 text-xs text-content-muted">
                               {piece.links[0].click_count} click{piece.links[0].click_count === 1 ? "" : "s"}
                             </span>
                             <CopyButton text={`${baseUrl}/r/${piece.links[0].slug}`} />
@@ -346,12 +346,12 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                         <div className="flex justify-end mb-2">
                           <CopyButton text={piece.body} />
                         </div>
-                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-content-secondary">
                           {piece.body}
                         </p>
                         {piece.metadata?.notes && (
-                          <p className="mt-3 border-t border-white/[0.06] pt-3 text-xs text-zinc-500">
-                            <strong className="text-zinc-400">Notes:</strong>{" "}
+                          <p className="mt-3 border-t border-line pt-3 text-xs text-content-muted">
+                            <strong className="text-content-secondary">Notes:</strong>{" "}
                             {piece.metadata.notes}
                           </p>
                         )}

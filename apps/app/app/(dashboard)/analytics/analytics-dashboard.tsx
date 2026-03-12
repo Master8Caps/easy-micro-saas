@@ -128,7 +128,7 @@ export function AnalyticsDashboard({
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-lg border border-white/[0.06] bg-zinc-900 px-3 py-2 text-sm text-zinc-300 focus:border-indigo-500/50 focus:outline-none [&>option]:bg-zinc-900 [&>option]:text-zinc-300"
+          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
         >
           <option value="">All products</option>
           {products.map((p) => (
@@ -140,9 +140,9 @@ export function AnalyticsDashboard({
       </div>
 
       {!hasData ? (
-        <div className="rounded-xl border border-dashed border-white/[0.08] p-12 text-center">
+        <div className="rounded-xl border border-dashed border-line p-12 text-center">
           <h2 className="text-lg font-semibold">No tracked links yet</h2>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-content-muted">
             Set a destination URL on a campaign and generate content to create
             tracked links. Analytics will appear here once links are clicked.
           </p>
@@ -158,8 +158,8 @@ export function AnalyticsDashboard({
           </div>
 
           {/* Daily clicks chart */}
-          <div className="mb-8 rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-            <h3 className="mb-4 text-sm font-medium text-zinc-400">
+          <div className="mb-8 rounded-xl border border-line bg-surface-card p-6">
+            <h3 className="mb-4 text-sm font-medium text-content-secondary">
               Clicks — Last 30 Days
             </h3>
             <div className="flex h-32 items-end gap-1">
@@ -179,7 +179,7 @@ export function AnalyticsDashboard({
                 </div>
               ))}
             </div>
-            <div className="mt-2 flex justify-between text-xs text-zinc-600">
+            <div className="mt-2 flex justify-between text-xs text-content-muted">
               <span>{dailyClicks[0]?.date.slice(5)}</span>
               <span>{dailyClicks[dailyClicks.length - 1]?.date.slice(5)}</span>
             </div>
@@ -188,18 +188,18 @@ export function AnalyticsDashboard({
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Top links table */}
             <div className="lg:col-span-2">
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-                <h3 className="mb-4 text-sm font-medium text-zinc-400">
+              <div className="rounded-xl border border-line bg-surface-card p-6">
+                <h3 className="mb-4 text-sm font-medium text-content-secondary">
                   Top Performing Links
                 </h3>
                 <div className="space-y-3">
                   {filteredLinks.slice(0, 10).map((link) => (
                     <div
                       key={link.id}
-                      className="flex items-center gap-3 rounded-lg bg-white/[0.03] px-4 py-3"
+                      className="flex items-center gap-3 rounded-lg bg-surface-card px-4 py-3"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-zinc-200">
+                        <p className="truncate text-sm font-medium text-content-primary">
                           {link.content_pieces?.title ??
                             link.campaigns?.angle ??
                             "Untitled"}
@@ -209,19 +209,19 @@ export function AnalyticsDashboard({
                             /r/{link.slug}
                           </span>
                           {link.products && (
-                            <span className="text-xs text-zinc-600">
+                            <span className="text-xs text-content-muted">
                               {link.products.name}
                             </span>
                           )}
                           {link.campaigns?.channel && (
-                            <span className="rounded bg-white/[0.05] px-1.5 py-0.5 text-xs text-zinc-500">
+                            <span className="rounded bg-surface-card-hover px-1.5 py-0.5 text-xs text-content-muted">
                               {link.campaigns.channel}
                             </span>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-semibold tabular-nums text-zinc-200">
+                        <span className="text-lg font-semibold tabular-nums text-content-primary">
                           {link.click_count}
                         </span>
                         <CopyButton text={`${baseUrl}/r/${link.slug}`} />
@@ -234,8 +234,8 @@ export function AnalyticsDashboard({
 
             {/* Clicks by channel */}
             <div>
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-                <h3 className="mb-4 text-sm font-medium text-zinc-400">
+              <div className="rounded-xl border border-line bg-surface-card p-6">
+                <h3 className="mb-4 text-sm font-medium text-content-secondary">
                   Clicks by Channel
                 </h3>
                 {byChannel.length > 0 ? (
@@ -248,14 +248,14 @@ export function AnalyticsDashboard({
                       return (
                         <div key={channel}>
                           <div className="mb-1 flex items-center justify-between text-sm">
-                            <span className="capitalize text-zinc-300">
+                            <span className="capitalize text-content-secondary">
                               {channel}
                             </span>
-                            <span className="tabular-nums text-zinc-500">
+                            <span className="tabular-nums text-content-muted">
                               {count} ({pct}%)
                             </span>
                           </div>
-                          <div className="h-2 w-full rounded-full bg-white/[0.06]">
+                          <div className="h-2 w-full rounded-full bg-surface-card-hover">
                             <div
                               className="h-2 rounded-full bg-indigo-500/60"
                               style={{ width: `${pct}%` }}
@@ -266,7 +266,7 @@ export function AnalyticsDashboard({
                     })}
                   </div>
                 ) : (
-                  <p className="text-sm text-zinc-600">No click data yet.</p>
+                  <p className="text-sm text-content-muted">No click data yet.</p>
                 )}
               </div>
             </div>
@@ -280,13 +280,13 @@ export function AnalyticsDashboard({
           )}
           {productFilter && perfData && perfData.hasData && !perfLoading && (
             <div className="mt-8">
-              <h3 className="mb-4 text-sm font-medium uppercase tracking-wider text-zinc-500">
+              <h3 className="mb-4 text-sm font-medium uppercase tracking-wider text-content-muted">
                 Performance Scores
               </h3>
               <div className="grid gap-6 lg:grid-cols-3">
                 {/* By Avatar */}
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-                  <h4 className="mb-4 text-sm font-medium text-zinc-400">By Avatar</h4>
+                <div className="rounded-xl border border-line bg-surface-card p-6">
+                  <h4 className="mb-4 text-sm font-medium text-content-secondary">By Avatar</h4>
                   <div className="space-y-3">
                     {[...perfData.avatars]
                       .sort((a, b) => b.normalizedScore - a.normalizedScore)
@@ -295,12 +295,12 @@ export function AnalyticsDashboard({
                         return (
                           <div key={avatar.avatarId}>
                             <div className="mb-1 flex items-center justify-between text-sm">
-                              <span className="truncate pr-2 text-zinc-300">{avatar.name}</span>
-                              <span className="shrink-0 tabular-nums text-zinc-500">
+                              <span className="truncate pr-2 text-content-secondary">{avatar.name}</span>
+                              <span className="shrink-0 tabular-nums text-content-muted">
                                 {avatar.totalClicks}
                               </span>
                             </div>
-                            <div className="h-2 w-full rounded-full bg-white/[0.06]">
+                            <div className="h-2 w-full rounded-full bg-surface-card-hover">
                               <div
                                 className={`h-2 rounded-full ${scoreBarColor(tier.color)}`}
                                 style={{ width: `${Math.max(avatar.normalizedScore, avatar.totalClicks > 0 ? 4 : 0)}%` }}
@@ -313,20 +313,20 @@ export function AnalyticsDashboard({
                 </div>
 
                 {/* By Channel */}
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-                  <h4 className="mb-4 text-sm font-medium text-zinc-400">By Channel</h4>
+                <div className="rounded-xl border border-line bg-surface-card p-6">
+                  <h4 className="mb-4 text-sm font-medium text-content-secondary">By Channel</h4>
                   <div className="space-y-3">
                     {perfData.channels.map((ch) => {
                       const tier = getScoreTier(ch.normalizedScore);
                       return (
                         <div key={ch.channel}>
                           <div className="mb-1 flex items-center justify-between text-sm">
-                            <span className="text-zinc-300">{ch.channel}</span>
-                            <span className="tabular-nums text-zinc-500">
+                            <span className="text-content-secondary">{ch.channel}</span>
+                            <span className="tabular-nums text-content-muted">
                               {ch.totalClicks}
                             </span>
                           </div>
-                          <div className="h-2 w-full rounded-full bg-white/[0.06]">
+                          <div className="h-2 w-full rounded-full bg-surface-card-hover">
                             <div
                               className={`h-2 rounded-full ${scoreBarColor(tier.color)}`}
                               style={{ width: `${Math.max(ch.normalizedScore, ch.totalClicks > 0 ? 4 : 0)}%` }}
@@ -339,8 +339,8 @@ export function AnalyticsDashboard({
                 </div>
 
                 {/* Top Campaign Angles */}
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-                  <h4 className="mb-4 text-sm font-medium text-zinc-400">Top Campaign Angles</h4>
+                <div className="rounded-xl border border-line bg-surface-card p-6">
+                  <h4 className="mb-4 text-sm font-medium text-content-secondary">Top Campaign Angles</h4>
                   <div className="space-y-3">
                     {[...perfData.campaigns]
                       .sort((a, b) => b.normalizedScore - a.normalizedScore)
@@ -350,12 +350,12 @@ export function AnalyticsDashboard({
                         return (
                           <div key={c.campaignId}>
                             <div className="mb-1 flex items-center justify-between text-sm">
-                              <span className="truncate pr-2 text-zinc-300">{c.angle}</span>
-                              <span className="shrink-0 tabular-nums text-zinc-500">
+                              <span className="truncate pr-2 text-content-secondary">{c.angle}</span>
+                              <span className="shrink-0 tabular-nums text-content-muted">
                                 {c.totalClicks}
                               </span>
                             </div>
-                            <div className="h-1.5 w-full rounded-full bg-white/[0.06]">
+                            <div className="h-1.5 w-full rounded-full bg-surface-card-hover">
                               <div
                                 className={`h-1.5 rounded-full ${scoreBarColor(tier.color)}`}
                                 style={{ width: `${Math.max(c.normalizedScore, c.totalClicks > 0 ? 4 : 0)}%` }}
@@ -370,8 +370,8 @@ export function AnalyticsDashboard({
             </div>
           )}
           {productFilter && perfData && !perfData.hasData && !perfLoading && (
-            <div className="mt-8 rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
-              <p className="text-sm text-zinc-500">
+            <div className="mt-8 rounded-xl border border-dashed border-line p-8 text-center">
+              <p className="text-sm text-content-muted">
                 No performance data yet. Scores will appear once tracked links receive clicks.
               </p>
             </div>
@@ -390,8 +390,8 @@ function SummaryCard({
   value: number;
 }) {
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
-      <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">{label}</p>
+    <div className="rounded-xl border border-line bg-surface-card p-6">
+      <p className="text-xs font-medium uppercase tracking-wider text-content-muted">{label}</p>
       <p className="mt-2 text-2xl font-bold tabular-nums">{value.toLocaleString()}</p>
     </div>
   );

@@ -65,11 +65,11 @@ export function ProductDeleteButton({
             e.stopPropagation();
           }}
         >
-          <div className="mx-4 w-full max-w-md rounded-xl border border-white/[0.06] bg-zinc-950 p-6 shadow-2xl">
-            <h3 className="font-heading text-lg font-bold text-white">Delete Product</h3>
-            <p className="mt-3 text-sm text-zinc-400">
+          <div className="mx-4 w-full max-w-md rounded-xl border border-line bg-surface-primary p-6 shadow-2xl">
+            <h3 className="font-heading text-lg font-bold text-content-primary">Delete Product</h3>
+            <p className="mt-3 text-sm text-content-secondary">
               Are you sure you want to delete{" "}
-              <span className="font-medium text-zinc-200">{productName}</span>?
+              <span className="font-medium text-content-primary">{productName}</span>?
               This will permanently delete all campaigns, content, and analytics data.
             </p>
             <p className="mt-2 text-sm font-medium text-red-400">This cannot be undone.</p>
@@ -81,7 +81,7 @@ export function ProductDeleteButton({
                   setShowConfirm(false);
                 }}
                 disabled={deleting}
-                className="rounded-lg border border-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05] disabled:opacity-50"
+                className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-card-hover disabled:opacity-50"
               >
                 Cancel
               </button>

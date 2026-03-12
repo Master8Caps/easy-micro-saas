@@ -320,10 +320,10 @@ export default function BrainPage() {
           <h1 className="mt-6 font-heading text-2xl font-bold">
             Generating your Marketing Brain
           </h1>
-          <p className="mt-2 text-zinc-400">
+          <p className="mt-2 text-content-secondary">
             Analyzing your product, identifying avatars, and creating campaign angles...
           </p>
-          <p className="mt-1 text-sm text-zinc-500">This usually takes about a minute.</p>
+          <p className="mt-1 text-sm text-content-muted">This usually takes about a minute.</p>
         </div>
       </div>
     );
@@ -334,10 +334,10 @@ export default function BrainPage() {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <h1 className="font-heading text-2xl font-bold text-red-400">Generation failed</h1>
-          <p className="mt-2 text-zinc-400">{error}</p>
+          <p className="mt-2 text-content-secondary">{error}</p>
           <button
             onClick={handleRegenerate}
-            className="mt-6 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-200"
+            className="mt-6 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary"
           >
             Try again
           </button>
@@ -352,7 +352,7 @@ export default function BrainPage() {
   const statusStyle =
     productStatus === "active"
       ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-      : "border-zinc-600/30 bg-zinc-600/10 text-zinc-500";
+      : "border-zinc-600/30 bg-zinc-600/10 text-content-muted";
 
   // Find avatar name for a campaign
   function getAvatarName(campaign: DbCampaign): string {
@@ -379,7 +379,7 @@ export default function BrainPage() {
         <div className="mb-10">
           <button
             onClick={() => router.push("/")}
-            className="text-sm text-zinc-500 transition-colors hover:text-zinc-300"
+            className="text-sm text-content-muted transition-colors hover:text-content-secondary"
           >
             &larr; Back to Dashboard
           </button>
@@ -391,7 +391,7 @@ export default function BrainPage() {
                   {statusLabel}
                 </span>
               </div>
-              <p className="mt-2 text-lg text-zinc-400">{output.positioning_summary}</p>
+              <p className="mt-2 text-lg text-content-secondary">{output.positioning_summary}</p>
             </div>
             <div className="flex shrink-0 gap-2">
               {isAdmin && (
@@ -406,14 +406,14 @@ export default function BrainPage() {
                 <button
                   onClick={handleToggleStatus}
                   disabled={togglingStatus}
-                  className="rounded-lg border border-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/[0.05] hover:text-zinc-300 disabled:opacity-50"
+                  className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-card-hover hover:text-content-secondary disabled:opacity-50"
                 >
                   {productStatus === "active" ? "Archive" : "Reactivate"}
                 </button>
               )}
               <button
               onClick={handleRegenerate}
-              className="rounded-lg border border-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
+              className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-card-hover"
             >
               Regenerate
             </button>
@@ -427,7 +427,7 @@ export default function BrainPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Target Avatars</h2>
             <div className="flex items-center gap-1.5">
-              <span className="mr-1 text-xs text-zinc-500">Performance:</span>
+              <span className="mr-1 text-xs text-content-muted">Performance:</span>
               {(["all", "30d", "7d"] as const).map((p) => (
                 <button
                   key={p}
@@ -435,7 +435,7 @@ export default function BrainPage() {
                   className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                     perfPeriod === p
                       ? "bg-indigo-500/20 text-indigo-300"
-                      : "text-zinc-500 hover:text-zinc-300"
+                      : "text-content-muted hover:text-content-secondary"
                   }`}
                 >
                   {p === "all" ? "All time" : p === "30d" ? "30 days" : "7 days"}
@@ -445,11 +445,11 @@ export default function BrainPage() {
           </div>
           <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {avatars.map((avatar) => (
-              <div key={avatar.id} className="group relative flex flex-col rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+              <div key={avatar.id} className="group relative flex flex-col rounded-xl border border-line bg-surface-card p-6">
                 {/* Edit button */}
                 <button
                   onClick={() => setEditingAvatar(avatar)}
-                  className="absolute right-3 top-3 rounded-md p-1.5 text-zinc-600 opacity-0 transition-all hover:bg-white/[0.05] hover:text-zinc-300 group-hover:opacity-100"
+                  className="absolute right-3 top-3 rounded-md p-1.5 text-content-muted opacity-0 transition-all hover:bg-surface-card-hover hover:text-content-secondary group-hover:opacity-100"
                   title="Edit avatar"
                 >
                   <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -458,19 +458,19 @@ export default function BrainPage() {
                 </button>
 
                 <h3 className="text-lg font-semibold">{avatar.name}</h3>
-                <p className="mt-2 text-sm text-zinc-400">{avatar.description}</p>
+                <p className="mt-2 text-sm text-content-secondary">{avatar.description}</p>
 
                 <div className="mt-4">
-                  <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Pain points</p>
+                  <p className="text-xs font-medium uppercase tracking-wider text-content-muted">Pain points</p>
                   <ul className="mt-2 space-y-1">
                     {avatar.pain_points.map((point) => (
-                      <li key={point} className="text-sm text-zinc-300">&bull; {point}</li>
+                      <li key={point} className="text-sm text-content-secondary">&bull; {point}</li>
                     ))}
                   </ul>
                 </div>
 
                 <div className="mt-4">
-                  <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Channels</p>
+                  <p className="text-xs font-medium uppercase tracking-wider text-content-muted">Channels</p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {[...avatar.channels].sort((a, b) => a.localeCompare(b)).map((channel) => (
                       <ChannelPill key={channel} channel={channel} />
@@ -479,15 +479,15 @@ export default function BrainPage() {
                 </div>
 
                 <div className="mt-auto pt-4">
-                  <div className="rounded-lg bg-white/[0.03] p-3">
-                    <p className="text-xs text-zinc-500">
-                      <strong className="text-zinc-400">Role:</strong> {avatar.icp_details?.role}
+                  <div className="rounded-lg bg-surface-card p-3">
+                    <p className="text-xs text-content-muted">
+                      <strong className="text-content-secondary">Role:</strong> {avatar.icp_details?.role}
                     </p>
-                    <p className="mt-1 text-xs text-zinc-500">
-                      <strong className="text-zinc-400">Context:</strong> {avatar.icp_details?.context}
+                    <p className="mt-1 text-xs text-content-muted">
+                      <strong className="text-content-secondary">Context:</strong> {avatar.icp_details?.context}
                     </p>
-                    <p className="mt-1 text-xs text-zinc-500">
-                      <strong className="text-zinc-400">Motivation:</strong> {avatar.icp_details?.motivation}
+                    <p className="mt-1 text-xs text-content-muted">
+                      <strong className="text-content-secondary">Motivation:</strong> {avatar.icp_details?.motivation}
                     </p>
                   </div>
                 </div>
@@ -498,9 +498,9 @@ export default function BrainPage() {
                   if (!avatarScore || !performanceData.hasData) return null;
                   const tier = getScoreTier(avatarScore.normalizedScore);
                   return (
-                    <div className="mt-4 border-t border-white/[0.06] pt-4">
+                    <div className="mt-4 border-t border-line pt-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                        <span className="text-xs font-medium uppercase tracking-wider text-content-muted">
                           Performance
                         </span>
                         <span className={`text-xs ${scoreTextColor(tier.color)}`}>
@@ -508,7 +508,7 @@ export default function BrainPage() {
                           {avatarScore.totalClicks > 0 && ` · ${avatarScore.totalClicks} clicks`}
                         </span>
                       </div>
-                      <div className="mt-2 h-1.5 w-full rounded-full bg-white/[0.06]">
+                      <div className="mt-2 h-1.5 w-full rounded-full bg-surface-card-hover">
                         <div
                           className={`h-1.5 rounded-full ${scoreBarColor(tier.color)}`}
                           style={{ width: `${Math.max(avatarScore.normalizedScore, avatarScore.totalClicks > 0 ? 4 : 0)}%` }}
@@ -519,7 +519,7 @@ export default function BrainPage() {
                           {tier.label}
                         </span>
                         {avatarScore.topChannel && (
-                          <span className="text-xs text-zinc-600">
+                          <span className="text-xs text-content-muted">
                             Best: {avatarScore.topChannel}
                           </span>
                         )}
@@ -638,8 +638,8 @@ export default function BrainPage() {
                 })}
               </div>
             ) : (
-              <div className="mt-6 rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
-                <p className="text-sm text-zinc-500">
+              <div className="mt-6 rounded-xl border border-dashed border-line p-8 text-center">
+                <p className="text-sm text-content-muted">
                   No ad campaigns generated yet. Try regenerating the brain above.
                 </p>
               </div>
@@ -653,7 +653,7 @@ export default function BrainPage() {
             <h2 className="text-xl font-bold">Email Copy</h2>
             <div className="mt-6 space-y-4">
               {emailPieces.map((piece) => (
-                <div key={piece.id} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+                <div key={piece.id} className="rounded-xl border border-line bg-surface-card p-6">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <TypePill type={piece.type} />
@@ -661,7 +661,7 @@ export default function BrainPage() {
                     </div>
                     <CopyButton text={piece.body} />
                   </div>
-                  <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+                  <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-content-secondary">
                     {piece.body}
                   </p>
                 </div>
@@ -677,7 +677,7 @@ export default function BrainPage() {
             {websiteKitPieces.length > 0 ? (
               <div className="mt-6 space-y-4">
                 {websiteKitPieces.map((piece) => (
-                  <div key={piece.id} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+                  <div key={piece.id} className="rounded-xl border border-line bg-surface-card p-6">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <TypePill type={piece.type} />
@@ -685,15 +685,15 @@ export default function BrainPage() {
                       </div>
                       <CopyButton text={piece.body} />
                     </div>
-                    <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+                    <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-content-secondary">
                       {piece.body}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="mt-6 rounded-xl border border-dashed border-white/[0.08] p-8 text-center">
-                <p className="text-sm text-zinc-500">
+              <div className="mt-6 rounded-xl border border-dashed border-line p-8 text-center">
+                <p className="text-sm text-content-muted">
                   No website kit generated yet. Try regenerating the brain above.
                 </p>
               </div>
@@ -705,7 +705,7 @@ export default function BrainPage() {
         <div className="flex gap-4">
           <button
             onClick={() => router.push("/")}
-            className="rounded-lg border border-white/[0.06] px-6 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
+            className="rounded-lg border border-line px-6 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-card-hover"
           >
             Back to Dashboard
           </button>
@@ -715,11 +715,11 @@ export default function BrainPage() {
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="mx-4 w-full max-w-md rounded-xl border border-white/[0.06] bg-zinc-950 p-6 shadow-2xl">
-            <h3 className="font-heading text-lg font-bold text-white">Delete Product</h3>
-            <p className="mt-3 text-sm text-zinc-400">
+          <div className="mx-4 w-full max-w-md rounded-xl border border-line bg-surface-primary p-6 shadow-2xl">
+            <h3 className="font-heading text-lg font-bold text-content-primary">Delete Product</h3>
+            <p className="mt-3 text-sm text-content-secondary">
               Are you sure you want to delete{" "}
-              <span className="font-medium text-zinc-200">{productName || "this product"}</span>?
+              <span className="font-medium text-content-primary">{productName || "this product"}</span>?
               This will permanently delete all campaigns, content, and analytics data.
             </p>
             <p className="mt-2 text-sm font-medium text-red-400">This cannot be undone.</p>
@@ -727,7 +727,7 @@ export default function BrainPage() {
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={deleting}
-                className="rounded-lg border border-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05] disabled:opacity-50"
+                className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-card-hover disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -767,25 +767,25 @@ function CampaignCard({
   score?: { totalClicks: number; normalizedScore: number; linkCount: number; engagementRaw: number } | null;
 }) {
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+    <div className="rounded-xl border border-line bg-surface-card p-6">
       <div className="flex flex-wrap items-center gap-2">
         <ChannelPill channel={campaign.channel} />
         <TypePill type={campaign.content_type} />
-        {avatarName && <span className="text-xs text-zinc-500">for {avatarName}</span>}
+        {avatarName && <span className="text-xs text-content-muted">for {avatarName}</span>}
       </div>
       <h3 className="mt-3 font-semibold">{campaign.angle}</h3>
-      <p className="mt-2 text-sm italic text-zinc-300">&ldquo;{campaign.hook}&rdquo;</p>
+      <p className="mt-2 text-sm italic text-content-secondary">&ldquo;{campaign.hook}&rdquo;</p>
 
       {/* Performance indicator */}
       {score && (score.linkCount > 0 || score.engagementRaw > 0) && (
         <div className="mt-3 flex items-center gap-3">
-          <div className="h-1 flex-1 rounded-full bg-white/[0.06]">
+          <div className="h-1 flex-1 rounded-full bg-surface-card-hover">
             <div
               className={`h-1 rounded-full ${scoreBarColor(getScoreTier(score.normalizedScore).color)}`}
               style={{ width: `${Math.max(score.normalizedScore, score.totalClicks > 0 ? 4 : 0)}%` }}
             />
           </div>
-          <span className="shrink-0 text-xs tabular-nums text-zinc-500">
+          <span className="shrink-0 text-xs tabular-nums text-content-muted">
             {score.totalClicks > 0 ? `${score.totalClicks} clicks` : ""}
             {score.totalClicks > 0 && score.engagementRaw > 0 ? " · " : ""}
             {score.engagementRaw > 0 ? `${score.engagementRaw} eng.` : ""}
@@ -794,12 +794,12 @@ function CampaignCard({
       )}
 
       {/* Content generation section */}
-      <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-4">
+      <div className="mt-4 flex items-center justify-between border-t border-line pt-4">
         <div>
           {pieces && pieces.length > 0 && (
             <button
               onClick={onToggleExpand}
-              className="text-xs text-zinc-400 transition-colors hover:text-zinc-200"
+              className="text-xs text-content-secondary transition-colors hover:text-content-primary"
             >
               {isExpanded
                 ? "Hide content"
@@ -828,11 +828,11 @@ function CampaignCard({
       {/* Inline content preview */}
       {isExpanded &&
         pieces?.map((piece) => (
-          <div key={piece.id} className="mt-3 rounded-lg bg-white/[0.03] p-4">
+          <div key={piece.id} className="mt-3 rounded-lg bg-surface-card p-4">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-zinc-400">{piece.title}</p>
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+                <p className="text-xs font-medium text-content-secondary">{piece.title}</p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-content-secondary">
                   {piece.body}
                 </p>
               </div>

@@ -38,7 +38,7 @@ export function RatingButtons({
         className={`rounded p-1 transition-colors ${
           rating === 1
             ? "text-emerald-400 bg-emerald-400/10"
-            : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05]"
+            : "text-content-muted hover:text-content-secondary hover:bg-surface-card-hover"
         }`}
         title="Thumbs up"
       >
@@ -53,7 +53,7 @@ export function RatingButtons({
         className={`rounded p-1 transition-colors ${
           rating === -1
             ? "text-red-400 bg-red-400/10"
-            : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.05]"
+            : "text-content-muted hover:text-content-secondary hover:bg-surface-card-hover"
         }`}
         title="Thumbs down"
       >

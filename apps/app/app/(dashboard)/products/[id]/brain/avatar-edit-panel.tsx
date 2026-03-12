@@ -134,7 +134,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
   }
 
   const inputClass =
-    "w-full rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30";
+    "w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-sm text-content-primary placeholder:text-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30";
 
   return (
     <>
@@ -145,13 +145,13 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
       />
 
       {/* Panel */}
-      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col border-l border-white/[0.06] bg-zinc-950 shadow-2xl">
+      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col border-l border-line bg-surface-primary shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.06] p-6">
+        <div className="flex items-center justify-between border-b border-line p-6">
           <h2 className="text-lg font-semibold">Edit Avatar</h2>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-zinc-500 transition-colors hover:bg-white/[0.05] hover:text-zinc-300"
+            className="rounded-md p-1 text-content-muted transition-colors hover:bg-surface-card-hover hover:text-content-secondary"
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -163,7 +163,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Name */}
           <div>
-            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-zinc-500">
+            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-content-muted">
               Name
             </label>
             <input
@@ -177,7 +177,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
 
           {/* Description */}
           <div>
-            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-zinc-500">
+            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-content-muted">
               Description
             </label>
             <textarea
@@ -191,7 +191,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
 
           {/* Pain Points */}
           <div>
-            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-zinc-500">
+            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-content-muted">
               Pain Points
             </label>
             <div className="space-y-2">
@@ -206,7 +206,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
                   />
                   <button
                     onClick={() => removePainPoint(index)}
-                    className="shrink-0 rounded-md p-1.5 text-zinc-600 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                    className="shrink-0 rounded-md p-1.5 text-content-muted transition-colors hover:bg-red-500/10 hover:text-red-400"
                   >
                     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -225,7 +225,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
 
           {/* Channels */}
           <div>
-            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-zinc-500">
+            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-content-muted">
               Channels
             </label>
             <div className="flex flex-wrap gap-2">
@@ -240,7 +240,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
                     className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                       selected
                         ? "border-indigo-500/30 bg-indigo-500/15 text-indigo-300"
-                        : "border-white/[0.06] bg-white/[0.02] text-zinc-500 hover:border-white/[0.1] hover:text-zinc-400"
+                        : "border-line bg-surface-card text-content-muted hover:border-line hover:text-content-secondary"
                     }`}
                   >
                     {ch}
@@ -252,12 +252,12 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
 
           {/* ICP Details */}
           <div>
-            <label className="mb-3 block text-xs font-medium uppercase tracking-wider text-zinc-500">
+            <label className="mb-3 block text-xs font-medium uppercase tracking-wider text-content-muted">
               ICP Details
             </label>
-            <div className="space-y-4 rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
+            <div className="space-y-4 rounded-lg border border-line bg-surface-card p-4">
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">Role</label>
+                <label className="mb-1 block text-xs text-content-secondary">Role</label>
                 <input
                   type="text"
                   value={role}
@@ -267,7 +267,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">Context</label>
+                <label className="mb-1 block text-xs text-content-secondary">Context</label>
                 <textarea
                   value={context}
                   onChange={(e) => setContext(e.target.value)}
@@ -277,7 +277,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">Motivation</label>
+                <label className="mb-1 block text-xs text-content-secondary">Motivation</label>
                 <textarea
                   value={motivation}
                   onChange={(e) => setMotivation(e.target.value)}
@@ -291,14 +291,14 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
         </div>
 
         {/* Footer */}
-        <div className="border-t border-white/[0.06] p-6">
+        <div className="border-t border-line p-6">
           {error && (
             <p className="mb-3 text-sm text-red-400">{error}</p>
           )}
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 rounded-lg border border-white/[0.06] px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.05]"
+              className="flex-1 rounded-lg border border-line px-4 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-card-hover"
             >
               Cancel
             </button>

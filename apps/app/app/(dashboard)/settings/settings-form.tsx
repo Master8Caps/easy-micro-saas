@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useTheme } from "@/components/theme-provider";
 
 const inputClass =
-  "mt-1 block w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30";
+  "mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30";
 
 const btnClass =
   "rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50";
@@ -174,14 +174,14 @@ export function SettingsForm({
   return (
     <div className="mt-8 space-y-8">
       {/* ── Profile ── */}
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6">
+      <div className="rounded-xl border border-line bg-surface-card p-6">
         <h2 className="text-lg font-semibold">Profile</h2>
         <div className="mt-4 flex items-center gap-5">
           <Avatar fullName={fullName} avatarUrl={initialAvatarUrl} />
           <div className="flex-1">
             <label
               htmlFor="fullName"
-              className="block text-sm font-medium text-zinc-300"
+              className="block text-sm font-medium text-content-secondary"
             >
               Full Name
             </label>
@@ -222,17 +222,17 @@ export function SettingsForm({
       {/* ── Email ── */}
       <form
         onSubmit={handleEmailUpdate}
-        className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6"
+        className="rounded-xl border border-line bg-surface-card p-6"
       >
         <h2 className="text-lg font-semibold">Email Address</h2>
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-1 text-sm text-content-secondary">
           Currently signed in as{" "}
-          <span className="text-zinc-200">{initialEmail}</span>
+          <span className="text-content-primary">{initialEmail}</span>
         </p>
         <div className="mt-4">
           <label
             htmlFor="newEmail"
-            className="block text-sm font-medium text-zinc-300"
+            className="block text-sm font-medium text-content-secondary"
           >
             New Email
           </label>
@@ -244,7 +244,7 @@ export function SettingsForm({
             placeholder="new@example.com"
             className={inputClass}
           />
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs text-content-muted">
             A confirmation link will be sent to your new email address.
           </p>
         </div>
@@ -273,14 +273,14 @@ export function SettingsForm({
       {/* ── Password ── */}
       <form
         onSubmit={handlePasswordUpdate}
-        className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6"
+        className="rounded-xl border border-line bg-surface-card p-6"
       >
         <h2 className="text-lg font-semibold">Password</h2>
         <div className="mt-4 space-y-4">
           <div>
             <label
               htmlFor="currentPassword"
-              className="block text-sm font-medium text-zinc-300"
+              className="block text-sm font-medium text-content-secondary"
             >
               Current Password
             </label>
@@ -296,7 +296,7 @@ export function SettingsForm({
           <div>
             <label
               htmlFor="newPassword"
-              className="block text-sm font-medium text-zinc-300"
+              className="block text-sm font-medium text-content-secondary"
             >
               New Password
             </label>
@@ -313,7 +313,7 @@ export function SettingsForm({
           <div>
             <label
               htmlFor="confirmPassword"
-              className="block text-sm font-medium text-zinc-300"
+              className="block text-sm font-medium text-content-secondary"
             >
               Confirm New Password
             </label>

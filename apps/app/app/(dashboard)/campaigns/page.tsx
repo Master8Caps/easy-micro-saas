@@ -43,7 +43,7 @@ export default async function CampaignsPage() {
     <>
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight">Campaigns</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-content-muted">
           All campaign angles across your products.
         </p>
       </div>
@@ -55,9 +55,9 @@ export default async function CampaignsPage() {
           clickCounts={clickMap}
         />
       ) : (
-        <div className="rounded-xl border border-dashed border-white/[0.08] p-12 text-center">
+        <div className="rounded-xl border border-dashed border-line p-12 text-center">
           <h2 className="text-lg font-semibold">No campaigns yet</h2>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-content-muted">
             Create a product and generate its Marketing Brain to see campaigns
             here.
           </p>

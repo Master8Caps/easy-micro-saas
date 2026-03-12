@@ -2,6 +2,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
+import { completeOnboardingStep } from "@/lib/actions/onboarding";
 import { loadLearningInsights, type LearningInsight } from "./learning";
 
 const anthropic = new Anthropic();
@@ -273,6 +274,8 @@ export async function generateBrain(input: GenerateBrainInput) {
 
       await supabase.from("content_pieces").insert(websitePieces);
     }
+
+    try { await completeOnboardingStep("brain"); } catch {}
 
     return { generationId: generation.id, output: brainOutput };
   } catch (err) {

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { completeOnboardingStep } from "@/lib/actions/onboarding";
 import { CampaignList } from "./campaign-list";
 
 export default async function CampaignsPage() {
@@ -38,6 +39,10 @@ export default async function CampaignsPage() {
       clickMap[row.campaign_id] = (clickMap[row.campaign_id] ?? 0) + (row.click_count ?? 0);
     }
   });
+
+  if (campaigns && campaigns.length > 0) {
+    try { await completeOnboardingStep("campaigns"); } catch {}
+  }
 
   return (
     <>

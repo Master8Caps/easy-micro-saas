@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { completeOnboardingStep } from "@/lib/actions/onboarding";
 
 export async function updateProfile(fullName: string) {
   const supabase = await createClient();
@@ -16,6 +17,8 @@ export async function updateProfile(fullName: string) {
     .eq("id", user.id);
 
   if (error) return { error: error.message };
+
+  try { await completeOnboardingStep("profile"); } catch {}
 
   revalidatePath("/settings");
   return { success: true };
@@ -36,6 +39,8 @@ export async function activateInvitedUser() {
     .eq("status", "invited");
 
   if (error) return { error: error.message };
+
+  try { await completeOnboardingStep("account"); } catch {}
 
   return { success: true };
 }

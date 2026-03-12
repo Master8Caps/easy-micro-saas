@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
+import { completeOnboardingStep } from "@/lib/actions/onboarding";
 import { createTrackedLink } from "./links";
 import { loadLearningInsights, type LearningInsight } from "./learning";
 
@@ -510,6 +511,10 @@ export async function updateContentPieceStatus(
 
   if (error) return { error: error.message };
 
+  if (newStatus === "scheduled") {
+    try { await completeOnboardingStep("schedule"); } catch {}
+  }
+
   revalidatePath("/content");
   revalidatePath("/schedule");
   revalidatePath("/campaigns");
@@ -619,6 +624,10 @@ export async function updateContentPieceSchedule(
     .eq("id", pieceId);
 
   if (error) return { error: error.message };
+
+  if (scheduledFor) {
+    try { await completeOnboardingStep("schedule"); } catch {}
+  }
 
   revalidatePath("/content");
   revalidatePath("/schedule");

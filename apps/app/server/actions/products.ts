@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { completeOnboardingStep } from "@/lib/actions/onboarding";
 
 interface CreateProductInput {
   name: string;
@@ -49,6 +50,8 @@ export async function createProduct(input: CreateProductInput) {
   if (error) {
     return { error: error.message };
   }
+
+  try { await completeOnboardingStep("product"); } catch {}
 
   return { id: data.id };
 }

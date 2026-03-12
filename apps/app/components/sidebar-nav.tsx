@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/components/user-context";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
   {
@@ -169,6 +170,9 @@ export function SidebarNav() {
             </div>
           </div>
         )}
+
+        {/* Theme toggle */}
+        <ThemeToggle />
 
         {/* Settings pinned directly above user info */}
         <NavLink item={settingsItem} active={isActive(settingsItem.href)} />

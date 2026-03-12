@@ -32,7 +32,7 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 |---|---|
 | Frontend + Backend | Next.js 15 (App Router) |
 | Language | TypeScript |
-| Styling | Tailwind CSS (dark-mode-first) |
+| Styling | Tailwind CSS (dark/light/system mode via CSS variables) |
 | Database | Supabase (Postgres + pgvector) |
 | Auth | Supabase Auth |
 | Payments | Stripe |
@@ -752,6 +752,67 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 - [ ] Thumbs-downed content noted in "what to avoid" section of prompt
 - [ ] Generated content shows influence of performance data (different angles/tone vs cold start)
 
+### Dark/Light Mode Toggle
+
+> Migration 00018 — theme_preference column + onboarding schema.
+
+#### Theme Infrastructure
+- [ ] Toggle sidebar button → switches between dark and light mode instantly
+- [ ] Toggle persists on page reload (localStorage)
+- [ ] Settings page → Appearance section shows Light / Dark / System buttons
+- [ ] System mode follows OS preference (prefers-color-scheme)
+- [ ] System mode updates in real-time when OS theme changes
+- [ ] No flash of wrong theme on page load (anti-flash script)
+- [ ] Theme preference syncs to Supabase (cross-device persistence)
+
+#### Light Mode Visual Checks
+- [ ] Dashboard page — stat cards, product list readable in light mode
+- [ ] Sidebar — navigation items, active states, logo visible in light mode
+- [ ] Campaigns page — campaign cards, tabs, panel all correct in light mode
+- [ ] Content page — content cards, status pills, category tabs correct
+- [ ] Schedule page — calendar, date cells, content items visible
+- [ ] Analytics page — charts, summary cards, performance bars visible
+- [ ] Products/new — 4-step form, step indicators, toggle switches correct
+- [ ] Brain page — avatar cards, campaign cards, performance bars correct
+- [ ] Settings page — all form sections, inputs, buttons correct
+- [ ] Archive page — archived items display correctly
+- [ ] Admin pages — system info, user list readable
+- [ ] Login page — form, button, toggle visible
+- [ ] Setup page — form fields, button visible
+- [ ] Waitlist page — displays correctly
+- [ ] All primary action buttons visible in both themes (not white-on-white)
+- [ ] All modals (delete confirmation, campaign panel) correct in both themes
+- [ ] Engagement popover readable in light mode
+- [ ] Date picker readable in light mode
+
+### Onboarding Checklist
+
+> Migration 00018 — user_onboarding_steps table + RLS policies.
+
+#### Checklist Display
+- [ ] New user sees checklist at top of dashboard
+- [ ] "Create your account" step auto-completed on signup
+- [ ] Progress bar shows X/6 steps complete
+- [ ] Incomplete steps are clickable links to relevant pages
+- [ ] Completed steps show checkmark, strikethrough, and reduced opacity
+- [ ] Existing users (before migration) do NOT see the checklist
+
+#### Auto-Completion
+- [ ] Complete profile (add name in settings) → "Complete your profile" step marks done
+- [ ] Create a product → "Create your first product" step marks done
+- [ ] Generate brain → "Generate your brand brain" step marks done
+- [ ] Visit campaigns page with campaigns present → "Review your campaigns" step marks done
+- [ ] Schedule a content piece → "Schedule your first content" step marks done
+- [ ] Completing a step twice doesn't error (upsert is idempotent)
+
+#### Completion & Dismissal
+- [ ] All 6 steps complete → confetti animation fires
+- [ ] All 6 steps complete → heading changes to "You're all set!"
+- [ ] Dismiss button appears only when all steps complete
+- [ ] Click dismiss → checklist disappears immediately
+- [ ] Refresh page after dismiss → checklist does not reappear
+- [ ] Dismiss persists in database (onboarding_completed_at set)
+
 ---
 
 ## What's Next
@@ -796,7 +857,8 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 
 ### Polish / UX
 - [ ] Website kit: structured editing (edit headline, benefits individually instead of raw text)
-- [ ] Onboarding flow for new users (guided product creation)
+- [x] ~~Onboarding flow for new users (guided product creation)~~ **Done** — 6-step checklist with auto-completion + confetti
+- [x] ~~Dashboard light/dark mode toggle~~ **Done** — dark/light/system with CSS variables + localStorage + Supabase sync
 - [ ] Mobile responsive improvements
 - [ ] Schedule page: drag-and-drop scheduling (dnd-kit)
 

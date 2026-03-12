@@ -33,6 +33,7 @@ nul
 # Internal
 EMS_PLAN.md
 .claude/
+.worktrees/
 
 # Database migrations
 supabase/migrations/

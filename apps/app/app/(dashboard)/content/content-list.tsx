@@ -265,7 +265,7 @@ export function ContentList({
               onClick={() => setCategoryFilter(tab.value)}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 categoryFilter === tab.value
-                  ? "bg-white text-zinc-950"
+                  ? "bg-content-primary text-surface-primary"
                   : "text-content-secondary hover:text-content-primary"
               }`}
             >
@@ -300,7 +300,7 @@ export function ContentList({
               ? "border-indigo-400 bg-indigo-500"
               : selectedIds.size > 0
                 ? "border-indigo-400 bg-indigo-500/50"
-                : "border-zinc-600"
+                : "border-line"
           }`}>
             {(allFilteredSelected || selectedIds.size > 0) && (
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -396,7 +396,7 @@ export function ContentList({
                 <span className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
                   isSelected
                     ? "border-indigo-400 bg-indigo-500"
-                    : "border-zinc-600 hover:border-zinc-400"
+                    : "border-line hover:border-zinc-400"
                 }`}>
                   {isSelected && (
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">

@@ -47,7 +47,7 @@ export default async function DashboardPage() {
         </div>
         <Link
           href="/products/new"
-          className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary"
+          className="rounded-lg bg-content-primary px-5 py-2.5 text-sm font-medium text-surface-primary transition-colors hover:bg-surface-tertiary"
         >
           New Product
         </Link>
@@ -104,7 +104,7 @@ export default async function DashboardPage() {
           </p>
           <Link
             href="/products/new"
-            className="mt-6 inline-flex items-center justify-center rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary"
+            className="mt-6 inline-flex items-center justify-center rounded-lg bg-content-primary px-6 py-2.5 text-sm font-medium text-surface-primary transition-colors hover:bg-surface-tertiary"
           >
             Create Product
           </Link>

@@ -102,7 +102,7 @@ export default function NewProductPage() {
               <div
                 key={s}
                 className={`h-1 flex-1 rounded-full ${
-                  s <= step ? "bg-white" : "bg-surface-card-hover"
+                  s <= step ? "bg-content-primary" : "bg-surface-card-hover"
                 }`}
               />
             ))}
@@ -163,7 +163,7 @@ export default function NewProductPage() {
             <button
               onClick={() => setStep(2)}
               disabled={!name || !description || !market}
-              className="mt-8 w-full rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary disabled:opacity-30"
+              className="mt-8 w-full rounded-lg bg-content-primary px-4 py-2.5 text-sm font-medium text-surface-primary transition-colors hover:bg-surface-tertiary disabled:opacity-30"
             >
               Continue
             </button>
@@ -202,7 +202,7 @@ export default function NewProductPage() {
               <button
                 onClick={() => setStep(3)}
                 disabled={!goals}
-                className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary disabled:opacity-30"
+                className="flex-1 rounded-lg bg-content-primary px-4 py-2.5 text-sm font-medium text-surface-primary transition-colors hover:bg-surface-tertiary disabled:opacity-30"
               >
                 Continue
               </button>
@@ -254,7 +254,7 @@ export default function NewProductPage() {
               <button
                 onClick={() => setStep(4)}
                 disabled={channels.length === 0}
-                className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary disabled:opacity-30"
+                className="flex-1 rounded-lg bg-content-primary px-4 py-2.5 text-sm font-medium text-surface-primary transition-colors hover:bg-surface-tertiary disabled:opacity-30"
               >
                 Continue
               </button>
@@ -338,14 +338,14 @@ export default function NewProductPage() {
                   <button
                     onClick={() => setHasWebsite(!hasWebsite)}
                     className={`relative h-6 w-11 rounded-full transition-colors ${
-                      hasWebsite ? "bg-white" : "bg-zinc-700"
+                      hasWebsite ? "bg-content-primary" : "bg-surface-tertiary"
                     }`}
                   >
                     <span
                       className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full transition-transform ${
                         hasWebsite
                           ? "translate-x-5 bg-surface-primary"
-                          : "bg-zinc-400"
+                          : "bg-content-muted"
                       }`}
                     />
                   </button>
@@ -378,14 +378,14 @@ export default function NewProductPage() {
                   <button
                     onClick={() => setWantsAds(!wantsAds)}
                     className={`relative h-6 w-11 rounded-full transition-colors ${
-                      wantsAds ? "bg-white" : "bg-zinc-700"
+                      wantsAds ? "bg-content-primary" : "bg-surface-tertiary"
                     }`}
                   >
                     <span
                       className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full transition-transform ${
                         wantsAds
                           ? "translate-x-5 bg-surface-primary"
-                          : "bg-zinc-400"
+                          : "bg-content-muted"
                       }`}
                     />
                   </button>
@@ -422,7 +422,7 @@ export default function NewProductPage() {
               <button
                 onClick={handleSubmit}
                 disabled={loading || contentFormats.length === 0}
-                className="flex-1 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary disabled:opacity-30"
+                className="flex-1 rounded-lg bg-content-primary px-4 py-2.5 text-sm font-medium text-surface-primary transition-colors hover:bg-surface-tertiary disabled:opacity-30"
               >
                 {loading ? "Creating..." : "Generate Marketing Brain"}
               </button>

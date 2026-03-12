@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { completeOnboardingStep } from "@/lib/actions/onboarding";
+import { completeOnboardingStep, getOnboardingProgress } from "@/lib/actions/onboarding";
 import { CampaignList } from "./campaign-list";
 
 export default async function CampaignsPage() {
@@ -41,7 +41,10 @@ export default async function CampaignsPage() {
   });
 
   if (campaigns && campaigns.length > 0) {
-    try { await completeOnboardingStep("campaigns"); } catch {}
+    const onboarding = await getOnboardingProgress();
+    if (onboarding && !onboarding.completedSteps.includes("campaigns")) {
+      try { await completeOnboardingStep("campaigns"); } catch {}
+    }
   }
 
   return (

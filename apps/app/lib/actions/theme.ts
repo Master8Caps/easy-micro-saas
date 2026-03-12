@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 
 export async function updateThemePreference(theme: string) {
+  if (!["dark", "light", "system"].includes(theme)) return;
   const supabase = await createClient();
   const {
     data: { user },

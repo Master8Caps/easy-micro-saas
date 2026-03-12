@@ -2,6 +2,11 @@
 alter table public.profiles
   add column theme_preference text not null default 'dark';
 
+alter table public.profiles
+  add constraint profiles_theme_preference_check check (
+    theme_preference in ('dark', 'light', 'system')
+  );
+
 -- Add onboarding completion timestamp to profiles
 alter table public.profiles
   add column onboarding_completed_at timestamptz;
@@ -28,6 +33,11 @@ create policy "Users can view own onboarding steps"
 
 create policy "Users can insert own onboarding steps"
   on public.user_onboarding_steps for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own onboarding steps"
+  on public.user_onboarding_steps for update
+  using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
 -- Auto-complete 'account' step for all existing active users

@@ -337,7 +337,7 @@ export default function BrainPage() {
           <p className="mt-2 text-content-secondary">{error}</p>
           <button
             onClick={handleRegenerate}
-            className="mt-6 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-surface-tertiary"
+            className="mt-6 rounded-lg bg-content-primary px-6 py-2.5 text-sm font-medium text-surface-primary transition-colors hover:bg-surface-tertiary"
           >
             Try again
           </button>

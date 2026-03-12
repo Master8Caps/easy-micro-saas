@@ -73,7 +73,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
               onClick={() => { setActiveTab("social"); setProductFilter(""); setChannelFilter(""); }}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 activeTab === "social"
-                  ? "bg-white text-zinc-950"
+                  ? "bg-content-primary text-surface-primary"
                   : "text-content-secondary hover:text-content-primary"
               }`}
             >
@@ -87,7 +87,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
                 onClick={() => { setActiveTab("email"); setProductFilter(""); setChannelFilter(""); }}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   activeTab === "email"
-                    ? "bg-white text-zinc-950"
+                    ? "bg-content-primary text-surface-primary"
                     : "text-content-secondary hover:text-content-primary"
                 }`}
               >
@@ -102,7 +102,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
                 onClick={() => { setActiveTab("ad"); setProductFilter(""); setChannelFilter(""); }}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   activeTab === "ad"
-                    ? "bg-white text-zinc-950"
+                    ? "bg-content-primary text-surface-primary"
                     : "text-content-secondary hover:text-content-primary"
                 }`}
               >

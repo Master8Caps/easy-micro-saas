@@ -3,17 +3,41 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-zinc-950 text-zinc-100 antialiased;
+  :root {
+    /* Light mode (default in :root, overridden by .dark) */
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #fafafa;
+    --color-bg-tertiary: #f4f4f5;
+    --color-bg-card: #fafafa;
+    --color-bg-card-hover: #f4f4f5;
+    --color-text-primary: #18181b;
+    --color-text-secondary: #52525b;
+    --color-text-muted: #71717a;
+    --color-border: #e4e4e7;
+    --color-border-subtle: #f4f4f5;
+    --color-shadow: rgba(0, 0, 0, 0.05);
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-heading;
+  .dark {
+    --color-bg-primary: #09090b;
+    --color-bg-secondary: #18181b;
+    --color-bg-tertiary: #27272a;
+    --color-bg-card: rgba(255, 255, 255, 0.03);
+    --color-bg-card-hover: rgba(255, 255, 255, 0.05);
+    --color-text-primary: #f4f4f5;
+    --color-text-secondary: #a1a1aa;
+    --color-text-muted: #71717a;
+    --color-border: rgba(255, 255, 255, 0.06);
+    --color-border-subtle: rgba(255, 255, 255, 0.03);
+    --color-shadow: rgba(0, 0, 0, 0.3);
+  }
+
+  body {
+    @apply bg-surface-primary text-content-primary;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 }
 
@@ -29,5 +53,5 @@
 }
 
 .animate-fade-in {
-  animation: fade-in 0.4s ease-out forwards;
+  animation: fade-in 0.4s ease-out;
 }

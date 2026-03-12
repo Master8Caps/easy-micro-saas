@@ -2,6 +2,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { StatusPill } from "@/components/pills";
 import { ProductDeleteButton } from "@/components/product-delete-button";
+import { getOnboardingProgress } from "@/lib/actions/onboarding";
+import { OnboardingChecklist } from "@/components/onboarding-checklist";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -28,8 +30,14 @@ export default async function DashboardPage() {
     .select("*", { count: "exact", head: true })
     .eq("archived", false);
 
+  const onboarding = await getOnboardingProgress();
+
   return (
     <>
+      {onboarding && (
+        <OnboardingChecklist completedSteps={onboarding.completedSteps} />
+      )}
+
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>

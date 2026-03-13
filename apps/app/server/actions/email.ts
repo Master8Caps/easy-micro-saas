@@ -1,6 +1,7 @@
 "use server";
 
 import { getResend, EMAIL_FROM } from "@/lib/resend";
+import type { DigestData } from "./digest";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://app.easymicrosaas.com";
 
@@ -121,4 +122,126 @@ export async function sendActivationEmail(email: string) {
   } catch (err) {
     console.error("Failed to send activation email:", err);
   }
+}
+
+// ── Weekly digest email ─────────────────────────────
+export function buildDigestEmail(data: DigestData): string {
+  const APP_URL =
+    process.env.NEXT_PUBLIC_APP_URL || "https://app.easymicrosaas.com";
+
+  const header = `
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td style="padding:20px;background-color:#1e1b4b;border-radius:10px;">
+          <h1 style="margin:0 0 16px;font-size:20px;color:#e0e7ff;">Weekly Performance Digest</h1>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td align="center" style="padding:8px;">
+                <p style="margin:0;font-size:24px;font-weight:bold;color:#818cf8;">${data.totalClicksAllProducts}</p>
+                <p style="margin:4px 0 0;font-size:11px;color:#a5b4fc;">Total Clicks</p>
+              </td>
+              <td align="center" style="padding:8px;">
+                <p style="margin:0;font-size:24px;font-weight:bold;color:#818cf8;">${data.postsThisWeek}</p>
+                <p style="margin:4px 0 0;font-size:11px;color:#a5b4fc;">Posted This Week</p>
+              </td>
+            </tr>
+          </table>
+          ${
+            data.topPerformer
+              ? `<p style="margin:12px 0 0;font-size:12px;color:#a5b4fc;">Top performer: <strong style="color:#e0e7ff;">${data.topPerformer.title}</strong> (${data.topPerformer.channel})</p>`
+              : ""
+          }
+        </td>
+      </tr>
+    </table>
+  `;
+
+  let productCards = "";
+  if (data.products.length > 0) {
+    const cards = data.products
+      .map(
+        (p) => `
+      <tr>
+        <td style="padding:12px 16px;background-color:#27272a;border-radius:8px;margin-bottom:8px;">
+          <p style="margin:0 0 8px;font-size:14px;font-weight:600;color:#f4f4f5;">${p.name}</p>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="font-size:11px;color:#a1a1aa;">Clicks: <strong style="color:#f4f4f5;">${p.totalClicks}</strong></td>
+              <td style="font-size:11px;color:#a1a1aa;">Views: <strong style="color:#f4f4f5;">${p.totalViews}</strong></td>
+              <td style="font-size:11px;color:#a1a1aa;">Likes: <strong style="color:#f4f4f5;">${p.totalLikes}</strong></td>
+            </tr>
+          </table>
+          ${
+            p.topPiece
+              ? `<p style="margin:8px 0 0;font-size:11px;color:#71717a;">Best: <span style="color:#a5b4fc;">${p.topPiece.title}</span> (${p.topPiece.channel})</p>`
+              : ""
+          }
+        </td>
+      </tr>
+      <tr><td style="height:8px;"></td></tr>
+    `,
+      )
+      .join("");
+
+    const moreProducts =
+      data.totalProductCount > 5
+        ? `<tr><td style="padding:8px 0;text-align:center;font-size:12px;color:#71717a;">and ${data.totalProductCount - 5} more product${data.totalProductCount - 5 === 1 ? "" : "s"}</td></tr>`
+        : "";
+
+    productCards = `
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+        <tr>
+          <td>
+            <h2 style="margin:0 0 12px;font-size:14px;font-weight:600;color:#a1a1aa;text-transform:uppercase;letter-spacing:0.05em;">Your Products</h2>
+          </td>
+        </tr>
+        ${cards}
+        ${moreProducts}
+      </table>
+    `;
+  }
+
+  const actions: string[] = [];
+  if (data.actionItems.readyToPost > 0)
+    actions.push(
+      `<li style="margin-bottom:6px;"><span style="color:#34d399;">&#10003;</span> <strong>${data.actionItems.readyToPost}</strong> piece${data.actionItems.readyToPost === 1 ? "" : "s"} ready to post</li>`,
+    );
+  if (data.actionItems.scheduledThisWeek > 0)
+    actions.push(
+      `<li style="margin-bottom:6px;"><span style="color:#818cf8;">&#9650;</span> <strong>${data.actionItems.scheduledThisWeek}</strong> scheduled this week</li>`,
+    );
+  if (data.actionItems.campaignsWithNoContent > 0)
+    actions.push(
+      `<li style="margin-bottom:6px;"><span style="color:#fbbf24;">&#9679;</span> <strong>${data.actionItems.campaignsWithNoContent}</strong> campaign${data.actionItems.campaignsWithNoContent === 1 ? "" : "s"} with no content yet</li>`,
+    );
+
+  const actionSection =
+    actions.length > 0
+      ? `
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td>
+          <h2 style="margin:0 0 12px;font-size:14px;font-weight:600;color:#a1a1aa;text-transform:uppercase;letter-spacing:0.05em;">Action Items</h2>
+          <ul style="margin:0;padding-left:16px;color:#d4d4d8;font-size:13px;list-style:none;">
+            ${actions.join("")}
+          </ul>
+        </td>
+      </tr>
+    </table>
+  `
+      : "";
+
+  const cta = `
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding-top:8px;">
+          <a href="${APP_URL}" style="display:inline-block;padding:10px 24px;background-color:#6366f1;color:#ffffff;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600;">
+            Open Dashboard
+          </a>
+        </td>
+      </tr>
+    </table>
+  `;
+
+  return emailWrapper(header + productCards + actionSection + cta);
 }

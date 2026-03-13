@@ -22,7 +22,7 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 
-interface SchedulePiece {
+export interface SchedulePiece {
   id: string;
   product_id: string;
   campaign_id: string | null;
@@ -79,6 +79,9 @@ function getWeekLabel(days: { date: string; dayOfMonth: number; month: string }[
   }
   return `${first.dayOfMonth} ${first.month} — ${last.dayOfMonth} ${last.month} ${endDate.getFullYear()}`;
 }
+
+const POINTER_SENSOR_OPTIONS = { activationConstraint: { distance: 8 } };
+const TOUCH_SENSOR_OPTIONS = { activationConstraint: { delay: 200, tolerance: 5 } };
 
 // ── DnD wrapper components ──────────────────────────
 
@@ -149,6 +152,13 @@ export function ScheduleCalendar({
   const [productFilter, setProductFilter] = useState("");
   const [selectedPiece, setSelectedPiece] = useState<SchedulePiece | null>(null);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  const [selectedMonthDate, setSelectedMonthDate] = useState<string | null>(null);
+
+  const isCurrentMonth = useMemo(() => {
+    if (!monthInfo) return true;
+    const now = new Date();
+    return monthInfo.monthStr === `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  }, [monthInfo]);
 
   // Sync state when server data changes (navigation)
   useEffect(() => {
@@ -159,13 +169,14 @@ export function ScheduleCalendar({
   }, [initialUnscheduled]);
 
   const weekDays = useMemo(() => getWeekDays(weekOffset), [weekOffset]);
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
 
   // Group scheduled pieces by date (extract date from timestamp)
   const piecesByDate = useMemo(() => {
     const groups: Record<string, SchedulePiece[]> = {};
     for (const piece of scheduled) {
-      const date = piece.scheduled_for!.split("T")[0];
+      if (!piece.scheduled_for) continue;
+      const date = piece.scheduled_for.split("T")[0];
       if (!groups[date]) groups[date] = [];
       groups[date].push(piece);
     }
@@ -185,12 +196,8 @@ export function ScheduleCalendar({
   }, [unscheduled, productFilter]);
 
   // DnD sensors
-  const pointerSensor = useSensor(PointerSensor, {
-    activationConstraint: { distance: 8 },
-  });
-  const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: { delay: 200, tolerance: 5 },
-  });
+  const pointerSensor = useSensor(PointerSensor, POINTER_SENSOR_OPTIONS);
+  const touchSensor = useSensor(TouchSensor, TOUCH_SENSOR_OPTIONS);
   const sensors = useSensors(pointerSensor, touchSensor);
 
   // Find piece being dragged (for overlay)
@@ -240,7 +247,7 @@ export function ScheduleCalendar({
     let newScheduledFor: string | null = null;
     if (targetDate) {
       const existingTime = fromScheduled?.scheduled_for?.split("T")[1];
-      newScheduledFor = `${targetDate}T${existingTime ?? "09:00:00"}`;
+      newScheduledFor = `${targetDate}T${existingTime ?? "09:00:00.000Z"}`;
     }
 
     // Optimistic update
@@ -523,11 +530,7 @@ export function ScheduleCalendar({
               </button>
               <div className="text-center">
                 <h2 className="text-lg font-semibold">{monthInfo.label}</h2>
-                {(() => {
-                  const now = new Date();
-                  const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-                  return monthInfo.monthStr !== currentMonthStr;
-                })() && (
+                {!isCurrentMonth && (
                   <button
                     onClick={goToThisMonth}
                     className="mt-0.5 text-xs text-indigo-400 hover:text-indigo-300"
@@ -553,9 +556,9 @@ export function ScheduleCalendar({
               year={monthInfo.year}
               month={monthInfo.month}
               piecesByDate={piecesByDate}
-              selectedDate={null}
+              selectedDate={selectedMonthDate}
               onSelectDate={(date) => {
-                // Open side panel with the first piece on that day
+                setSelectedMonthDate(date);
                 const dayPieces = piecesByDate[date];
                 if (dayPieces && dayPieces.length > 0) {
                   setSelectedPiece(dayPieces[0]);

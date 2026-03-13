@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { ScheduleCalendar } from "./schedule-calendar";
+import { ScheduleCalendar, type SchedulePiece } from "./schedule-calendar";
 
 function getWeekRange(offset: number) {
   const today = new Date();
@@ -112,8 +112,8 @@ export default async function SchedulePage({
       </div>
 
       <ScheduleCalendar
-        scheduledPieces={(scheduledPieces ?? []) as any}
-        unscheduledPieces={(unscheduledPieces ?? []) as any}
+        scheduledPieces={(scheduledPieces ?? []) as unknown as SchedulePiece[]}
+        unscheduledPieces={(unscheduledPieces ?? []) as unknown as SchedulePiece[]}
         products={(products ?? []) as { id: string; name: string }[]}
         weekOffset={weekOffset}
         view={view}

@@ -121,7 +121,8 @@ export function MonthGrid({
   onSelectDate,
 }: MonthGridProps) {
   const days = useMemo(() => getMonthGridDays(year, month), [year, month]);
-  const todayStr = new Date().toISOString().split("T")[0];
+  // Stable for the lifetime of the component — "today" won't change mid-session
+  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], [year, month]);
 
   return (
     <div>

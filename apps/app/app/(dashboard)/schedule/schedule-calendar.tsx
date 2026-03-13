@@ -26,6 +26,9 @@ interface SchedulePiece {
   engagement_comments: number | null;
   engagement_shares: number | null;
   engagement_logged_at: string | null;
+  image_url: string | null;
+  image_source: "generated" | "uploaded" | null;
+  image_prompt_used: string | null;
   products: { name: string } | null;
   campaigns: { channel: string; angle: string } | null;
 }
@@ -495,6 +498,17 @@ function ContentPanel({
               )}
             </div>
           </div>
+
+          {/* Image preview */}
+          {piece.image_url && (
+            <div className="mb-3">
+              <img
+                src={piece.image_url}
+                alt=""
+                className="w-full rounded-lg"
+              />
+            </div>
+          )}
 
           {/* Content body */}
           <div className="rounded-xl border border-line bg-surface-card p-5">

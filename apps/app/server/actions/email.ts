@@ -170,10 +170,15 @@ export function buildDigestEmail(data: DigestData): string {
               <td style="font-size:11px;color:#a1a1aa;">Views: <strong style="color:#f4f4f5;">${p.totalViews}</strong></td>
               <td style="font-size:11px;color:#a1a1aa;">Likes: <strong style="color:#f4f4f5;">${p.totalLikes}</strong></td>
             </tr>
+            <tr>
+              <td style="font-size:11px;color:#a1a1aa;">Comments: <strong style="color:#f4f4f5;">${p.totalComments}</strong></td>
+              <td style="font-size:11px;color:#a1a1aa;">Shares: <strong style="color:#f4f4f5;">${p.totalShares}</strong></td>
+              <td></td>
+            </tr>
           </table>
           ${
             p.topPiece
-              ? `<p style="margin:8px 0 0;font-size:11px;color:#71717a;">Best: <span style="color:#a5b4fc;">${p.topPiece.title}</span> (${p.topPiece.channel})</p>`
+              ? `<p style="margin:8px 0 0;font-size:11px;color:#71717a;">Best: <span style="color:#a5b4fc;">${p.topPiece.title}</span> (${p.topPiece.channel}) — Score: ${Math.round(p.topPiece.compositeScore)}</p>`
               : ""
           }
         </td>
@@ -185,7 +190,7 @@ export function buildDigestEmail(data: DigestData): string {
 
     const moreProducts =
       data.totalProductCount > 5
-        ? `<tr><td style="padding:8px 0;text-align:center;font-size:12px;color:#71717a;">and ${data.totalProductCount - 5} more product${data.totalProductCount - 5 === 1 ? "" : "s"}</td></tr>`
+        ? `<tr><td style="padding:8px 0;text-align:center;font-size:12px;color:#71717a;"><a href="${APP_URL}" style="color:#818cf8;text-decoration:underline;">and ${data.totalProductCount - 5} more product${data.totalProductCount - 5 === 1 ? "" : "s"}</a></td></tr>`
         : "";
 
     productCards = `

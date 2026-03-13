@@ -11,6 +11,7 @@ import {
   toggleContentPieceArchived,
   updateContentPiecesStatusBulk,
 } from "@/server/actions/content";
+import ImageGenerator from "@/components/image-generator";
 
 interface TrackedLink {
   id: string;
@@ -40,6 +41,9 @@ interface ContentPieceRow {
   engagement_comments: number | null;
   engagement_shares: number | null;
   engagement_logged_at: string | null;
+  image_url: string | null;
+  image_source: "generated" | "uploaded" | null;
+  image_prompt_used: string | null;
 }
 
 const typeOptions = [
@@ -479,6 +483,17 @@ export function ContentList({
                   </div>
                 )}
 
+                {/* Image thumbnail (when collapsed and has image) */}
+                {!isExpanded && piece.image_url && (
+                  <div className="mt-2">
+                    <img
+                      src={piece.image_url}
+                      alt=""
+                      className="h-16 w-16 rounded-md object-cover"
+                    />
+                  </div>
+                )}
+
                 {/* Body preview / expand */}
                 <button
                   onClick={() => setExpandedId(isExpanded ? null : piece.id)}
@@ -497,6 +512,18 @@ export function ContentList({
                     </span>
                   )}
                 </button>
+
+                {/* Image generator (when expanded, for image-prompt type) */}
+                {isExpanded && piece.type === "image-prompt" && (
+                  <ImageGenerator
+                    contentPieceId={piece.id}
+                    imageUrl={piece.image_url}
+                    imageSource={piece.image_source}
+                    imagePromptUsed={piece.image_prompt_used}
+                    body={piece.body}
+                    channel={piece.metadata?.channel}
+                  />
+                )}
               </div>
             </div>
           );

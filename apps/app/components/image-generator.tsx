@@ -165,15 +165,25 @@ export default function ImageGenerator({
             <span className="text-xs text-zinc-500">
               {imageSource === "generated" ? "AI Generated" : "Uploaded"}
             </span>
-            <a
-              href={imageUrl}
-              download
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch(imageUrl);
+                  const blob = await res.blob();
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `image-${contentPieceId}.png`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                } catch {
+                  setError("Failed to download image");
+                }
+              }}
               className="text-xs text-indigo-400 hover:text-indigo-300"
             >
               Download
-            </a>
+            </button>
             <div className="flex-1" />
             {imageSource === "generated" && (
               <button

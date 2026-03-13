@@ -3,12 +3,28 @@ import { createServiceClient } from "@/lib/supabase/service";
 import { getResend, EMAIL_FROM } from "@/lib/resend";
 import { getDigestDataForUser } from "@/server/actions/digest";
 import { buildDigestEmail } from "@/server/actions/email";
+import crypto from "crypto";
 
 export const maxDuration = 300;
 
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL || "https://app.easymicrosaas.com";
+
+function signUnsubscribe(uid: string, secret: string): string {
+  return crypto.createHmac("sha256", secret).update(uid).digest("hex");
+}
+
 export async function GET(request: NextRequest) {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    return NextResponse.json(
+      { error: "CRON_SECRET not configured" },
+      { status: 500 },
+    );
+  }
+
   const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -37,6 +53,7 @@ export async function GET(request: NextRequest) {
 
     for (const profile of batch) {
       try {
+        // N+1 getUserById: profiles table lacks email column; acceptable for small user base
         const {
           data: { user },
         } = await supabase.auth.admin.getUserById(profile.id);
@@ -51,17 +68,15 @@ export async function GET(request: NextRequest) {
           continue;
         }
 
-        const html = buildDigestEmail(digestData);
-        const APP_URL =
-          process.env.NEXT_PUBLIC_APP_URL || "https://app.easymicrosaas.com";
+        const sig = signUnsubscribe(profile.id, secret);
+        const unsubscribeUrl = `${APP_URL}/api/digest/unsubscribe?uid=${profile.id}&sig=${sig}`;
+        const html = buildDigestEmail(digestData, unsubscribeUrl);
 
         await resend.emails.send({
           from: EMAIL_FROM,
           to: user.email,
           subject: "Your Weekly Marketing Digest — Easy Micro SaaS",
-          html:
-            html +
-            `<p style="text-align:center;margin-top:16px;font-size:11px;color:#52525b;"><a href="${APP_URL}/api/digest/unsubscribe?uid=${profile.id}" style="color:#71717a;">Unsubscribe from digest emails</a></p>`,
+          html,
         });
         sent++;
       } catch (err) {

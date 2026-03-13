@@ -5,6 +5,14 @@ import type { DigestData } from "./digest";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://app.easymicrosaas.com";
 
+function escHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 // ── Shared template wrapper ─────────────────────────
 function emailWrapper(content: string) {
   return `<!DOCTYPE html>
@@ -125,10 +133,7 @@ export async function sendActivationEmail(email: string) {
 }
 
 // ── Weekly digest email ─────────────────────────────
-export function buildDigestEmail(data: DigestData): string {
-  const APP_URL =
-    process.env.NEXT_PUBLIC_APP_URL || "https://app.easymicrosaas.com";
-
+export function buildDigestEmail(data: DigestData, unsubscribeUrl?: string): string {
   const header = `
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
       <tr>
@@ -148,7 +153,7 @@ export function buildDigestEmail(data: DigestData): string {
           </table>
           ${
             data.topPerformer
-              ? `<p style="margin:12px 0 0;font-size:12px;color:#a5b4fc;">Top performer: <strong style="color:#e0e7ff;">${data.topPerformer.title}</strong> (${data.topPerformer.channel})</p>`
+              ? `<p style="margin:12px 0 0;font-size:12px;color:#a5b4fc;">Top performer: <strong style="color:#e0e7ff;">${escHtml(data.topPerformer.title)}</strong> (${escHtml(data.topPerformer.channel)})</p>`
               : ""
           }
         </td>
@@ -163,7 +168,7 @@ export function buildDigestEmail(data: DigestData): string {
         (p) => `
       <tr>
         <td style="padding:12px 16px;background-color:#27272a;border-radius:8px;margin-bottom:8px;">
-          <p style="margin:0 0 8px;font-size:14px;font-weight:600;color:#f4f4f5;">${p.name}</p>
+          <p style="margin:0 0 8px;font-size:14px;font-weight:600;color:#f4f4f5;">${escHtml(p.name)}</p>
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td style="font-size:11px;color:#a1a1aa;">Clicks: <strong style="color:#f4f4f5;">${p.totalClicks}</strong></td>
@@ -178,7 +183,7 @@ export function buildDigestEmail(data: DigestData): string {
           </table>
           ${
             p.topPiece
-              ? `<p style="margin:8px 0 0;font-size:11px;color:#71717a;">Best: <span style="color:#a5b4fc;">${p.topPiece.title}</span> (${p.topPiece.channel}) — Score: ${Math.round(p.topPiece.compositeScore)}</p>`
+              ? `<p style="margin:8px 0 0;font-size:11px;color:#71717a;">Best: <span style="color:#a5b4fc;">${escHtml(p.topPiece.title)}</span> (${escHtml(p.topPiece.channel)}) — Score: ${Math.round(p.topPiece.compositeScore)}</p>`
               : ""
           }
         </td>
@@ -248,5 +253,9 @@ export function buildDigestEmail(data: DigestData): string {
     </table>
   `;
 
-  return emailWrapper(header + productCards + actionSection + cta);
+  const unsubFooter = unsubscribeUrl
+    ? `<p style="text-align:center;margin-top:16px;font-size:11px;color:#52525b;"><a href="${unsubscribeUrl}" style="color:#71717a;">Unsubscribe from digest emails</a></p>`
+    : "";
+
+  return emailWrapper(header + productCards + actionSection + cta + unsubFooter);
 }

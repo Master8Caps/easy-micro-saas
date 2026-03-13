@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import crypto from "crypto";
 
 export async function GET(request: NextRequest) {
   const uid = request.nextUrl.searchParams.get("uid");
-  if (!uid) {
-    return new NextResponse("Missing user ID", { status: 400 });
+  const sig = request.nextUrl.searchParams.get("sig");
+  if (!uid || !sig) {
+    return new NextResponse("Invalid unsubscribe link", { status: 400 });
+  }
+
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    return new NextResponse("Server configuration error", { status: 500 });
+  }
+
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(uid)
+    .digest("hex");
+  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) {
+    return new NextResponse("Invalid unsubscribe link", { status: 400 });
   }
 
   const supabase = createServiceClient();

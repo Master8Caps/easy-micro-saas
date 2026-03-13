@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getResend, EMAIL_FROM } from "@/lib/resend";
 import { getDigestDataForUser } from "@/server/actions/digest";
-import { buildDigestEmail } from "@/server/actions/email";
+import { buildDigestEmail } from "@/server/actions/digest-email";
 import crypto from "crypto";
 
 export const maxDuration = 300;

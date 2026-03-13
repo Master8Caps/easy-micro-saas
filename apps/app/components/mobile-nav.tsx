@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 interface MobileNavProps {
   onToggle: () => void;
 }
@@ -24,7 +26,7 @@ export function MobileNav({ onToggle }: MobileNavProps) {
           <path d="M3 5h14M3 10h14M3 15h14" />
         </svg>
       </button>
-      <a href="/" className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2">
         <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
           <rect width="32" height="32" rx="8" fill="url(#logo-grad-mobile)" />
           <path d="M9 16.5L14 21.5L23 10.5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -37,7 +39,7 @@ export function MobileNav({ onToggle }: MobileNavProps) {
           </defs>
         </svg>
         <span className="font-heading text-sm font-semibold">Easy Micro SaaS</span>
-      </a>
+      </Link>
     </div>
   );
 }

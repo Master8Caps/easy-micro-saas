@@ -141,7 +141,7 @@ export function ScheduleCalendar({
   products: { id: string; name: string }[];
   weekOffset: number;
   view?: "week" | "month";
-  monthInfo?: { offset: number; year: number; month: number; label: string };
+  monthInfo?: { year: number; month: number; label: string; monthStr: string };
 }) {
   const router = useRouter();
   const [scheduled, setScheduled] = useState(initialScheduled);
@@ -349,8 +349,9 @@ export function ScheduleCalendar({
 
   function navigateMonth(direction: "prev" | "next") {
     if (!monthInfo) return;
-    const newOffset = direction === "prev" ? monthInfo.offset - 1 : monthInfo.offset + 1;
-    router.push(`/schedule?view=month&month=${newOffset}`);
+    const d = new Date(monthInfo.year, monthInfo.month + (direction === "prev" ? -1 : 1), 1);
+    const ms = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    router.push(`/schedule?view=month&month=${ms}`);
   }
 
   function goToThisMonth() {
@@ -361,13 +362,10 @@ export function ScheduleCalendar({
     if (newView === view) return;
     if (newView === "month") {
       // Use Wednesday of current week to determine month
-      const wednesday = weekDays[2]; // Wed is index 2 (Mon-based)
+      const wednesday = weekDays[2];
       const wedDate = new Date(wednesday.date);
-      const today = new Date();
-      const monthDiff =
-        (wedDate.getFullYear() - today.getFullYear()) * 12 +
-        (wedDate.getMonth() - today.getMonth());
-      router.push(`/schedule?view=month&month=${monthDiff}`);
+      const ms = `${wedDate.getFullYear()}-${String(wedDate.getMonth() + 1).padStart(2, "0")}`;
+      router.push(`/schedule?view=month&month=${ms}`);
     } else {
       // Compute week offset from month midpoint
       if (monthInfo) {
@@ -525,7 +523,11 @@ export function ScheduleCalendar({
               </button>
               <div className="text-center">
                 <h2 className="text-lg font-semibold">{monthInfo.label}</h2>
-                {monthInfo.offset !== 0 && (
+                {(() => {
+                  const now = new Date();
+                  const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+                  return monthInfo.monthStr !== currentMonthStr;
+                })() && (
                   <button
                     onClick={goToThisMonth}
                     className="mt-0.5 text-xs text-indigo-400 hover:text-indigo-300"
@@ -553,27 +555,11 @@ export function ScheduleCalendar({
               piecesByDate={piecesByDate}
               selectedDate={null}
               onSelectDate={(date) => {
-                // Clicking a day in month view navigates to that week
-                const clickedDate = new Date(date);
-                const today = new Date();
-                const diffDays = Math.round(
-                  (clickedDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
-                );
-                // Find which Monday-based week this falls in
-                const clickedDay = clickedDate.getDay();
-                const daysFromMonday = clickedDay === 0 ? 6 : clickedDay - 1;
-                const mondayOfClickedWeek = new Date(clickedDate);
-                mondayOfClickedWeek.setDate(clickedDate.getDate() - daysFromMonday);
-
-                const todayDay = today.getDay();
-                const todayDaysFromMonday = todayDay === 0 ? 6 : todayDay - 1;
-                const mondayOfThisWeek = new Date(today);
-                mondayOfThisWeek.setDate(today.getDate() - todayDaysFromMonday);
-
-                const weekDiff = Math.round(
-                  (mondayOfClickedWeek.getTime() - mondayOfThisWeek.getTime()) / (1000 * 60 * 60 * 24 * 7),
-                );
-                router.push(`/schedule?view=week&week=${weekDiff}`);
+                // Open side panel with the first piece on that day
+                const dayPieces = piecesByDate[date];
+                if (dayPieces && dayPieces.length > 0) {
+                  setSelectedPiece(dayPieces[0]);
+                }
               }}
             />
           </>

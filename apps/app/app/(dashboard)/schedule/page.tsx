@@ -20,10 +20,18 @@ function getWeekRange(offset: number) {
   };
 }
 
-function getMonthRange(offset: number) {
+function getMonthRange(monthParam: string | undefined) {
   const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth() + offset;
+  let year = today.getFullYear();
+  let month = today.getMonth(); // 0-indexed
+
+  if (monthParam) {
+    const [y, m] = monthParam.split("-").map(Number);
+    if (y && m) {
+      year = y;
+      month = m - 1; // convert 1-indexed to 0-indexed
+    }
+  }
 
   const first = new Date(year, month, 1);
   const last = new Date(year, month + 1, 0);
@@ -58,11 +66,10 @@ export default async function SchedulePage({
 
   const view = params.view === "month" ? "month" : "week";
   const weekOffset = parseInt(params.week || "0", 10);
-  const monthOffset = parseInt(params.month || "0", 10);
 
   // Determine date range based on view
   const weekRange = getWeekRange(weekOffset);
-  const monthRange = view === "month" ? getMonthRange(monthOffset) : null;
+  const monthRange = view === "month" ? getMonthRange(params.month) : null;
 
   const startDate = view === "month" ? monthRange!.startDate : weekRange.startDate;
   const endDate = view === "month" ? monthRange!.endDate : weekRange.endDate;
@@ -112,7 +119,12 @@ export default async function SchedulePage({
         view={view}
         monthInfo={
           view === "month" && monthRange
-            ? { offset: monthOffset, year: monthRange.year, month: monthRange.month, label: monthRange.label }
+            ? {
+                year: monthRange.year,
+                month: monthRange.month,
+                label: monthRange.label,
+                monthStr: `${monthRange.year}-${String(monthRange.month + 1).padStart(2, "0")}`,
+              }
             : undefined
         }
       />

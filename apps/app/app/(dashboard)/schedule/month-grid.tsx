@@ -96,15 +96,15 @@ function DayCell({
       {/* Status dots */}
       {pieces.length > 0 && (
         <div className="mt-1 flex flex-wrap gap-1">
-          {pieces.slice(0, 6).map((p) => (
+          {pieces.slice(0, 3).map((p) => (
             <span
               key={p.id}
               className={`h-2 w-2 rounded-full ${STATUS_DOT[p.status] ?? "bg-gray-400"}`}
             />
           ))}
-          {pieces.length > 6 && (
+          {pieces.length > 3 && (
             <span className="text-[10px] text-content-muted">
-              +{pieces.length - 6}
+              +{pieces.length - 3}
             </span>
           )}
         </div>

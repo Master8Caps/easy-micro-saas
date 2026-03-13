@@ -1,6 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { ContentList } from "./content-list";
 
+// Image generation can take 10-30s
+export const maxDuration = 60;
+
 export default async function ContentPage() {
   const supabase = await createClient();
 

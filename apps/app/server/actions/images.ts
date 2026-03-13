@@ -5,9 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { revalidatePath } from "next/cache";
 
-// Image generation can take 10-30s — extend Vercel timeout
-export const maxDuration = 60;
-
 const openai = new OpenAI();
 
 // Channel → default aspect ratio mapping

@@ -351,6 +351,27 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
       pieces: { content_type?: string; title: string; body: string; cta_text?: string; notes?: string }[];
     } = JSON.parse(jsonMatch[0]);
 
+    // Clean up any stored images for old content pieces before deleting
+    const { data: oldPieces } = await supabase
+      .from("content_pieces")
+      .select("id, product_id, image_url")
+      .eq("campaign_id", input.campaignId);
+
+    if (oldPieces && oldPieces.length > 0) {
+      const piecesWithImages = oldPieces.filter((p) => p.image_url);
+      if (piecesWithImages.length > 0) {
+        const { createServiceClient } = await import("@/lib/supabase/service");
+        const serviceClient = createServiceClient();
+        const paths = piecesWithImages.map((p) => {
+          // Extract storage path from URL (after /content-images/)
+          const urlPath = new URL(p.image_url!).pathname;
+          const match = urlPath.match(/content-images\/(.+?)(\?|$)/);
+          return match ? match[1] : `${p.product_id}/${p.id}.png`;
+        });
+        await serviceClient.storage.from("content-images").remove(paths);
+      }
+    }
+
     // Delete existing content pieces for this campaign before inserting new ones
     await supabase
       .from("content_pieces")
@@ -377,7 +398,7 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
     const { data: savedPieces, error: insertError } = await supabase
       .from("content_pieces")
       .insert(inserts)
-      .select("id, type, title, body, metadata, status, archived, created_at");
+      .select("id, type, title, body, metadata, status, archived, created_at, image_url, image_source, image_prompt_used");
 
     if (insertError) return { error: insertError.message };
 
@@ -456,7 +477,7 @@ export async function loadContentForCampaign(campaignId: string) {
 
   const { data, error } = await supabase
     .from("content_pieces")
-    .select("id, type, title, body, metadata, status, archived, posted_at, scheduled_for, created_at, rating, engagement_views, engagement_likes, engagement_comments, engagement_shares, engagement_logged_at, links(id, slug, click_count)")
+    .select("id, type, title, body, metadata, status, archived, posted_at, scheduled_for, created_at, rating, engagement_views, engagement_likes, engagement_comments, engagement_shares, engagement_logged_at, image_url, image_source, image_prompt_used, links(id, slug, click_count)")
     .eq("campaign_id", campaignId)
     .order("created_at", { ascending: false });
 

@@ -463,6 +463,31 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 - [x] `loadContentForCampaign` query updated to include new columns
 - [x] Content page and schedule page server queries updated to include new columns
 
+### App — Visual Content Generation (Image AI)
+- [x] OpenAI SDK installed (`openai` package) + `OPENAI_API_KEY` in `turbo.json` env array
+- [x] Migration 00019: `image_url`, `image_source`, `image_prompt_used` columns on `content_pieces` + `image_source` CHECK constraint (`generated`/`uploaded`)
+- [x] Supabase Storage bucket `content-images` (public, 5MB limit, PNG/JPG/WebP)
+- [x] `generateImage()` server action — GPT Image 1 API call, base64 decode, upload to Supabase Storage, cache-busting URL
+- [x] `uploadContentImage()` server action — file validation (type + 5MB), upload to Storage with original extension, set `image_source = 'uploaded'`
+- [x] `deleteContentImage()` server action — removes from Storage + clears DB columns
+- [x] `updateImagePrompt()` server action — saves edited prompt to `image_prompt_used`
+- [x] Prompt extraction logic — parses "Image Prompt:" header from body text, fallback to full body
+- [x] Channel-to-aspect-ratio auto-mapping (LinkedIn/X→landscape, Instagram/Facebook→square, Pinterest/TikTok→portrait)
+- [x] `ImageGenerator` client component — generate/upload/delete/edit prompt/regenerate with loading states
+- [x] Aspect ratio dropdown (Square/Portrait/Landscape) with smart channel defaults + override
+- [x] HD quality toggle (medium default, high on toggle)
+- [x] Image preview with Download button (blob-based for cross-origin instant download)
+- [x] "Upload Instead" / "Replace" / "Generate AI Image Instead" contextual links
+- [x] Error handling: content policy detection, file validation (client + server), upload failures
+- [x] Content list: image thumbnail on collapsed cards, `ImageGenerator` in expanded view for `image-prompt` type
+- [x] Campaign panel: `ImageGenerator` in expanded content pieces for `image-prompt` type
+- [x] Schedule calendar: image preview in detail panel
+- [x] Content page `maxDuration = 60` for Vercel timeout on image generation
+- [x] `loadContentForCampaign()` select updated with image columns
+- [x] `generateContentForCampaign()` insert select updated with image columns
+- [x] Content regeneration cleans up Storage files for old pieces before delete
+- [x] Content page and schedule page server queries updated with image columns
+
 ### Rebrand: Easy Micro SaaS
 - [x] GitHub repo renamed from `micro-machine` to `easy-micro-saas`
 - [x] Git remote URL updated
@@ -813,6 +838,59 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 - [ ] Refresh page after dismiss → checklist does not reappear
 - [ ] Dismiss persists in database (onboarding_completed_at set)
 
+### Visual Content Generation (Image AI)
+
+> Migration 00019 — image_url, image_source, image_prompt_used columns.
+
+#### Image Generation
+- [ ] Navigate to Content page → find an `image-prompt` type piece → expand it
+- [ ] `ImageGenerator` component appears with aspect ratio dropdown, HD toggle, Generate/Upload buttons
+- [ ] Aspect ratio defaults correctly for the channel (e.g. Instagram → Square, LinkedIn → Landscape)
+- [ ] Change aspect ratio in dropdown → selection persists
+- [ ] Toggle HD on → quality set to high
+- [ ] Click "Generate Image" → spinner shows "Generating image..."
+- [ ] Image appears after generation with "AI Generated" label
+- [ ] Image persists on page reload
+- [ ] Click "Edit Prompt" → prompt text shown in textarea
+- [ ] Edit the prompt → click "Save Prompt" → prompt saved
+- [ ] Click "Regenerate" → new image replaces old one
+- [ ] Collapsed content card shows 64×64 thumbnail when image exists
+
+#### Image Upload
+- [ ] On a piece with no image → click "Upload Image" → file picker opens
+- [ ] Select a JPG under 5MB → upload succeeds, "Uploaded" label shown
+- [ ] Click "Replace" → upload a different image → replacement works
+- [ ] Try uploading a file > 5MB → error message shown
+- [ ] Try uploading a .gif → error message shown ("Invalid file type")
+- [ ] On uploaded image → "Generate AI Image Instead" link shown
+- [ ] Click "Generate AI Image Instead" → prompt editor opens
+
+#### Image Download & Delete
+- [ ] Click "Download" → image file saves instantly (no Supabase URL tab)
+- [ ] Click "Delete" → image disappears, generate/upload controls return
+- [ ] Page reload after delete → no image shown
+
+#### Campaign Panel Integration
+- [ ] Open a campaign with `image-prompt` content → expand a piece
+- [ ] `ImageGenerator` appears and works same as content page
+- [ ] Generate/upload/delete all work within the panel
+
+#### Schedule Page Integration
+- [ ] Schedule an `image-prompt` piece that has a generated image
+- [ ] Click the calendar card → image preview shows in detail panel
+
+#### Content Regeneration Cleanup
+- [ ] Generate images for a campaign's content pieces
+- [ ] Click "Regenerate Content" on the campaign
+- [ ] Old images cleaned up from Supabase Storage (check Storage browser)
+- [ ] New content pieces have no images (fresh slate)
+
+#### Theme Compatibility
+- [ ] ImageGenerator component looks correct in dark mode
+- [ ] ImageGenerator component looks correct in light mode
+- [ ] Borders, backgrounds, text, buttons all theme-appropriate
+- [ ] No white-on-white or invisible elements in either theme
+
 ---
 
 ## What's Next
@@ -820,9 +898,10 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 ### Immediate (Next Up)
 1. ~~**Self-learning system (v1)** — rating, engagement tracking, composite scoring, pattern extraction into regeneration prompts~~ **Done**
 2. ~~**Regeneration logic based on top-performing content** — performance context injected into brain + content generation prompts~~ **Done**
-3. **Meta Ad Library API integration** — pull winning ads as reference for ad generation (filter by longevity as proxy for success)
-4. **Weekly performance summary / digest** — scheduled email or in-app summary of campaign performance
-5. **Assisted posting workflow** — copy + reminders to help users actually post their content
+3. ~~**Visual content generation** — GPT Image 1 integration with Supabase Storage, on-demand generation, upload, prompt editing~~ **Done**
+4. **Meta Ad Library API integration** — pull winning ads as reference for ad generation (filter by longevity as proxy for success)
+5. **Weekly performance summary / digest** — scheduled email or in-app summary of campaign performance
+6. **Assisted posting workflow** — copy + reminders to help users actually post their content
 
 **Self-learning v2 (later):**
 - Metricool / platform API integrations for auto-pulling metrics

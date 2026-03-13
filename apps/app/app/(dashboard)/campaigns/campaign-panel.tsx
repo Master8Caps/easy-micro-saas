@@ -12,6 +12,7 @@ import {
   toggleContentPieceArchived,
 } from "@/server/actions/content";
 import { updateCampaignDestinationUrl } from "@/server/actions/links";
+import ImageGenerator from "@/components/image-generator";
 
 interface TrackedLink {
   id: string;
@@ -37,6 +38,9 @@ interface ContentPiece {
   engagement_comments: number | null;
   engagement_shares: number | null;
   engagement_logged_at: string | null;
+  image_url: string | null;
+  image_source: "generated" | "uploaded" | null;
+  image_prompt_used: string | null;
 }
 
 interface CampaignPanelProps {
@@ -342,6 +346,16 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                             </span>
                             <CopyButton text={`${baseUrl}/r/${piece.links[0].slug}`} />
                           </div>
+                        )}
+                        {piece.type === "image-prompt" && (
+                          <ImageGenerator
+                            contentPieceId={piece.id}
+                            imageUrl={piece.image_url}
+                            imageSource={piece.image_source}
+                            imagePromptUsed={piece.image_prompt_used}
+                            body={piece.body}
+                            channel={campaign.channel}
+                          />
                         )}
                         <div className="flex justify-end mb-2">
                           <CopyButton text={piece.body} />

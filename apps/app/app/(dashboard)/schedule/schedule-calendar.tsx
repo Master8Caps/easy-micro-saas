@@ -8,6 +8,19 @@ import { LifecycleAction } from "@/components/lifecycle-action";
 import { RatingButtons } from "@/components/rating-buttons";
 import { EngagementPopover } from "@/components/engagement-popover";
 import { updateContentPieceSchedule } from "@/server/actions/content";
+import { MonthGrid } from "./month-grid";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  useDraggable,
+  useDroppable,
+  type DragStartEvent,
+  type DragEndEvent,
+} from "@dnd-kit/core";
 
 interface SchedulePiece {
   id: string;
@@ -67,22 +80,83 @@ function getWeekLabel(days: { date: string; dayOfMonth: number; month: string }[
   return `${first.dayOfMonth} ${first.month} — ${last.dayOfMonth} ${last.month} ${endDate.getFullYear()}`;
 }
 
+// ── DnD wrapper components ──────────────────────────
+
+function DraggableCard({
+  id,
+  children,
+}: {
+  id: string;
+  children: React.ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className={isDragging ? "opacity-30" : ""}
+    >
+      {children}
+    </div>
+  );
+}
+
+function DroppableZone({
+  id,
+  children,
+  className,
+}: {
+  id: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`${className ?? ""} ${isOver ? "ring-2 ring-indigo-500/40" : ""}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ── Main component ──────────────────────────────────
+
 export function ScheduleCalendar({
   scheduledPieces: initialScheduled,
   unscheduledPieces: initialUnscheduled,
   products,
   weekOffset,
+  view = "week",
+  monthInfo,
 }: {
   scheduledPieces: SchedulePiece[];
   unscheduledPieces: SchedulePiece[];
   products: { id: string; name: string }[];
   weekOffset: number;
+  view?: "week" | "month";
+  monthInfo?: { offset: number; year: number; month: number; label: string };
 }) {
   const router = useRouter();
   const [scheduled, setScheduled] = useState(initialScheduled);
   const [unscheduled, setUnscheduled] = useState(initialUnscheduled);
   const [productFilter, setProductFilter] = useState("");
   const [selectedPiece, setSelectedPiece] = useState<SchedulePiece | null>(null);
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
+
+  // Sync state when server data changes (navigation)
+  useEffect(() => {
+    setScheduled(initialScheduled);
+  }, [initialScheduled]);
+  useEffect(() => {
+    setUnscheduled(initialUnscheduled);
+  }, [initialUnscheduled]);
 
   const weekDays = useMemo(() => getWeekDays(weekOffset), [weekOffset]);
   const todayStr = new Date().toISOString().split("T")[0];
@@ -109,6 +183,93 @@ export function ScheduleCalendar({
     if (!productFilter) return unscheduled;
     return unscheduled.filter((p) => p.product_id === productFilter);
   }, [unscheduled, productFilter]);
+
+  // DnD sensors
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: { distance: 8 },
+  });
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: { delay: 200, tolerance: 5 },
+  });
+  const sensors = useSensors(pointerSensor, touchSensor);
+
+  // Find piece being dragged (for overlay)
+  const activePiece = useMemo(() => {
+    if (!activeDragId) return null;
+    return (
+      scheduled.find((p) => p.id === activeDragId) ??
+      unscheduled.find((p) => p.id === activeDragId) ??
+      null
+    );
+  }, [activeDragId, scheduled, unscheduled]);
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveDragId(event.active.id as string);
+  }
+
+  async function handleDragEnd(event: DragEndEvent) {
+    setActiveDragId(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const pieceId = active.id as string;
+    const dropId = over.id as string;
+
+    // Determine target date
+    let targetDate: string | null = null;
+    if (dropId.startsWith("day-")) {
+      targetDate = dropId.replace("day-", "");
+    } else if (dropId === "unscheduled-pool") {
+      targetDate = null;
+    } else {
+      return;
+    }
+
+    // Find the piece
+    const fromScheduled = scheduled.find((p) => p.id === pieceId);
+    const fromUnscheduled = unscheduled.find((p) => p.id === pieceId);
+    const piece = fromScheduled ?? fromUnscheduled;
+    if (!piece) return;
+
+    // No-op: dropping scheduled piece on same date
+    if (fromScheduled && targetDate && piece.scheduled_for?.startsWith(targetDate)) return;
+    // No-op: dropping unscheduled piece back to pool
+    if (fromUnscheduled && targetDate === null) return;
+
+    // Build new scheduled_for value (keep existing time if rescheduling, default to 09:00)
+    let newScheduledFor: string | null = null;
+    if (targetDate) {
+      const existingTime = fromScheduled?.scheduled_for?.split("T")[1];
+      newScheduledFor = `${targetDate}T${existingTime ?? "09:00:00"}`;
+    }
+
+    // Optimistic update
+    const prevScheduled = scheduled;
+    const prevUnscheduled = unscheduled;
+
+    if (targetDate === null) {
+      // Moving to unscheduled pool
+      setScheduled((prev) => prev.filter((p) => p.id !== pieceId));
+      setUnscheduled((prev) => [{ ...piece, scheduled_for: null, status: "approved" }, ...prev]);
+    } else if (fromUnscheduled) {
+      // Moving from unscheduled to a day
+      setUnscheduled((prev) => prev.filter((p) => p.id !== pieceId));
+      setScheduled((prev) => [...prev, { ...piece, scheduled_for: newScheduledFor, status: "scheduled" }]);
+    } else {
+      // Rescheduling within the calendar
+      setScheduled((prev) =>
+        prev.map((p) => (p.id === pieceId ? { ...p, scheduled_for: newScheduledFor } : p)),
+      );
+    }
+
+    // Fire server action
+    const result = await updateContentPieceSchedule(pieceId, newScheduledFor);
+    if (!result.success) {
+      // Revert on failure
+      setScheduled(prevScheduled);
+      setUnscheduled(prevUnscheduled);
+    }
+  }
 
   async function handleUnschedule(pieceId: string) {
     const result = await updateContentPieceSchedule(pieceId, null);
@@ -175,154 +336,314 @@ export function ScheduleCalendar({
     );
   }
 
+  // ── Navigation helpers ──────────────────────────────
+
   function navigateWeek(direction: "prev" | "next") {
     const newOffset = direction === "prev" ? weekOffset - 1 : weekOffset + 1;
-    router.push(`/schedule?week=${newOffset}`);
+    router.push(`/schedule?view=week&week=${newOffset}`);
   }
 
   function goToThisWeek() {
-    router.push("/schedule");
+    router.push("/schedule?view=week");
+  }
+
+  function navigateMonth(direction: "prev" | "next") {
+    if (!monthInfo) return;
+    const newOffset = direction === "prev" ? monthInfo.offset - 1 : monthInfo.offset + 1;
+    router.push(`/schedule?view=month&month=${newOffset}`);
+  }
+
+  function goToThisMonth() {
+    router.push("/schedule?view=month");
+  }
+
+  function switchView(newView: "week" | "month") {
+    if (newView === view) return;
+    if (newView === "month") {
+      // Use Wednesday of current week to determine month
+      const wednesday = weekDays[2]; // Wed is index 2 (Mon-based)
+      const wedDate = new Date(wednesday.date);
+      const today = new Date();
+      const monthDiff =
+        (wedDate.getFullYear() - today.getFullYear()) * 12 +
+        (wedDate.getMonth() - today.getMonth());
+      router.push(`/schedule?view=month&month=${monthDiff}`);
+    } else {
+      // Compute week offset from month midpoint
+      if (monthInfo) {
+        const mid = new Date(monthInfo.year, monthInfo.month, 15);
+        const today = new Date();
+        const diffDays = Math.round(
+          (mid.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        const diffWeeks = Math.round(diffDays / 7);
+        router.push(`/schedule?view=week&week=${diffWeeks}`);
+      } else {
+        router.push("/schedule?view=week");
+      }
+    }
   }
 
   return (
-    <div className="space-y-6">
-      {/* Week navigation */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => navigateWeek("prev")}
-          className="rounded-lg border border-line bg-surface-card px-4 py-2 text-sm text-content-secondary transition-colors hover:border-line hover:bg-surface-card"
-        >
-          <span className="flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-            Prev
-          </span>
-        </button>
-        <div className="text-center">
-          <h2 className="text-lg font-semibold">{getWeekLabel(weekDays)}</h2>
-          {weekOffset !== 0 && (
-            <button
-              onClick={goToThisWeek}
-              className="mt-0.5 text-xs text-indigo-400 hover:text-indigo-300"
-            >
-              Back to this week
-            </button>
-          )}
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="space-y-6">
+        {/* View switcher */}
+        <div className="flex items-center gap-1 rounded-lg border border-line bg-surface-card p-1 w-fit">
+          <button
+            onClick={() => switchView("week")}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              view === "week"
+                ? "bg-indigo-500 text-white"
+                : "text-content-secondary hover:bg-surface-hover"
+            }`}
+          >
+            Week
+          </button>
+          <button
+            onClick={() => switchView("month")}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              view === "month"
+                ? "bg-indigo-500 text-white"
+                : "text-content-secondary hover:bg-surface-hover"
+            }`}
+          >
+            Month
+          </button>
         </div>
-        <button
-          onClick={() => navigateWeek("next")}
-          className="rounded-lg border border-line bg-surface-card px-4 py-2 text-sm text-content-secondary transition-colors hover:border-line hover:bg-surface-card"
-        >
-          <span className="flex items-center gap-1.5">
-            Next
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          </span>
-        </button>
-      </div>
 
-      {/* 7-day calendar grid */}
-      <div className="grid grid-cols-7 gap-2">
-        {weekDays.map((day) => {
-          const pieces = piecesByDate[day.date] || [];
-          const isToday = day.date === todayStr;
-          const isPast = day.date < todayStr;
+        {/* Week view */}
+        {view === "week" && (
+          <>
+            {/* Week navigation */}
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => navigateWeek("prev")}
+                className="rounded-lg border border-line bg-surface-card px-4 py-2 text-sm text-content-secondary transition-colors hover:border-line hover:bg-surface-card"
+              >
+                <span className="flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m15 18-6-6 6-6" />
+                  </svg>
+                  Prev
+                </span>
+              </button>
+              <div className="text-center">
+                <h2 className="text-lg font-semibold">{getWeekLabel(weekDays)}</h2>
+                {weekOffset !== 0 && (
+                  <button
+                    onClick={goToThisWeek}
+                    className="mt-0.5 text-xs text-indigo-400 hover:text-indigo-300"
+                  >
+                    Back to this week
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={() => navigateWeek("next")}
+                className="rounded-lg border border-line bg-surface-card px-4 py-2 text-sm text-content-secondary transition-colors hover:border-line hover:bg-surface-card"
+              >
+                <span className="flex items-center gap-1.5">
+                  Next
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m9 18 6-6-6-6" />
+                  </svg>
+                </span>
+              </button>
+            </div>
 
-          return (
-            <div
-              key={day.date}
-              className={`flex min-h-[200px] flex-col rounded-xl border bg-surface-card p-3 ${
-                isToday
-                  ? "border-indigo-500/40"
-                  : "border-line"
-              }`}
-            >
-              {/* Day header */}
-              <div className="mb-2 border-b border-line pb-2">
-                <p className={`text-xs font-medium ${isToday ? "text-indigo-400" : "text-content-muted"}`}>
-                  {day.label}
-                </p>
-                <p className={`text-lg font-bold ${isToday ? "text-indigo-300" : isPast ? "text-content-muted" : ""}`}>
-                  {day.dayOfMonth}
+            {/* 7-day calendar grid */}
+            <div className="grid grid-cols-7 gap-2">
+              {weekDays.map((day) => {
+                const pieces = piecesByDate[day.date] || [];
+                const isToday = day.date === todayStr;
+                const isPast = day.date < todayStr;
+
+                return (
+                  <DroppableZone
+                    key={day.date}
+                    id={`day-${day.date}`}
+                    className={`flex min-h-[200px] flex-col rounded-xl border bg-surface-card p-3 ${
+                      isToday
+                        ? "border-indigo-500/40"
+                        : "border-line"
+                    }`}
+                  >
+                    {/* Day header */}
+                    <div className="mb-2 border-b border-line pb-2">
+                      <p className={`text-xs font-medium ${isToday ? "text-indigo-400" : "text-content-muted"}`}>
+                        {day.label}
+                      </p>
+                      <p className={`text-lg font-bold ${isToday ? "text-indigo-300" : isPast ? "text-content-muted" : ""}`}>
+                        {day.dayOfMonth}
+                      </p>
+                    </div>
+
+                    {/* Scheduled pieces */}
+                    <div className="flex-1 space-y-2">
+                      {pieces.map((piece) => (
+                        <DraggableCard key={piece.id} id={piece.id}>
+                          <CalendarCard
+                            piece={piece}
+                            onSelect={() => setSelectedPiece(piece)}
+                          />
+                        </DraggableCard>
+                      ))}
+                    </div>
+
+                    {/* Empty day indicator */}
+                    {pieces.length === 0 && (
+                      <p className="py-4 text-center text-xs text-content-muted">
+                        No content
+                      </p>
+                    )}
+                  </DroppableZone>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {/* Month view */}
+        {view === "month" && monthInfo && (
+          <>
+            {/* Month navigation */}
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => navigateMonth("prev")}
+                className="rounded-lg border border-line bg-surface-card px-4 py-2 text-sm text-content-secondary transition-colors hover:border-line hover:bg-surface-card"
+              >
+                <span className="flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m15 18-6-6 6-6" />
+                  </svg>
+                  Prev
+                </span>
+              </button>
+              <div className="text-center">
+                <h2 className="text-lg font-semibold">{monthInfo.label}</h2>
+                {monthInfo.offset !== 0 && (
+                  <button
+                    onClick={goToThisMonth}
+                    className="mt-0.5 text-xs text-indigo-400 hover:text-indigo-300"
+                  >
+                    Back to this month
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={() => navigateMonth("next")}
+                className="rounded-lg border border-line bg-surface-card px-4 py-2 text-sm text-content-secondary transition-colors hover:border-line hover:bg-surface-card"
+              >
+                <span className="flex items-center gap-1.5">
+                  Next
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m9 18 6-6-6-6" />
+                  </svg>
+                </span>
+              </button>
+            </div>
+
+            <MonthGrid
+              year={monthInfo.year}
+              month={monthInfo.month}
+              piecesByDate={piecesByDate}
+              selectedDate={null}
+              onSelectDate={(date) => {
+                // Clicking a day in month view navigates to that week
+                const clickedDate = new Date(date);
+                const today = new Date();
+                const diffDays = Math.round(
+                  (clickedDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+                );
+                // Find which Monday-based week this falls in
+                const clickedDay = clickedDate.getDay();
+                const daysFromMonday = clickedDay === 0 ? 6 : clickedDay - 1;
+                const mondayOfClickedWeek = new Date(clickedDate);
+                mondayOfClickedWeek.setDate(clickedDate.getDate() - daysFromMonday);
+
+                const todayDay = today.getDay();
+                const todayDaysFromMonday = todayDay === 0 ? 6 : todayDay - 1;
+                const mondayOfThisWeek = new Date(today);
+                mondayOfThisWeek.setDate(today.getDate() - todayDaysFromMonday);
+
+                const weekDiff = Math.round(
+                  (mondayOfClickedWeek.getTime() - mondayOfThisWeek.getTime()) / (1000 * 60 * 60 * 24 * 7),
+                );
+                router.push(`/schedule?view=week&week=${weekDiff}`);
+              }}
+            />
+          </>
+        )}
+
+        {/* Unscheduled content pool */}
+        <DroppableZone id="unscheduled-pool">
+          <div className="rounded-xl border border-line bg-surface-card p-6">
+            <div className="mb-4 flex items-center gap-4">
+              <div>
+                <h3 className="font-semibold">Unscheduled Content</h3>
+                <p className="mt-0.5 text-xs text-content-muted">
+                  {filteredUnscheduled.length} piece{filteredUnscheduled.length === 1 ? "" : "s"} ready to schedule
                 </p>
               </div>
+              <select
+                value={productFilter}
+                onChange={(e) => setProductFilter(e.target.value)}
+                className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
+              >
+                <option value="">All products</option>
+                {products.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              {/* Scheduled pieces */}
-              <div className="flex-1 space-y-2">
-                {pieces.map((piece) => (
-                  <CalendarCard
-                    key={piece.id}
-                    piece={piece}
-                    onSelect={() => setSelectedPiece(piece)}
-                  />
+            {filteredUnscheduled.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-line p-8 text-center">
+                <p className="text-sm text-content-muted">
+                  No unscheduled content. Everything is scheduled or archived.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filteredUnscheduled.map((piece) => (
+                  <DraggableCard key={piece.id} id={piece.id}>
+                    <UnscheduledCard
+                      piece={piece}
+                      onLifecycleChange={(s, sf, pa) => handleLifecycleChange(piece.id, s, sf, pa)}
+                    />
+                  </DraggableCard>
                 ))}
               </div>
-
-              {/* Empty day indicator */}
-              {pieces.length === 0 && (
-                <p className="py-4 text-center text-xs text-content-muted">
-                  No content
-                </p>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Unscheduled content pool */}
-      <div className="rounded-xl border border-line bg-surface-card p-6">
-        <div className="mb-4 flex items-center gap-4">
-          <div>
-            <h3 className="font-semibold">Unscheduled Content</h3>
-            <p className="mt-0.5 text-xs text-content-muted">
-              {filteredUnscheduled.length} piece{filteredUnscheduled.length === 1 ? "" : "s"} ready to schedule
-            </p>
+            )}
           </div>
-          <select
-            value={productFilter}
-            onChange={(e) => setProductFilter(e.target.value)}
-            className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
-          >
-            <option value="">All products</option>
-            {products.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        </DroppableZone>
 
-        {filteredUnscheduled.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-line p-8 text-center">
-            <p className="text-sm text-content-muted">
-              No unscheduled content. Everything is scheduled or archived.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {filteredUnscheduled.map((piece) => (
-              <UnscheduledCard
-                key={piece.id}
-                piece={piece}
-                onLifecycleChange={(s, sf, pa) => handleLifecycleChange(piece.id, s, sf, pa)}
-              />
-            ))}
-          </div>
+        {/* Content detail panel */}
+        {selectedPiece && (
+          <ContentPanel
+            piece={selectedPiece}
+            onClose={() => setSelectedPiece(null)}
+            onUnschedule={() => handleUnschedule(selectedPiece.id)}
+            onLifecycleChange={(s, sf, pa) => handleLifecycleChange(selectedPiece.id, s, sf, pa)}
+          />
         )}
       </div>
 
-      {/* Content detail panel */}
-      {selectedPiece && (
-        <ContentPanel
-          piece={selectedPiece}
-          onClose={() => setSelectedPiece(null)}
-          onUnschedule={() => handleUnschedule(selectedPiece.id)}
-          onLifecycleChange={(s, sf, pa) => handleLifecycleChange(selectedPiece.id, s, sf, pa)}
-        />
-      )}
-    </div>
+      {/* Drag overlay */}
+      <DragOverlay>
+        {activePiece ? (
+          <div className="rounded-lg border border-indigo-500/40 bg-surface-card px-3 py-2 text-sm font-medium text-content-secondary shadow-lg">
+            {activePiece.title ?? activePiece.campaigns?.angle ?? "Untitled"}
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }
 

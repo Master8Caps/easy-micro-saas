@@ -20,18 +20,54 @@ function getWeekRange(offset: number) {
   };
 }
 
+function getMonthRange(offset: number) {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + offset;
+
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month + 1, 0);
+
+  // Extend to include full weeks (Monday start)
+  const firstDay = first.getDay(); // 0=Sun
+  const startPad = firstDay === 0 ? 6 : firstDay - 1;
+  const gridStart = new Date(first);
+  gridStart.setDate(first.getDate() - startPad);
+
+  const lastDay = last.getDay();
+  const endPad = lastDay === 0 ? 0 : 7 - lastDay;
+  const gridEnd = new Date(last);
+  gridEnd.setDate(last.getDate() + endPad);
+
+  return {
+    startDate: gridStart.toISOString().split("T")[0],
+    endDate: `${gridEnd.toISOString().split("T")[0]}T23:59:59.999Z`,
+    year: first.getFullYear(),
+    month: first.getMonth(), // 0-indexed
+    label: first.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+  };
+}
+
 export default async function SchedulePage({
   searchParams,
 }: {
-  searchParams: Promise<{ week?: string }>;
+  searchParams: Promise<{ week?: string; view?: string; month?: string }>;
 }) {
   const params = await searchParams;
   const supabase = await createClient();
 
+  const view = params.view === "month" ? "month" : "week";
   const weekOffset = parseInt(params.week || "0", 10);
-  const { startDate, endDate } = getWeekRange(weekOffset);
+  const monthOffset = parseInt(params.month || "0", 10);
 
-  // Fetch scheduled content for the week
+  // Determine date range based on view
+  const weekRange = getWeekRange(weekOffset);
+  const monthRange = view === "month" ? getMonthRange(monthOffset) : null;
+
+  const startDate = view === "month" ? monthRange!.startDate : weekRange.startDate;
+  const endDate = view === "month" ? monthRange!.endDate : weekRange.endDate;
+
+  // Fetch scheduled content for the date range
   const { data: scheduledPieces } = await supabase
     .from("content_pieces")
     .select(
@@ -64,7 +100,7 @@ export default async function SchedulePage({
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight">Schedule</h1>
         <p className="mt-1 text-sm text-content-muted">
-          Plan your content calendar week by week.
+          Plan and organise your content calendar.
         </p>
       </div>
 
@@ -73,6 +109,12 @@ export default async function SchedulePage({
         unscheduledPieces={(unscheduledPieces ?? []) as any}
         products={(products ?? []) as { id: string; name: string }[]}
         weekOffset={weekOffset}
+        view={view}
+        monthInfo={
+          view === "month" && monthRange
+            ? { offset: monthOffset, year: monthRange.year, month: monthRange.month, label: monthRange.label }
+            : undefined
+        }
       />
     </>
   );

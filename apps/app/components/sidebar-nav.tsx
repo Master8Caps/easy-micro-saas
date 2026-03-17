@@ -38,6 +38,16 @@ const navItems = [
     ),
   },
   {
+    label: "Ads",
+    href: "/ads",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="3" width="14" height="12" rx="2" />
+        <path d="M6 9.5V12M9 7.5V12M12 5.5V12" />
+      </svg>
+    ),
+  },
+  {
     label: "Schedule",
     href: "/schedule",
     icon: (

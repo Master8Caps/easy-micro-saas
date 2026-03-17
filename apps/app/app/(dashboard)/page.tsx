@@ -30,6 +30,18 @@ export default async function DashboardPage() {
     .select("*", { count: "exact", head: true })
     .eq("archived", false);
 
+  const { data: adCampaigns } = await supabase
+    .from("ad_campaigns")
+    .select("id, status")
+    .eq("status", "active");
+
+  const { data: recentRecommendations } = await supabase
+    .from("optimization_recommendations")
+    .select("summary")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
   const onboarding = await getOnboardingProgress();
 
   return (
@@ -53,7 +65,7 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-xl border border-line bg-surface-card p-6 transition-colors hover:bg-surface-card">
           <p className="text-xs font-medium uppercase tracking-wider text-content-muted">Products</p>
           <p className="mt-2 text-3xl font-bold">{activeProducts?.length ?? 0}</p>
@@ -66,6 +78,17 @@ export default async function DashboardPage() {
           <p className="text-xs font-medium uppercase tracking-wider text-content-muted">Content Pieces</p>
           <p className="mt-2 text-3xl font-bold">{contentCount ?? 0}</p>
         </div>
+        <Link href="/ads" className="rounded-xl border border-line bg-surface-card p-6 transition-colors hover:border-brand/30">
+          <p className="text-xs font-medium uppercase tracking-wider text-content-muted">Ad Campaigns</p>
+          <p className="mt-2 text-3xl font-bold">
+            {adCampaigns?.length ?? 0} active
+          </p>
+          {recentRecommendations?.[0] && (
+            <p className="mt-2 text-xs text-brand">
+              {recentRecommendations[0].summary}
+            </p>
+          )}
+        </Link>
       </div>
 
       {/* Active Products */}

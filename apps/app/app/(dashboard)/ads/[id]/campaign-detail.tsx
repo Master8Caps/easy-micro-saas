@@ -147,10 +147,11 @@ export function CampaignDetail({
 
       {/* Stats Grid */}
       {performance.length > 0 && (
-        <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
           {[
             { label: "Total Spend", value: `$${totalSpend.toFixed(2)}` },
             { label: "Clicks", value: totalClicks.toLocaleString() },
+            { label: "Conversions", value: totalConversions.toLocaleString() },
             { label: "CTR", value: `${avgCtr.toFixed(2)}%` },
             { label: "ROAS", value: `${avgRoas.toFixed(2)}x` },
           ].map((stat) => (

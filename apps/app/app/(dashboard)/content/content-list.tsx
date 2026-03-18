@@ -269,13 +269,13 @@ export function ContentList({
               onClick={() => setCategoryFilter(tab.value)}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 categoryFilter === tab.value
-                  ? "bg-content-primary text-surface-primary"
+                  ? "bg-brand text-white"
                   : "text-content-secondary hover:text-content-primary"
               }`}
             >
               {tab.label}
               {(categoryCounts[tab.value] ?? 0) > 0 && (
-                <span className={`ml-1.5 ${categoryFilter === tab.value ? "text-content-muted" : "text-content-muted"}`}>
+                <span className={`ml-1.5 ${categoryFilter === tab.value ? "text-white/60" : "text-content-muted"}`}>
                   {categoryCounts[tab.value]}
                 </span>
               )}

@@ -73,12 +73,12 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
               onClick={() => { setActiveTab("social"); setProductFilter(""); setChannelFilter(""); }}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                 activeTab === "social"
-                  ? "bg-content-primary text-surface-primary"
+                  ? "bg-brand text-white"
                   : "text-content-secondary hover:text-content-primary"
               }`}
             >
               Social
-              <span className={`ml-1.5 ${activeTab === "social" ? "text-content-muted" : "text-content-muted"}`}>
+              <span className={`ml-1.5 ${activeTab === "social" ? "text-white/60" : "text-content-muted"}`}>
                 {activeTab === "social" ? filtered.length : socialCampaigns.length}
               </span>
             </button>
@@ -87,12 +87,12 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
                 onClick={() => { setActiveTab("email"); setProductFilter(""); setChannelFilter(""); }}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   activeTab === "email"
-                    ? "bg-content-primary text-surface-primary"
+                    ? "bg-brand text-white"
                     : "text-content-secondary hover:text-content-primary"
                 }`}
               >
                 Email
-                <span className={`ml-1.5 ${activeTab === "email" ? "text-content-muted" : "text-content-muted"}`}>
+                <span className={`ml-1.5 ${activeTab === "email" ? "text-white/60" : "text-content-muted"}`}>
                   {activeTab === "email" ? filtered.length : emailCampaigns.length}
                 </span>
               </button>
@@ -102,12 +102,12 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
                 onClick={() => { setActiveTab("ad"); setProductFilter(""); setChannelFilter(""); }}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   activeTab === "ad"
-                    ? "bg-content-primary text-surface-primary"
+                    ? "bg-brand text-white"
                     : "text-content-secondary hover:text-content-primary"
                 }`}
               >
                 Ads
-                <span className={`ml-1.5 ${activeTab === "ad" ? "text-content-muted" : "text-content-muted"}`}>
+                <span className={`ml-1.5 ${activeTab === "ad" ? "text-white/60" : "text-content-muted"}`}>
                   {activeTab === "ad" ? filtered.length : adCampaigns.length}
                 </span>
               </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 
 interface AdCampaign {
@@ -21,15 +21,16 @@ interface Product {
   name: string;
 }
 
-const platformLabels: Record<string, string> = {
-  meta: "Meta",
-  google: "Google",
-  linkedin: "LinkedIn",
-  tiktok: "TikTok",
-};
+const platformTabs = [
+  { value: "", label: "All" },
+  { value: "meta", label: "Meta" },
+  { value: "google", label: "Google" },
+  { value: "linkedin", label: "LinkedIn" },
+  { value: "tiktok", label: "TikTok" },
+];
 
 const statusColors: Record<string, string> = {
-  draft: "bg-surface-hover text-content-muted",
+  draft: "bg-surface-tertiary text-content-muted",
   active: "bg-green-500/10 text-green-400",
   paused: "bg-yellow-500/10 text-yellow-400",
   completed: "bg-blue-500/10 text-blue-400",
@@ -42,38 +43,71 @@ export function AdsList({
   campaigns: AdCampaign[];
   products: Product[];
 }) {
-  const [platformFilter, setPlatformFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [productFilter, setProductFilter] = useState<string>("all");
+  const [platformFilter, setPlatformFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [productFilter, setProductFilter] = useState("");
 
-  const filtered = campaigns.filter((c) => {
-    if (platformFilter !== "all" && c.platform !== platformFilter) return false;
-    if (statusFilter !== "all" && c.status !== statusFilter) return false;
-    if (productFilter !== "all" && c.products?.name !== productFilter) return false;
-    return true;
-  });
+  const platformCounts = useMemo(() => {
+    const visible = campaigns.filter((c) => {
+      if (statusFilter && c.status !== statusFilter) return false;
+      if (productFilter && c.products?.name !== productFilter) return false;
+      return true;
+    });
+    const counts: Record<string, number> = { "": visible.length };
+    for (const c of visible) {
+      counts[c.platform] = (counts[c.platform] ?? 0) + 1;
+    }
+    return counts;
+  }, [campaigns, statusFilter, productFilter]);
+
+  const filtered = useMemo(
+    () =>
+      campaigns.filter((c) => {
+        if (platformFilter && c.platform !== platformFilter) return false;
+        if (statusFilter && c.status !== statusFilter) return false;
+        if (productFilter && c.products?.name !== productFilter) return false;
+        return true;
+      }),
+    [campaigns, platformFilter, statusFilter, productFilter],
+  );
 
   return (
     <div>
-      {/* Filters */}
-      <div className="mb-4 flex gap-3">
-        <select
-          value={platformFilter}
-          onChange={(e) => setPlatformFilter(e.target.value)}
-          className="rounded-md border border-line bg-surface px-3 py-1.5 text-sm text-content"
-        >
-          <option value="all">All Platforms</option>
-          <option value="meta">Meta</option>
-          <option value="google">Google</option>
-          <option value="linkedin">LinkedIn</option>
-          <option value="tiktok">TikTok</option>
-        </select>
+      {/* Row 1: Platform tabs + count */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex gap-1 rounded-lg border border-line bg-surface-card p-1">
+          {platformTabs.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setPlatformFilter(tab.value)}
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                platformFilter === tab.value
+                  ? "bg-brand text-white"
+                  : "text-content-secondary hover:text-content-primary"
+              }`}
+            >
+              {tab.label}
+              {(platformCounts[tab.value] ?? 0) > 0 && (
+                <span className={`ml-1.5 ${platformFilter === tab.value ? "text-white/60" : "text-content-muted"}`}>
+                  {platformCounts[tab.value]}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+        <span className="text-sm text-content-muted">
+          {filtered.length} campaign{filtered.length === 1 ? "" : "s"}
+        </span>
+      </div>
+
+      {/* Row 2: Secondary filters */}
+      <div className="mb-6 flex flex-wrap items-center gap-3">
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-md border border-line bg-surface px-3 py-1.5 text-sm text-content"
+          className="rounded-lg border border-line bg-surface-card px-3 py-2 text-sm text-content-secondary"
         >
-          <option value="all">All Status</option>
+          <option value="">All statuses</option>
           <option value="draft">Draft</option>
           <option value="active">Active</option>
           <option value="paused">Paused</option>
@@ -82,15 +116,16 @@ export function AdsList({
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-md border border-line bg-surface px-3 py-1.5 text-sm text-content"
+          className="rounded-lg border border-line bg-surface-card px-3 py-2 text-sm text-content-secondary"
         >
-          <option value="all">All Products</option>
+          <option value="">All products</option>
           {products.map((p) => (
             <option key={p.id} value={p.name}>
               {p.name}
             </option>
           ))}
         </select>
+
         <Link
           href="/ads/new"
           className="ml-auto rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-white hover:bg-brand/90"
@@ -126,7 +161,7 @@ export function AdsList({
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-content">
+                      <h3 className="font-medium text-content-primary">
                         {campaign.name}
                       </h3>
                       <span
@@ -136,7 +171,7 @@ export function AdsList({
                       </span>
                     </div>
                     <div className="mt-1 flex items-center gap-3 text-xs text-content-muted">
-                      <span>{platformLabels[campaign.platform] ?? campaign.platform}</span>
+                      <span>{platformTabs.find((t) => t.value === campaign.platform)?.label ?? campaign.platform}</span>
                       <span>&middot;</span>
                       <span>{campaign.objective}</span>
                       <span>&middot;</span>

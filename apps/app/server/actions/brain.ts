@@ -202,18 +202,28 @@ export async function generateBrain(input: GenerateBrainInput) {
         await supabase.from("campaigns").insert(adInserts);
 
         // Also create ad_campaigns entries so they appear on the Ads page
-        const adCampaignInserts = brainOutput.ad_campaigns.map((ad) => ({
-          user_id: user.id,
-          product_id: product.id,
-          platform: ad.platform.toLowerCase(),
-          name: `${ad.angle} — ${ad.platform}`,
-          objective: ad.strategy,
-          daily_budget: 0,
-          total_budget: 0,
-          currency: "USD",
-          audience_targeting: {},
-          status: "draft" as const,
-        }));
+        const validPlatforms = ["meta", "google", "linkedin", "tiktok"] as const;
+        const validObjectives = ["awareness", "traffic", "conversions", "engagement", "leads"] as const;
+
+        const adCampaignInserts = brainOutput.ad_campaigns.map((ad) => {
+          const platform = ad.platform.toLowerCase().replace(/\s+ads?$/i, "");
+          return {
+            user_id: user.id,
+            product_id: product.id,
+            platform: validPlatforms.includes(platform as typeof validPlatforms[number])
+              ? platform
+              : "meta",
+            name: `${ad.angle} — ${ad.platform}`,
+            objective: validObjectives.includes(ad.strategy as typeof validObjectives[number])
+              ? ad.strategy
+              : "conversions",
+            daily_budget: 0,
+            total_budget: 0,
+            currency: "USD",
+            audience_targeting: {},
+            status: "draft" as const,
+          };
+        });
 
         await supabase.from("ad_campaigns").insert(adCampaignInserts);
       }

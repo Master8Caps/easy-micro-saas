@@ -550,6 +550,52 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 - **Performance data is manual entry** — users log spend/impressions/clicks/conversions per day. CSV import and API auto-pull are future features.
 - **The `campaigns` table (existing) and `ad_campaigns` table are different** — `campaigns` = marketing angles/hooks per avatar. `ad_campaigns` = paid ad campaigns on external platforms. `ads.campaign_id` connects the two.
 
+### Metricool Integration (2026-03-20)
+
+**Architecture:** Admin-only two-way integration with Metricool for social media publishing and analytics. Custom HTTP client wraps Metricool's REST API (no official SDK). Single shared Metricool account via env vars. Existing pages enhanced with admin-conditional UI — no new routes.
+
+**Scope:** Internal team only — admins can publish content to social platforms and pull back performance analytics.
+
+#### Database (Migrations 00023–00024)
+- [x] `metricool_posts` table — content_piece_id (FK), metricool_post_id (external), platform, scheduled_at, posted_at, status (pending/scheduled/posted/failed), performance metrics (impressions, reach, engagement, clicks, shares), last_synced_at
+- [x] `metricool_analytics` table — platform, date, followers, reach, impressions, engagement, profile_views, unique constraint on (platform, date)
+- [x] Admin-only RLS policies on both tables (separate SELECT, INSERT, UPDATE policies)
+- [x] Indexes on content_piece_id, status, and platform+date
+
+#### Metricool HTTP Client (`lib/metricool/`)
+- [x] `types.ts` — Request/response interfaces, content type → network mapping, network labels
+- [x] `client.ts` — HTTP wrapper with `X-Mc-Auth` header + userId/blogId query params, schedulePost, getScheduledPosts, updateScheduledPost, getBestTimeToPost, normalizeImageUrl, getAnalytics, getPostPerformance, getMetrics, getBrands
+- [x] `publish.ts` — publishToMetricool (with image normalization), getDefaultNetwork, fetchBestTimes
+- [x] `analytics.ts` — fetchPlatformAnalytics (all networks, sequential for rate limits), fetchPostPerformance, getDateRangeForDays
+
+#### Server Actions
+- [x] `metricool.ts` — requireAdmin() helper, publishContentToMetricool (creates metricool_posts rows + updates content piece status), getMetricoolBestTimes, refreshMetricoolAnalytics (upserts to metricool_analytics), getMetricoolPostsForContent
+
+#### UI Components
+- [x] `metricool-publish-modal.tsx` — Slide-over modal with platform multi-select, datetime picker, best-time-to-post suggestion, content preview (body + image), error handling
+- [x] `metricool-performance-card.tsx` — Per-post performance stats with platform badges (color-coded by status), refresh button, last-synced timestamp
+
+#### Page Integrations (Admin-Only)
+- [x] `/content` — "Publish to Metricool" button in expanded content view, MetricoolPerformanceCard below content, role prop passed from page
+- [x] `/analytics` — SocialPerformance section above existing link analytics, platform-level stats grid with refresh button, fetches from metricool_analytics table
+- [x] `/schedule` — Metricool-scheduled posts overlaid on calendar with emerald badge/dots in both week and month views
+
+#### Consolidated Daily Cron
+- [x] `/api/cron/daily` replaces `/api/cron/weekly-digest` — runs daily at 09:00 UTC
+- [x] Step 1: Sync platform analytics from Metricool API
+- [x] Step 2: Update metricool_posts statuses (scheduled → posted for past posts)
+- [x] Step 3: Sync per-post performance metrics for posts published in last 30 days
+- [x] Step 4: Weekly digest on Mondays only (dynamic import of existing handler)
+- [x] `vercel.json` updated: `0 9 * * *` schedule, `/api/cron/daily` path
+- [x] Stays within Vercel free plan's one-cron limit
+
+#### Important Notes
+- **Metricool Advanced plan required** ($45-54/mo minimum) for API access
+- **No official Node.js SDK** — custom HTTP client built from Swagger spec
+- **Rate limits undocumented** — analytics fetched sequentially, daily sync only
+- **Media handling** — images must be publicly accessible URLs; normalized via Metricool's endpoint before scheduling
+- **Phase 2 deferred** — charts on analytics page (line/bar charts with date range selector) to be added once data pipeline is proven
+
 ---
 
 ## Test Checklist
@@ -1122,6 +1168,77 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 - [ ] Performance data with 0 impressions → CTR shows 0%, no division errors
 - [ ] Performance data with 0 spend → ROAS shows 0x, no division errors
 
+### Metricool Integration (from 2026-03-20)
+
+> Migrations 00023–00024 — **Must be applied before testing.**
+> Requires Metricool Advanced plan + env vars: `METRICOOL_API_TOKEN`, `METRICOOL_USER_ID`, `METRICOOL_BLOG_ID`
+
+#### Prerequisites
+- [ ] Apply migrations 00023 + 00024 via Supabase dashboard or `supabase db push`
+- [ ] Confirm tables exist: metricool_posts, metricool_analytics
+- [ ] Set env vars in `.env.local`: METRICOOL_API_TOKEN, METRICOOL_USER_ID, METRICOOL_BLOG_ID
+- [ ] Set same env vars in Vercel project settings for production
+
+#### Publishing Flow (Admin Only)
+- [ ] Log in as admin user
+- [ ] Navigate to `/content` and expand a content piece
+- [ ] "Publish to Metricool" button visible (admin only)
+- [ ] Non-admin user does NOT see the button
+- [ ] Click button → slide-over modal opens
+- [ ] Default platform pre-selected based on content type (e.g., LinkedIn for linkedin-post)
+- [ ] Can toggle multiple platforms on/off
+- [ ] Date/time picker pre-filled with scheduled_for date if set
+- [ ] "Best time to post" suggestion shown below datetime picker
+- [ ] Content preview shows body text and image (if present)
+- [ ] Click "Schedule" → loading state → success closes modal
+- [ ] Content piece status updates to "scheduled"
+- [ ] Error displayed in modal if Metricool API fails
+
+#### Performance Card (Admin Only)
+- [ ] After publishing a content piece via Metricool, expand it again
+- [ ] "Metricool Performance" card appears below content
+- [ ] Platform badge shown with correct status color (amber=scheduled, green=posted, red=failed)
+- [ ] Scheduled posts show scheduled datetime
+- [ ] Posted posts show performance metrics (impressions, reach, engagement, clicks, shares)
+- [ ] "Last synced" timestamp displayed
+- [ ] "Refresh" button triggers manual sync and reloads data
+- [ ] Card hidden when no Metricool posts exist for that content piece
+
+#### Analytics Page — Social Performance (Admin Only)
+- [ ] Navigate to `/analytics` as admin
+- [ ] "Social Performance" section appears above existing link analytics
+- [ ] Non-admin user does NOT see the Social Performance section
+- [ ] Empty state shows "No social analytics yet" with "Sync Now" button
+- [ ] "Sync Now" / "Refresh Metrics" triggers refresh and shows loading state
+- [ ] After sync, platform cards appear with followers, reach, impressions, engagement
+- [ ] Platform names display correctly (e.g., "LinkedIn" not "LINKEDIN")
+
+#### Schedule Calendar — Metricool Posts (Admin Only)
+- [ ] Navigate to `/schedule` as admin
+- [ ] Metricool-scheduled posts appear on calendar with emerald green badge
+- [ ] Badge shows platform name and status
+- [ ] Visible in both week view and month view
+- [ ] Non-admin user does NOT see Metricool posts on calendar
+- [ ] Posts correctly positioned on their scheduled date
+
+#### Daily Cron
+- [ ] `vercel.json` has `/api/cron/daily` with `0 9 * * *` schedule
+- [ ] Hit `/api/cron/daily` with correct `Authorization: Bearer <CRON_SECRET>` header → returns JSON with results
+- [ ] Without auth header → returns 401
+- [ ] Metricool analytics synced (check metricool_analytics table)
+- [ ] Post statuses updated (scheduled → posted for past scheduled_at)
+- [ ] Per-post performance metrics updated (check metricool_posts impressions/reach/etc.)
+- [ ] On Mondays, weekly digest also fires
+- [ ] Without METRICOOL_API_TOKEN set → Metricool steps skipped gracefully, digest still runs
+
+#### Edge Cases
+- [ ] Publishing with no platforms selected → button disabled
+- [ ] Publishing with past datetime → Metricool API error handled gracefully
+- [ ] Content piece without image → modal shows body only, no broken image
+- [ ] Multiple Metricool posts for same content piece (cross-posted) → all shown in performance card
+- [ ] metricool_analytics table empty → analytics page shows empty state, not error
+- [ ] Cron runs without any metricool_posts in DB → completes without error
+
 ---
 
 ## What's Next
@@ -1450,3 +1567,9 @@ This is the current marketing module — avatars, campaigns, content generation,
 | 2026-03-17 | 3-tier optimization engine | Level 1 (rule-based health checks) = instant, no AI. Level 2 (cross-campaign analysis) = Claude, needs 2+ campaigns. Level 3 (creative learning loop) = deferred. Progressive unlock as data accumulates |
 | 2026-03-17 | Performance data upsert with NULLS NOT DISTINCT | Unique index on (campaign, ad_set, ad, date) with `NULLS NOT DISTINCT` enables clean upsert even when ad_set_id and ad_id are null; requires PG 15+ |
 | 2026-03-17 | Ad generation produces 3 variations | Each generation call returns 3 ad variations so users can pick the best; platform adapter validates each against character/format constraints |
+| 2026-03-20 | Metricool for social publishing (admin-only) | Internal team tool — admins publish content to social platforms via Metricool API; single shared account via env vars; not customer-facing |
+| 2026-03-20 | Custom HTTP client for Metricool | No official Node.js SDK exists; lightweight fetch wrapper with auth headers; pinned to known Swagger spec endpoints |
+| 2026-03-20 | Enhance existing pages, no new routes | Metricool features added to `/content`, `/analytics`, `/schedule` behind admin role checks; zero new nav items, admins get richer versions |
+| 2026-03-20 | Consolidated daily cron | Vercel free plan allows one cron; combined Metricool analytics sync + weekly digest into single `/api/cron/daily` route; digest only runs on Mondays |
+| 2026-03-20 | Daily sync + manual refresh for analytics | Conservative approach due to undocumented Metricool rate limits; daily cron for background sync, manual refresh button for on-demand |
+| 2026-03-20 | Stats grid before charts (Phase 2) | V1 uses simple number cards per platform; charts (line/bar with date range) deferred until data pipeline is proven |

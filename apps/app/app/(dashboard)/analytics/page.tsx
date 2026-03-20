@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { requireAuth } from "@/server/auth";
+import { requireAuth, getUserWithRole } from "@/server/auth";
 import { AnalyticsDashboard } from "./analytics-dashboard";
 
 export default async function AnalyticsPage() {
@@ -38,6 +38,18 @@ export default async function AnalyticsPage() {
     recentClicks = data ?? [];
   }
 
+  const { role } = await getUserWithRole();
+
+  let socialAnalytics: any[] = [];
+  if (role === "admin") {
+    const { data: metricoolData } = await supabase
+      .from("metricool_analytics")
+      .select("*")
+      .order("date", { ascending: false })
+      .limit(100);
+    socialAnalytics = metricoolData ?? [];
+  }
+
   return (
     <>
       <div className="mb-8">
@@ -51,6 +63,8 @@ export default async function AnalyticsPage() {
         products={(products ?? []) as { id: string; name: string }[]}
         links={(links ?? []) as any}
         recentClicks={recentClicks}
+        role={role}
+        socialAnalytics={socialAnalytics}
       />
     </>
   );

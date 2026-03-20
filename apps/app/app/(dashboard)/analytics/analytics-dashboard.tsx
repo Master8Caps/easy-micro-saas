@@ -7,6 +7,7 @@ import {
   type PerformanceData,
 } from "@/server/actions/performance";
 import { getScoreTier, scoreBarColor } from "@/lib/score-utils";
+import { SocialPerformance } from "./social-performance";
 
 interface LinkRow {
   id: string;
@@ -28,12 +29,16 @@ interface AnalyticsDashboardProps {
   products: { id: string; name: string }[];
   links: LinkRow[];
   recentClicks: { clicked_at: string; link_id: string }[];
+  role: string;
+  socialAnalytics: any[];
 }
 
 export function AnalyticsDashboard({
   products,
   links,
   recentClicks,
+  role,
+  socialAnalytics,
 }: AnalyticsDashboardProps) {
   const [productFilter, setProductFilter] = useState("");
   const [perfData, setPerfData] = useState<PerformanceData | null>(null);
@@ -123,6 +128,8 @@ export function AnalyticsDashboard({
 
   return (
     <>
+      {role === "admin" && <SocialPerformance data={socialAnalytics} />}
+
       {/* Product filter */}
       <div className="mb-6">
         <select

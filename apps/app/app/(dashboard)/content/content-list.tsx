@@ -12,6 +12,8 @@ import {
   updateContentPiecesStatusBulk,
 } from "@/server/actions/content";
 import ImageGenerator from "@/components/image-generator";
+import { MetricoolPublishModal } from "@/components/metricool-publish-modal";
+import { MetricoolPerformanceCard } from "@/components/metricool-performance-card";
 
 interface TrackedLink {
   id: string;
@@ -87,9 +89,11 @@ function getCategory(piece: ContentPieceRow): string {
 export function ContentList({
   pieces: initialPieces,
   products,
+  role,
 }: {
   pieces: ContentPieceRow[];
   products: { id: string; name: string }[];
+  role: "admin" | "paid" | "free";
 }) {
   const [pieces, setPieces] = useState(initialPieces);
   const [productFilter, setProductFilter] = useState("");
@@ -98,6 +102,7 @@ export function ContentList({
   const [categoryFilter, setCategoryFilter] = useState("");
   const [showArchived, setShowArchived] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [publishingPieceId, setPublishingPieceId] = useState<string | null>(null);
 
   // Bulk selection state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -524,11 +529,41 @@ export function ContentList({
                     channel={piece.metadata?.channel}
                   />
                 )}
+
+                {/* Metricool — admin only */}
+                {isExpanded && role === "admin" && (
+                  <>
+                    <div className="mt-3 flex items-center gap-2">
+                      <button
+                        onClick={() => setPublishingPieceId(piece.id)}
+                        className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
+                      >
+                        Publish to Metricool
+                      </button>
+                    </div>
+                    <MetricoolPerformanceCard contentPieceId={piece.id} />
+                  </>
+                )}
               </div>
             </div>
           );
         })}
       </div>
+
+      {publishingPieceId && (() => {
+        const piece = initialPieces.find((p) => p.id === publishingPieceId);
+        return piece ? (
+          <MetricoolPublishModal
+            contentPieceId={publishingPieceId}
+            contentType={piece.type}
+            contentBody={piece.body}
+            imageUrl={piece.image_url}
+            scheduledFor={piece.scheduled_for}
+            onClose={() => setPublishingPieceId(null)}
+            onPublished={() => setPublishingPieceId(null)}
+          />
+        ) : null;
+      })()}
 
       {/* Bulk action toolbar */}
       {selectedIds.size > 0 && (

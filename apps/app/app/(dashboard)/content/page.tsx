@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getUserWithRole } from "@/server/auth";
 import { ContentList } from "./content-list";
 
 // Image generation can take 10-30s
@@ -6,6 +7,7 @@ export const maxDuration = 60;
 
 export default async function ContentPage() {
   const supabase = await createClient();
+  const { role } = await getUserWithRole();
 
   const { data: pieces } = await supabase
     .from("content_pieces")
@@ -33,6 +35,7 @@ export default async function ContentPage() {
         <ContentList
           pieces={pieces as any}
           products={(products ?? []) as { id: string; name: string }[]}
+          role={role}
         />
       ) : (
         <div className="rounded-xl border border-dashed border-line p-12 text-center">

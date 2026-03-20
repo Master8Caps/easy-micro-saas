@@ -53,14 +53,14 @@ export async function GET(request: NextRequest) {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       // Mark scheduled posts whose scheduled_at has passed as "posted"
-      const { count } = await supabase
+      const { data: updated } = await supabase
         .from("metricool_posts")
         .update({ status: "posted", posted_at: new Date().toISOString() })
         .eq("status", "scheduled")
         .lt("scheduled_at", new Date().toISOString())
-        .select("id", { count: "exact", head: true });
+        .select("id");
 
-      results.metricoolPostUpdates = `Updated ${count ?? 0} posts to posted`;
+      results.metricoolPostUpdates = `Updated ${updated?.length ?? 0} posts to posted`;
     } catch (err) {
       results.metricoolPostUpdates = `Error: ${err instanceof Error ? err.message : "Unknown"}`;
     }

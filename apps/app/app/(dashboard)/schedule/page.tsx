@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getUserWithRole } from "@/server/auth";
 import { ScheduleCalendar, type SchedulePiece } from "./schedule-calendar";
 
 function getWeekRange(offset: number) {
@@ -102,6 +103,19 @@ export default async function SchedulePage({
     .select("id, name")
     .order("name");
 
+  const { role } = await getUserWithRole();
+
+  let metricoolPosts: any[] = [];
+  if (role === "admin") {
+    const { data } = await supabase
+      .from("metricool_posts")
+      .select("id, content_piece_id, platform, scheduled_at, posted_at, status")
+      .in("status", ["scheduled", "posted"])
+      .gte("scheduled_at", startDate)
+      .lte("scheduled_at", endDate);
+    metricoolPosts = data ?? [];
+  }
+
   return (
     <>
       <div className="mb-8">
@@ -117,6 +131,7 @@ export default async function SchedulePage({
         products={(products ?? []) as { id: string; name: string }[]}
         weekOffset={weekOffset}
         view={view}
+        metricoolPosts={metricoolPosts}
         monthInfo={
           view === "month" && monthRange
             ? {

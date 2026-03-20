@@ -138,6 +138,7 @@ export function ScheduleCalendar({
   weekOffset,
   view = "week",
   monthInfo,
+  metricoolPosts = [],
 }: {
   scheduledPieces: SchedulePiece[];
   unscheduledPieces: SchedulePiece[];
@@ -145,6 +146,7 @@ export function ScheduleCalendar({
   weekOffset: number;
   view?: "week" | "month";
   monthInfo?: { year: number; month: number; label: string; monthStr: string };
+  metricoolPosts?: { id: string; platform: string; scheduled_at: string | null; status: string }[];
 }) {
   const router = useRouter();
   const [scheduled, setScheduled] = useState(initialScheduled);
@@ -188,6 +190,18 @@ export function ScheduleCalendar({
     }
     return groups;
   }, [scheduled]);
+
+  // Group Metricool posts by date
+  const metricoolPostsByDate = useMemo(() => {
+    const groups: Record<string, { id: string; platform: string; status: string }[]> = {};
+    for (const mp of metricoolPosts) {
+      if (!mp.scheduled_at) continue;
+      const date = mp.scheduled_at.split("T")[0];
+      if (!groups[date]) groups[date] = [];
+      groups[date].push(mp);
+    }
+    return groups;
+  }, [metricoolPosts]);
 
   // Filter unscheduled by product
   const filteredUnscheduled = useMemo(() => {
@@ -497,10 +511,23 @@ export function ScheduleCalendar({
                           />
                         </DraggableCard>
                       ))}
+                      {metricoolPosts
+                        .filter((mp) => mp.scheduled_at?.startsWith(day.date))
+                        .map((mp) => (
+                          <div
+                            key={mp.id}
+                            className="flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs"
+                          >
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                            <span className="truncate text-emerald-400">
+                              {mp.platform} — {mp.status}
+                            </span>
+                          </div>
+                        ))}
                     </div>
 
                     {/* Empty day indicator */}
-                    {pieces.length === 0 && (
+                    {pieces.length === 0 && metricoolPosts.filter((mp) => mp.scheduled_at?.startsWith(day.date)).length === 0 && (
                       <p className="py-4 text-center text-xs text-content-muted">
                         No content
                       </p>
@@ -556,6 +583,7 @@ export function ScheduleCalendar({
               year={monthInfo.year}
               month={monthInfo.month}
               piecesByDate={piecesByDate}
+              metricoolPostsByDate={metricoolPostsByDate}
               selectedDate={selectedMonthDate}
               onSelectDate={(date) => {
                 setSelectedMonthDate(date);

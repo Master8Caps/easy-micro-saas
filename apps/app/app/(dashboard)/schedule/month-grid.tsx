@@ -7,6 +7,7 @@ interface MonthGridProps {
   year: number;
   month: number; // 0-indexed
   piecesByDate: Record<string, { id: string; status: string }[]>;
+  metricoolPostsByDate?: Record<string, { id: string; platform: string; status: string }[]>;
   selectedDate: string | null;
   onSelectDate: (date: string) => void;
 }
@@ -51,12 +52,14 @@ const STATUS_DOT: Record<string, string> = {
 function DayCell({
   day,
   pieces,
+  metricoolPosts = [],
   isToday,
   isSelected,
   onSelect,
 }: {
   day: { date: string; dayOfMonth: number; inMonth: boolean };
   pieces: { id: string; status: string }[];
+  metricoolPosts?: { id: string; platform: string; status: string }[];
   isToday: boolean;
   isSelected: boolean;
   onSelect: () => void;
@@ -94,7 +97,7 @@ function DayCell({
       </span>
 
       {/* Status dots */}
-      {pieces.length > 0 && (
+      {(pieces.length > 0 || metricoolPosts.length > 0) && (
         <div className="mt-1 flex flex-wrap gap-1">
           {pieces.slice(0, 3).map((p) => (
             <span
@@ -107,6 +110,18 @@ function DayCell({
               +{pieces.length - 3}
             </span>
           )}
+          {metricoolPosts.slice(0, 3).map((mp) => (
+            <span
+              key={mp.id}
+              className="h-2 w-2 rounded-full bg-emerald-400 ring-1 ring-emerald-400/40"
+              title={`${mp.platform} — ${mp.status}`}
+            />
+          ))}
+          {metricoolPosts.length > 3 && (
+            <span className="text-[10px] text-emerald-400">
+              +{metricoolPosts.length - 3}
+            </span>
+          )}
         </div>
       )}
     </button>
@@ -117,6 +132,7 @@ export function MonthGrid({
   year,
   month,
   piecesByDate,
+  metricoolPostsByDate = {},
   selectedDate,
   onSelectDate,
 }: MonthGridProps) {
@@ -147,6 +163,7 @@ export function MonthGrid({
               key={day.date}
               day={day}
               pieces={pieces}
+              metricoolPosts={metricoolPostsByDate[day.date] ?? []}
               isToday={day.date === todayStr}
               isSelected={day.date === selectedDate}
               onSelect={() => onSelectDate(day.date)}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { WaitlistButton } from "./waitlist-form";
 
 export function Navbar() {
@@ -23,7 +24,7 @@ export function Navbar() {
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-2.5">
+        <Link href="/" className="flex items-center gap-2.5">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32 32" className="shrink-0">
             <path d="M16,3 Q21,10 21,18 Q21,24 16,24 Q11,24 11,18 Q11,10 16,3Z" fill="#6366f1"/>
             <circle cx="16" cy="14" r="2.5" fill="white"/>
@@ -36,13 +37,21 @@ export function Navbar() {
           <span className="font-heading text-sm font-semibold tracking-tight">
             Easy Micro SaaS
           </span>
-        </div>
+        </Link>
 
-        <WaitlistButton
-          source="navbar"
-          label="Get Early Access"
-          className="rounded-full border border-white/[0.12] bg-white/[0.05] px-4 py-1.5 text-xs font-medium text-zinc-300 transition-all hover:border-white/[0.2] hover:bg-white/[0.08] hover:text-white"
-        />
+        <div className="flex items-center gap-5">
+          <Link
+            href="/blog"
+            className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+          >
+            Blog
+          </Link>
+          <WaitlistButton
+            source="navbar"
+            label="Get Early Access"
+            className="rounded-full border border-white/[0.12] bg-white/[0.05] px-4 py-1.5 text-xs font-medium text-zinc-300 transition-all hover:border-white/[0.2] hover:bg-white/[0.08] hover:text-white"
+          />
+        </div>
       </div>
     </nav>
   );

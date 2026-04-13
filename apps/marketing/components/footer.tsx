@@ -1,8 +1,10 @@
+import Link from "next/link";
+
 export function Footer() {
   return (
     <footer className="border-t border-white/[0.06] px-6 py-8">
-      <div className="mx-auto flex max-w-6xl items-center justify-between">
-        <div className="flex items-center gap-2.5">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 md:flex-row">
+        <Link href="/" className="flex items-center gap-2.5">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" className="shrink-0">
             <path d="M16,3 Q21,10 21,18 Q21,24 16,24 Q11,24 11,18 Q11,10 16,3Z" fill="#6366f1"/>
             <circle cx="16" cy="14" r="2.5" fill="white"/>
@@ -15,10 +17,18 @@ export function Footer() {
           <span className="text-sm font-medium text-zinc-500">
             Easy Micro SaaS
           </span>
-        </div>
-        <p className="text-xs text-zinc-600">
-          &copy; {new Date().getFullYear()} Easy Micro SaaS
-        </p>
+        </Link>
+        <nav className="flex items-center gap-6 text-xs">
+          <Link
+            href="/blog"
+            className="text-zinc-500 transition-colors hover:text-zinc-200"
+          >
+            Blog
+          </Link>
+          <span className="text-zinc-600">
+            &copy; {new Date().getFullYear()} Easy Micro SaaS
+          </span>
+        </nav>
       </div>
     </footer>
   );

@@ -596,6 +596,69 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 - **Media handling** — images must be publicly accessible URLs; normalized via Metricool's endpoint before scheduling
 - **Phase 2 deferred** — charts on analytics page (line/bar charts with date range selector) to be added once data pipeline is proven
 
+### Blog System & External Publishing API (2026-04-13)
+
+**Architecture:** Public-facing blog on the marketing site (`easymicrosaas.com/blog`) **plus** a wire-locked external publishing API (`/api/publish/*`) that the central dashboard calls to push AI-generated articles across all sites. Every publish endpoint is protected by an `x-api-key` header checked against `BLOG_PUBLISH_API_KEY`. Design spec: `docs/superpowers/specs/2026-04-13-blog-page-design.md`.
+
+**Scope:** Marketing site only (`apps/marketing`). No admin UI — all publishing flows through the dashboard's API key.
+
+#### Database (Migration 00025)
+- [x] `blog_categories` table — slug (PK), name, created_at. Public read RLS. **Seeded with 15 categories** covering Strategy, Channels, Functions, and Meta/Inspiration layers (positioning, launch-strategies, pricing-monetization, growth-experiments, seo, content-marketing, email-marketing, social-media, paid-ads, customer-acquisition, retention-churn, analytics-metrics, founder-stories, tools-and-workflows, ai-for-marketers)
+- [x] `blog_tags` table — slug (PK), created_at. Public read RLS. **Seeded with 50 tags** as vocabulary baseline for the dashboard AI (9 platforms, 5 SEO, 5 content formats, 10 acquisition tactics, 3 email, 5 metrics, 6 stage/persona, 3 monetization, 4 tools)
+- [x] `blog_articles` table — id, slug (unique), title, content (HTML), excerpt, category_slug (FK), author (default "Easy Micro SaaS Team"), reading_time, featured_image, **tags TEXT[]** (idiomatic Postgres array, GIN-indexed), published, published_at, created_at, updated_at
+- [x] Index on `(published, published_at DESC)` for the blog index page
+- [x] Partial index on `category_slug WHERE published = true` for category pages
+- [x] GIN index on `tags` for future tag filtering
+- [x] RLS: public read of published articles only; all writes via service-role key
+- [x] Supabase Storage bucket `blog-media` (public) created via migration + public read policy on `storage.objects`
+
+#### Shared Blog Lib (`apps/marketing/lib/blog/`)
+- [x] `auth.ts` — `requireApiKey(request)` — single-source `x-api-key` check against `BLOG_PUBLISH_API_KEY` env var, returns 401 response or null
+- [x] `supabase.ts` — service-role Supabase client (mirrors waitlist route pattern) + `SITE_ORIGIN` constant
+- [x] `context.ts` — hardcoded `BLOG_CONTEXT` with 5 context groups (target-audience, content-themes, brand-voice, product-context, avoid) consumed by `/metadata/context`
+
+#### External Publishing API (6 routes under `app/api/publish/`)
+- [x] `POST /api/publish/article` — upsert by slug. Validates required fields (slug/title/content), validates category against `blog_categories` (409 with `valid` array on miss), splits comma-separated `tags` into lowercased array, returns `{ success, slug, publishedUrl, created }`
+- [x] `DELETE /api/publish/article/[slug]` — soft delete (sets `published = false` instead of removing row). Returns 404 if slug doesn't exist
+- [x] `GET /api/publish/metadata/categories` — returns all categories ordered by name as `{ categories: [{slug, name}] }`
+- [x] `GET /api/publish/metadata/tags` — returns union of seeded tags + distinct tags used across published articles, sorted, as `{ tags: [...] }`
+- [x] `GET /api/publish/metadata/context` — returns hardcoded `BLOG_CONTEXT` as `{ context: [{label, description, items}] }`
+- [x] `POST /api/publish/media` — multipart upload, validates mime type (jpeg/png/webp/gif/avif), generates `<timestamp>-<slugified-name>.<ext>` filename, uploads to `blog-media` bucket, returns `{ url: "https://easymicrosaas.com/uploads/FILENAME" }`
+- [x] All routes respond with exact spec-compliant JSON shapes (dashboard parses programmatically)
+
+#### Image Serving Pipeline
+- [x] `next.config.ts` rewrite: `/uploads/:filename*` → `${SUPABASE_URL}/storage/v1/object/public/blog-media/:filename*`
+- [x] Preserves the spec-required `easymicrosaas.com/uploads/FILENAME` URL shape while serving from Supabase CDN — zero function invocations on image reads
+
+#### Public Blog UI (`apps/marketing/app/blog/`)
+- [x] `/blog` — index page, server component, 60s revalidate, fetches all published articles + categories, grid of article cards, empty state when no posts
+- [x] `/blog/[slug]` — article page, server component, `notFound()` for unpublished/missing slugs, renders HTML content via `dangerouslySetInnerHTML`, tag chips at bottom, back-to-blog link
+- [x] `generateMetadata()` on article pages — title, description from excerpt, canonical URL, full Open Graph (title, description, type=article, publishedTime, authors, images), Twitter card
+- [x] `/blog/category/[slug]` — category filter page, `notFound()` for unknown categories, shows post count, same article grid component
+
+#### Blog UI Components (`components/blog/`)
+- [x] `article-card.tsx` — 16:9 featured image (hover scale), category chip, title, 3-line excerpt, author + date + reading time footer
+- [x] `category-chip.tsx` — indigo rounded pill, defaults to `<Link>` to category page, optional non-link mode
+- [x] `tag-chip.tsx` — subtle zinc `#slug` chip for article footer
+
+#### Article HTML Prose Styles (`app/globals.css`)
+- [x] `.blog-content` scoped styles for all common HTML elements: h2/h3/h4, p, a (indigo underline), strong, em, ul/ol, blockquote (indigo left border), inline code + pre code blocks, img (bordered rounded), hr, table/th/td
+
+#### Navigation
+- [x] Navbar — added "Blog" link between logo and waitlist CTA, matching existing link styling. Logo now links to `/` (was static)
+- [x] Footer — restructured into flex layout with Blog link + copyright, logo links to `/`
+
+#### Environment Variables (must be set in Vercel)
+- [x] Code reads `BLOG_PUBLISH_API_KEY` (the x-api-key secret) and `NEXT_PUBLIC_SITE_ORIGIN` (used for `publishedUrl` + canonical tags)
+
+#### Design Decisions
+- **Categories: hybrid** — 15 seeded via migration into a DB table, so they can be edited without a deploy if ever needed, but start with a strong default set
+- **Tags: union-return** — `/metadata/tags` returns seeded baseline + distinct article tags to solve the day-1 chicken-and-egg problem (dashboard AI has a vocabulary to pick from before any articles exist)
+- **Tag storage: TEXT[] array column** — idiomatic Postgres, clean `unnest` aggregation, GIN index for future tag filtering, no junction table overhead
+- **Delete: soft** — preserves backlinks, lets dashboard recover from accidental deletes by republishing the same slug
+- **Image URLs: rewrite not proxy** — `/uploads/*` rewrite preserves the spec-required URL shape without a Next.js function invocation per image
+- **No hardcoded navbar middle links** — only Blog link added, site still single-page aside from the blog
+
 ---
 
 ## Test Checklist
@@ -1238,6 +1301,132 @@ Easy Micro SaaS is a platform that guides micro-SaaS builders through the full p
 - [ ] Multiple Metricool posts for same content piece (cross-posted) → all shown in performance card
 - [ ] metricool_analytics table empty → analytics page shows empty state, not error
 - [ ] Cron runs without any metricool_posts in DB → completes without error
+
+### Blog System & External Publishing API (from 2026-04-13)
+
+> Migration 00025 — **Must be applied before testing.**
+> Requires env vars on the `marketing` Vercel project: `BLOG_PUBLISH_API_KEY` (value: `5e79deff-2a78-488f-ac2c-6be1b279e180`), `NEXT_PUBLIC_SITE_ORIGIN` (value: `https://easymicrosaas.com`)
+
+#### Prerequisites
+- [ ] Apply migration 00025 via Supabase SQL Editor or `supabase db push`
+- [ ] Confirm tables exist: `blog_categories` (15 rows), `blog_tags` (50 rows), `blog_articles` (0 rows)
+- [ ] Confirm Storage bucket `blog-media` exists and is marked public in Supabase dashboard
+- [ ] Set `BLOG_PUBLISH_API_KEY` in Vercel marketing project (Preview + Production)
+- [ ] Set `NEXT_PUBLIC_SITE_ORIGIN=https://easymicrosaas.com` in Vercel marketing project
+- [ ] Redeploy marketing site so new env vars are picked up
+
+#### API Auth (all 6 endpoints)
+- [ ] Hit any publish endpoint **without** `x-api-key` header → 401 `{"error":"Unauthorized"}`
+- [ ] Hit any publish endpoint with **wrong** key → 401 `{"error":"Unauthorized"}`
+- [ ] Hit any publish endpoint with **correct** key → non-401 response
+
+#### POST /api/publish/article (upsert)
+- [ ] Publish a test article with only required fields (`slug`, `title`, `content`) → 200 `{success, slug, publishedUrl, created: true}`
+- [ ] Publish the **same slug** again with different content → 200 `{..., created: false}`, content updated
+- [ ] Omit `slug` → 400 `{"error":"Missing required field: slug"}`
+- [ ] Omit `title` → 400 with correct field name
+- [ ] Omit `content` → 400 with correct field name
+- [ ] Publish with **invalid category** (e.g. `"fake-cat"`) → 409 `{"error":"Invalid category","valid":[...15 slugs]}`
+- [ ] Publish with **valid category** (e.g. `"seo"`) → 200, category persists
+- [ ] Publish with `tags: "ai-tools, case-study, SEO"` → tags stored lowercased + trimmed as `["ai-tools","case-study","seo"]`
+- [ ] Publish with `author: "Jane Doe"` → author persists; omit author → defaults to "Easy Micro SaaS Team"
+- [ ] Publish with `published: false` → article hidden from public UI
+- [ ] Publish with explicit `publishedAt` ISO string → respected
+- [ ] Publish with `featuredImage` URL + `excerpt` + `readingTime` → all fields persist
+- [ ] Invalid JSON body → 400 `{"error":"Invalid JSON body"}`
+
+#### DELETE /api/publish/article/:slug (soft delete)
+- [ ] Delete existing slug → 200 `{"success":true,"slug":"..."}`
+- [ ] Delete nonexistent slug → 404 `{"error":"Article not found"}`
+- [ ] Confirm `blog_articles` row still exists in DB with `published = false` after delete
+- [ ] Confirm article no longer visible on `/blog` index or `/blog/[slug]` after delete
+- [ ] Re-publish the same slug via POST → article reappears (`created: false`, published back to true)
+
+#### GET /api/publish/metadata/categories
+- [ ] Returns `{"categories":[{slug,name},...]}` with **15 entries**
+- [ ] Ordered alphabetically by name
+- [ ] Response shape exact — no extra wrapping objects, no renamed fields
+
+#### GET /api/publish/metadata/tags
+- [ ] With 0 articles → returns all **50 seeded tags**
+- [ ] Publish an article with a new tag like `my-custom-tag` not in the seed set → endpoint now returns 51 tags (union of seed + used)
+- [ ] Response shape exact: `{"tags":["...","..."]}`
+- [ ] Tags sorted alphabetically
+
+#### GET /api/publish/metadata/context
+- [ ] Returns `{"context":[...]}` with **5 groups**
+- [ ] Groups in order: `target-audience`, `content-themes`, `brand-voice`, `product-context`, `avoid`
+- [ ] Each group has `label`, `description`, `items` (array of `{slug, name}`)
+- [ ] Descriptions are full sentences (not empty strings)
+
+#### POST /api/publish/media (image upload)
+- [ ] Upload a valid PNG via multipart form with field name `image` → 200 `{"url":"https://easymicrosaas.com/uploads/<filename>"}`
+- [ ] Uploaded image is accessible at the returned URL in a browser
+- [ ] URL pattern: `https://easymicrosaas.com/uploads/<timestamp>-<slugified-name>.<ext>`
+- [ ] Upload with wrong field name (`file` instead of `image`) → 400 `{"error":"Missing required field: image"}`
+- [ ] Upload a `.txt` or `application/pdf` → 400 `{"error":"Unsupported image type: ..."}`
+- [ ] Upload a JPG, WebP, GIF, AVIF — all accepted
+- [ ] File appears in Supabase Storage `blog-media` bucket under the generated filename
+
+#### Public Blog UI — `/blog` index
+- [ ] Navigate to `https://easymicrosaas.com/blog` → page loads with hero "Go-to-market, decoded."
+- [ ] With 0 published articles → shows "No posts yet — check back soon." empty state
+- [ ] Publish 3 test articles via the API → all three appear on `/blog` in reverse chronological order
+- [ ] Article cards show: featured image (or no image section), category chip, title, excerpt, author + date + reading time
+- [ ] Clicking a card navigates to `/blog/[slug]`
+- [ ] Clicking the category chip navigates to `/blog/category/[slug]`
+- [ ] Dark theme matches rest of the marketing site
+- [ ] Responsive: single column on mobile, 2 cols on tablet, 3 cols on desktop
+- [ ] Navbar and footer render correctly
+
+#### Public Blog UI — `/blog/[slug]` article page
+- [ ] Published article renders: category chip, title, excerpt, author + date + reading time row
+- [ ] Featured image displays if set, hidden otherwise
+- [ ] HTML content renders with proper prose styles (headings, links are indigo, lists, blockquotes, code, etc.)
+- [ ] Tags display as chips at the bottom
+- [ ] "Back to blog" link works
+- [ ] Unpublished slug → 404 page
+- [ ] Nonexistent slug → 404 page
+- [ ] View source / DevTools: `<title>` matches article title, `<meta description>` = excerpt, `og:image` set if featured image present, canonical URL present
+- [ ] Paste the article URL into Twitter/LinkedIn post composer → Open Graph preview shows title, description, image
+
+#### Public Blog UI — `/blog/category/[slug]` category page
+- [ ] Valid category slug (e.g. `/blog/category/seo`) → loads with category name header and post count
+- [ ] Only shows articles in that category
+- [ ] Invalid category slug → 404 page
+- [ ] "All posts" back link works
+- [ ] Empty category → "No posts in this category yet" empty state
+
+#### Navigation
+- [ ] Navbar "Blog" link visible on all pages including homepage
+- [ ] Clicking Navbar logo navigates to `/`
+- [ ] Navbar Blog link navigates to `/blog`
+- [ ] Footer "Blog" link navigates to `/blog`
+- [ ] Footer logo links to `/`
+- [ ] Both nav and footer render correctly on `/blog`, `/blog/[slug]`, `/blog/category/[slug]`
+
+#### `/uploads/*` Rewrite
+- [ ] After uploading an image via `/api/publish/media`, visit the returned URL in a browser → image loads
+- [ ] Direct Supabase Storage URL also loads (rewrite is additive, not a replacement)
+- [ ] Blog article with a `featuredImage` using the `/uploads/*` URL → image displays correctly on article page
+
+#### End-to-End Dashboard Smoke Test
+- [ ] From the central dashboard, configure `SITE_ORIGIN=https://easymicrosaas.com` and `BLOG_PUBLISH_API_KEY=5e79deff-2a78-488f-ac2c-6be1b279e180`
+- [ ] Dashboard pulls categories → gets 15
+- [ ] Dashboard pulls tags → gets 50 (or more if articles published)
+- [ ] Dashboard pulls context → gets 5 context groups
+- [ ] Dashboard uploads an image → gets back a usable URL
+- [ ] Dashboard publishes a full article with all fields → appears on `/blog` immediately (or within 60s due to revalidate cache)
+- [ ] Dashboard deletes the article → disappears from public UI but row still exists
+
+#### Edge Cases
+- [ ] Publish an article with 0 tags → article renders without the tag chips section
+- [ ] Publish an article with no `featuredImage` → article renders without the image block, card shows no image section
+- [ ] Publish an article with extremely long title (150+ chars) → layout doesn't break on card or article page
+- [ ] Publish an article with HTML including `<script>` tags → rendered as-is (admin-trusted content — verify this is acceptable)
+- [ ] Publish an article with same slug but `published: false` first, then `published: true` → works as upsert
+- [ ] Rapid-fire 10 publishes → no errors, all articles appear
+- [ ] Blog index with 20+ articles → all render, page doesn't break (pagination is a future task)
 
 ---
 

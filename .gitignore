@@ -37,6 +37,7 @@ nul
 EMS_PLAN.md
 .claude/
 .worktrees/
+.superpowers/
 docs/CRUSH.md
 
 # Database migrations

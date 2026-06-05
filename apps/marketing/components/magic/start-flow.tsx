@@ -18,6 +18,7 @@ export function StartFlow({ initialUrl = "" }: { initialUrl?: string }) {
   const [result, setResult] = useState<MagicResult | null>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
+  const [unlocking, setUnlocking] = useState(false);
 
   const analyse = useCallback(
     async (targetUrl: string, desc?: string) => {
@@ -52,18 +53,26 @@ export function StartFlow({ initialUrl = "" }: { initialUrl?: string }) {
   );
 
   async function handleUnlock() {
+    if (unlocking) return;
     setError("");
-    const res = await fetch("/api/magic/unlock", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, email }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error || "Something went wrong.");
-      return;
+    setUnlocking(true);
+    try {
+      const res = await fetch("/api/magic/unlock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, email }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Something went wrong.");
+        return;
+      }
+      setPhase("reveal");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setUnlocking(false);
     }
-    setPhase("reveal");
   }
 
   // ---- Render per phase ----
@@ -127,7 +136,7 @@ export function StartFlow({ initialUrl = "" }: { initialUrl?: string }) {
           className="mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row"
         >
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="flex-1 rounded-full border border-white/[0.1] bg-white/[0.03] px-5 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:border-indigo-500/50 focus:outline-none" />
-          <button type="submit" className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-200">Reveal it &rarr;</button>
+          <button type="submit" disabled={unlocking} className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-200 disabled:opacity-50">{unlocking ? "Revealing…" : "Reveal it →"}</button>
         </form>
         {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
       </Centered>

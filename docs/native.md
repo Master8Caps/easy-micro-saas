@@ -3,7 +3,7 @@
 Tracking doc for upgrading the Marketing Machine marketing site(s), inspired by
 [native.no](https://native.no/en/). Living document — update as we ship.
 
-**Status:** 🟡 Planning → starting Week 1 quick wins on the **original (techy)** site.
+**Status:** 🟡 Stage 2 built — pending owner live verification, DB table creation, and env keys.
 **Last updated:** 2026-06-05
 
 ---
@@ -50,7 +50,7 @@ Both run the same back end (the existing MicroSaaS app) and the same journey —
 
 ## 📋 Stages & checklist
 
-### Stage 1 — Week 1 quick wins (original/techy site) ← **WE ARE HERE**
+### Stage 1 — Week 1 quick wins (original/techy site) ✅
 - [x] New hero message — simplified to "You built it. We market it." + price up front.
       CTAs → `/signup` placeholder. (`apps/marketing/components/hero.tsx`)
 - [x] **Pricing section** — `components/pricing.tsx`, one card **£49.95/mo**, everything
@@ -66,16 +66,34 @@ Both run the same back end (the existing MicroSaaS app) and the same journey —
 - Also added: `/signup` placeholder page (`app/signup/page.tsx`) so CTAs don't 404.
 - Also done: stopped tracking `*.tsbuildinfo` (gitignore).
 
-**✅ Stage 1 complete.** Next: Stage 2 (the URL-first "magic" pre-purchase flow) — see below.
+**✅ Stage 1 complete.**
+
+**✅ Stage 2 built** — pending owner live verification, `magic_leads` DB table creation, and
+env keys (`ANTHROPIC_API_KEY`, Supabase, Resend). SQL for the table is in
+`docs/superpowers/specs/2026-06-05-stage2-magic-flow-design.md`.
 
 ### Stage 2 — The "magic" pre-purchase flow (original site)
-- [ ] **URL scrape/analysis** — fetch page, extract copy/meta, feed to Claude. (New. Fiddly:
-      anti-scraping, JS-rendered pages.) Optional: pull recent social posts for voice.
-- [ ] **Decouple `generateBrain`** from authed user + saved product row → generate for an
-      anonymous, email-gated visitor and stash temporarily.
-- [ ] **Public "instant result" page** — "watch it think → here's your DNA + avatars" with
-      email capture.
-- [ ] **Email capture** wired to the lead store.
+- [x] **URL scrape/analysis** — `lib/magic/scrape.ts` fetches the submitted URL, extracts
+      copy/meta/OG signals, and feeds them to Claude. Handles basic anti-scraping (custom
+      UA, timeout, error fallback). Social posts are not pulled (deferred).
+- [x] **Decouple anonymous generation** — implemented as a **new, lighter teaser generator**
+      (`lib/magic/generate.ts`) in `apps/marketing`; the existing `apps/app` `generateBrain`
+      is untouched. Generates brand DNA + audience avatars for an anonymous visitor and
+      stashes the result in Supabase (`magic_leads` table).
+- [x] **Public "instant result" page** — `/start` flow: hero URL entry → swipe-during-wait
+      deck (`components/magic/SwipeDeck.tsx`) → email gate → `Reveal`
+      (`components/magic/Reveal.tsx`). Permalink at `/magic/[id]` for sharing.
+- [x] **Email capture** wired to the lead store — `POST /api/magic/unlock` records the email
+      against the lead row and triggers a Resend welcome email via `lib/magic/email.ts`.
+
+**New routes/modules shipped:**
+- `POST /api/magic/analyze` — scrapes URL, generates teaser result, returns `magicId`
+- `POST /api/magic/unlock` — records email, unlocks full result, sends welcome email
+- `app/start/page.tsx` — `/start` flow orchestrator
+- `app/magic/[id]/page.tsx` — `/magic/[id]` permalink
+- `lib/magic/` — scrape, generate, store, rate-limit, email, validation modules
+- `components/magic/` — SwipeDeck, Reveal, and supporting components
+- Hero home-page URL entry updated to drive the `/start` flow
 
 ### Stage 3 — Conversion + access
 - [ ] **Swipe-to-approve queue** ("Tinder for social") — new UI over existing content

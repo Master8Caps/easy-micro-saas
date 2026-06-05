@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { AnimateOnScroll } from "./animate-on-scroll";
+import { HeroUrlInput } from "./magic/hero-url-input";
 
 // Copy kept as extractable strings so the calm/Scandinavian variant can swap
 // tone without touching markup. See docs/native.md.
@@ -9,8 +9,6 @@ const copy = {
   headlineAccent: "We market it.",
   subline:
     "Social, ads, email and content — auto-created from your brand and ready to ship. Everything in one place for £49.95 a month.",
-  primaryCta: "Start for £49.95/mo",
-  secondaryCta: "See your free brand DNA first",
   trust: "Free brand DNA & avatars · No card to start · Cancel anytime",
 };
 
@@ -61,23 +59,7 @@ export function Hero() {
 
         <AnimateOnScroll delay={240}>
           <div className="mt-10 flex flex-col items-center gap-4">
-            <div className="flex flex-col items-center gap-3 sm:flex-row">
-              <Link
-                href="/signup"
-                className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-zinc-950 transition-all hover:bg-zinc-200 hover:shadow-lg hover:shadow-white/[0.1]"
-              >
-                {copy.primaryCta}
-              </Link>
-              <Link
-                href="/signup"
-                className="group inline-flex items-center gap-1.5 rounded-full border border-white/[0.1] bg-white/[0.03] px-6 py-3 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-zinc-100"
-              >
-                {copy.secondaryCta}
-                <span className="transition-transform group-hover:translate-x-0.5">
-                  →
-                </span>
-              </Link>
-            </div>
+            <HeroUrlInput />
             <p className="text-sm text-zinc-500">{copy.trust}</p>
           </div>
         </AnimateOnScroll>

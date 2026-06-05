@@ -27,3 +27,27 @@ describe("isValidEmail", () => {
     expect(isValidEmail("a@b")).toBe(false);
   });
 });
+
+describe("normaliseUrl SSRF blocking", () => {
+  const blocked = [
+    "http://127.0.0.1",
+    "http://10.0.0.1",
+    "http://192.168.1.1",
+    "http://172.16.0.1",
+    "http://169.254.169.254",
+    "http://0.0.0.0",
+    "http://0x7f000001",      // hex -> 127.0.0.1
+    "http://2130706433",       // decimal -> 127.0.0.1
+    "http://metadata.google.internal",
+    "http://[::1]",
+  ];
+  for (const u of blocked) {
+    it(`rejects ${u}`, () => {
+      expect(normaliseUrl(u)).toBeNull();
+    });
+  }
+  it("still allows a normal public domain", () => {
+    expect(normaliseUrl("example.com")).toBe("https://example.com/");
+    expect(normaliseUrl("https://www.stripe.com")).toBe("https://www.stripe.com/");
+  });
+});

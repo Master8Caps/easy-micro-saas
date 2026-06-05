@@ -18,22 +18,45 @@ function abs(href: string | undefined, base: string): string | undefined {
   }
 }
 
-function metaContent(html: string, name: string): string | undefined {
-  const re = new RegExp(
-    `<meta[^>]+name=["']${name}["'][^>]*content=["']([^"']*)["']`,
-    "i",
-  );
-  const m = html.match(re);
+function attr(tag: string, name: string): string | undefined {
+  const m = tag.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']*)["']`, "i"));
   return m ? m[1].trim() : undefined;
 }
 
+function findMetaContent(
+  html: string,
+  key: "name" | "property",
+  value: string,
+): string | undefined {
+  const tags = html.match(/<meta\b[^>]*>/gi) ?? [];
+  for (const tag of tags) {
+    const k = attr(tag, key);
+    if (k && k.toLowerCase() === value.toLowerCase()) {
+      const content = attr(tag, "content");
+      if (content !== undefined) return content;
+    }
+  }
+  return undefined;
+}
+
+function metaContent(html: string, name: string): string | undefined {
+  return findMetaContent(html, "name", name);
+}
+
 function ogContent(html: string, prop: string): string | undefined {
-  const re = new RegExp(
-    `<meta[^>]+property=["']${prop}["'][^>]*content=["']([^"']*)["']`,
-    "i",
-  );
-  const m = html.match(re);
-  return m ? m[1].trim() : undefined;
+  return findMetaContent(html, "property", prop);
+}
+
+function findFavicon(html: string): string | undefined {
+  const tags = html.match(/<link\b[^>]*>/gi) ?? [];
+  for (const tag of tags) {
+    const rel = attr(tag, "rel")?.toLowerCase();
+    if (rel && ["icon", "shortcut icon", "apple-touch-icon"].includes(rel)) {
+      const href = attr(tag, "href");
+      if (href) return href;
+    }
+  }
+  return undefined;
 }
 
 export function extractSignals(html: string, url: string): BrandSignals {
@@ -44,10 +67,7 @@ export function extractSignals(html: string, url: string): BrandSignals {
     metaContent(html, "description") ?? ogContent(html, "og:description") ?? "";
   const ogImage = abs(ogContent(html, "og:image"), url);
   const themeColor = metaContent(html, "theme-color");
-  const favMatch = html.match(
-    /<link[^>]+rel=["'](?:icon|shortcut icon|apple-touch-icon)["'][^>]*href=["']([^"']+)["']/i,
-  );
-  const favicon = abs(favMatch ? favMatch[1] : undefined, url);
+  const favicon = abs(findFavicon(html), url);
 
   const headings = [...html.matchAll(/<h[12][^>]*>([\s\S]*?)<\/h[12]>/gi)]
     .map((m) => stripTags(m[1]))

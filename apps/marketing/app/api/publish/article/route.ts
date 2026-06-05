@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     .eq("slug", slug)
     .maybeSingle();
 
-  const row = {
+  const baseRow = {
     slug,
     title,
     content,
@@ -98,14 +98,19 @@ export async function POST(request: Request) {
     featured_image: body.featuredImage ?? null,
     tags: parseTags(body.tags),
     published: body.published ?? true,
-    published_at: body.publishedAt ?? new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
 
   if (existing) {
+    // Preserve the existing published_at on re-publish unless a new date is
+    // explicitly supplied — so manual date edits (admin page) aren't wiped.
+    const updateRow = body.publishedAt
+      ? { ...baseRow, published_at: body.publishedAt }
+      : baseRow;
+
     const { error } = await blogSupabase
       .from("blog_articles")
-      .update(row)
+      .update(updateRow)
       .eq("slug", slug);
 
     if (error) {
@@ -124,7 +129,12 @@ export async function POST(request: Request) {
     });
   }
 
-  const { error } = await blogSupabase.from("blog_articles").insert(row);
+  const insertRow = {
+    ...baseRow,
+    published_at: body.publishedAt ?? new Date().toISOString(),
+  };
+
+  const { error } = await blogSupabase.from("blog_articles").insert(insertRow);
 
   if (error) {
     console.error("Blog upsert (insert) error:", error);

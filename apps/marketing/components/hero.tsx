@@ -1,5 +1,18 @@
+import Link from "next/link";
 import { AnimateOnScroll } from "./animate-on-scroll";
-import { WaitlistButton } from "./waitlist-form";
+
+// Copy kept as extractable strings so the calm/Scandinavian variant can swap
+// tone without touching markup. See docs/native.md.
+const copy = {
+  eyebrow: "Your marketing, done for you",
+  headlineLead: "You built it.",
+  headlineAccent: "We market it.",
+  subline:
+    "Social, ads, email and content — auto-created from your brand and ready to ship. Everything in one place for £49.95 a month.",
+  primaryCta: "Start for £49.95/mo",
+  secondaryCta: "See your free brand DNA first",
+  trust: "Free brand DNA & avatars · No card to start · Cancel anytime",
+};
 
 export function Hero() {
   return (
@@ -25,35 +38,47 @@ export function Hero() {
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-1.5">
             <div className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse-glow" />
             <span className="text-xs font-medium tracking-wide text-zinc-400">
-              Your go-to-market engine
+              {copy.eyebrow}
             </span>
           </div>
         </AnimateOnScroll>
 
         <AnimateOnScroll delay={80}>
           <h1 className="text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl md:text-7xl lg:text-[5.25rem]">
-            You shipped.{" "}
+            {copy.headlineLead}{" "}
             <br className="hidden sm:block" />
             <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">
-              Now what?
+              {copy.headlineAccent}
             </span>
           </h1>
         </AnimateOnScroll>
 
         <AnimateOnScroll delay={160}>
           <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-zinc-400 md:text-lg">
-            Turn a five-minute product brief into targeted avatars, campaign
-            angles, ready-to-post content, and tracked links — so you know
-            exactly who to reach, what to say, and what&apos;s working.
+            {copy.subline}
           </p>
         </AnimateOnScroll>
 
         <AnimateOnScroll delay={240}>
           <div className="mt-10 flex flex-col items-center gap-4">
-            <WaitlistButton source="hero" label="Get Early Access" />
-            <p className="text-sm text-zinc-500">
-              Free early access &middot; No credit card required
-            </p>
+            <div className="flex flex-col items-center gap-3 sm:flex-row">
+              <Link
+                href="/signup"
+                className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-zinc-950 transition-all hover:bg-zinc-200 hover:shadow-lg hover:shadow-white/[0.1]"
+              >
+                {copy.primaryCta}
+              </Link>
+              <Link
+                href="/signup"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-white/[0.1] bg-white/[0.03] px-6 py-3 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-zinc-100"
+              >
+                {copy.secondaryCta}
+                <span className="transition-transform group-hover:translate-x-0.5">
+                  →
+                </span>
+              </Link>
+            </div>
+            <p className="text-sm text-zinc-500">{copy.trust}</p>
           </div>
         </AnimateOnScroll>
       </div>

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { ArticleCard, type ArticleCardData } from "@/components/blog/article-card";
-import { blogSupabase } from "@/lib/blog/supabase";
+import { ArticleCard } from "@/components/blog/article-card";
+import { fetchArticles } from "@/lib/blog/articles";
 
 export const metadata: Metadata = {
   title: "Blog — Easy Micro SaaS",
@@ -11,40 +11,6 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 60;
-
-async function fetchArticles(): Promise<ArticleCardData[]> {
-  const { data: articles, error } = await blogSupabase
-    .from("blog_articles")
-    .select(
-      "slug, title, excerpt, author, reading_time, featured_image, published_at, category_slug",
-    )
-    .eq("published", true)
-    .order("published_at", { ascending: false });
-
-  if (error || !articles) {
-    console.error("Blog index fetch error:", error);
-    return [];
-  }
-
-  const { data: categories } = await blogSupabase
-    .from("blog_categories")
-    .select("slug, name");
-
-  const catMap = new Map<string, string>();
-  for (const c of categories ?? []) catMap.set(c.slug, c.name);
-
-  return articles.map((a) => ({
-    slug: a.slug,
-    title: a.title,
-    excerpt: a.excerpt,
-    author: a.author,
-    reading_time: a.reading_time,
-    featured_image: a.featured_image,
-    published_at: a.published_at,
-    category_slug: a.category_slug,
-    category_name: a.category_slug ? catMap.get(a.category_slug) ?? null : null,
-  }));
-}
 
 export default async function BlogIndexPage() {
   const articles = await fetchArticles();

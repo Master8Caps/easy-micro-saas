@@ -59,8 +59,14 @@ Both run the same back end (the existing MicroSaaS app) and the same journey —
       menu + solid CTA) **and** added a 3-latest-posts teaser strip on the home page
       (`components/blog-teaser.tsx`, shared fetch in `lib/blog/articles.ts`).
 - [x] Write new copy as **extractable strings/props** (variant-ready `copy` objects).
-- [ ] **Sample visuals** on the home page (Native-style product previews). ← only Stage-1 item left
+- [x] **Sample visuals** on the home page — bento showcase right under the hero with 4 code-built
+      mockups (Tinder swipe card, content queue, ad set, brand DNA + avatars). Each wrapped in a
+      swap-ready `ShowcaseFrame` (`components/showcase/`) — add an `image` to swap in a real
+      screenshot later, no other changes.
 - Also added: `/signup` placeholder page (`app/signup/page.tsx`) so CTAs don't 404.
+- Also done: stopped tracking `*.tsbuildinfo` (gitignore).
+
+**✅ Stage 1 complete.** Next: Stage 2 (the URL-first "magic" pre-purchase flow) — see below.
 
 ### Stage 2 — The "magic" pre-purchase flow (original site)
 - [ ] **URL scrape/analysis** — fetch page, extract copy/meta, feed to Claude. (New. Fiddly:

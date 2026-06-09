@@ -5,6 +5,11 @@ import { generateMagicResult } from "@/lib/magic/generate";
 import { createLead, findRecentResultByUrl } from "@/lib/magic/store";
 import { isRateLimited } from "@/lib/magic/rate-limit";
 
+// node:net (validation) + supabase-js need the Node runtime, and the reader
+// fallback can take a while, so give the function headroom.
+export const runtime = "nodejs";
+export const maxDuration = 30;
+
 export async function POST(request: Request) {
   let body: { url?: string; description?: string };
   try {

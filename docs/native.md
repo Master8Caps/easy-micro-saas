@@ -3,8 +3,9 @@
 Tracking doc for upgrading the Marketing Machine marketing site(s), inspired by
 [native.no](https://native.no/en/). Living document — update as we ship.
 
-**Status:** 🟡 Stage 2 built — pending owner live verification, DB table creation, and env keys.
-**Last updated:** 2026-06-05
+**Status:** 🟢 Stage 2 verified working locally — `magic_leads` table created, marketing
+env keys added. ⚠️ Still pending: same env keys in **Vercel** for the deployed site.
+**Last updated:** 2026-06-08
 
 ---
 
@@ -68,14 +69,24 @@ Both run the same back end (the existing MicroSaaS app) and the same journey —
 
 **✅ Stage 1 complete.**
 
-**✅ Stage 2 built** — pending owner live verification, `magic_leads` DB table creation, and
-env keys (`ANTHROPIC_API_KEY`, Supabase, Resend). SQL for the table is in
-`docs/superpowers/specs/2026-06-05-stage2-magic-flow-design.md`.
+**✅ Stage 2 verified (2026-06-08)** — root-caused two config blockers (not code): the marketing
+app's `.env.local` was missing `ANTHROPIC_API_KEY`/`RESEND_API_KEY`, and the `magic_leads`
+table didn't exist. Both fixed: keys added, table created via migration
+`supabase/migrations/00026_magic_leads.sql` (RLS on — service-role only). End-to-end test
+(`POST /api/magic/analyze` on a live URL) returns a full result + persists the lead row.
+⚠️ The same env keys must still be added in **Vercel** for the deployed marketing site.
 
 ### Stage 2 — The "magic" pre-purchase flow (original site)
 - [x] **URL scrape/analysis** — `lib/magic/scrape.ts` fetches the submitted URL, extracts
-      copy/meta/OG signals, and feeds them to Claude. Handles basic anti-scraping (custom
-      UA, timeout, error fallback). Social posts are not pulled (deferred).
+      copy/meta/OG signals, and feeds them to Claude. Social posts are not pulled (deferred).
+- [x] **Scraper hardened for ALL site types (2026-06-08)** — was sending JS-only & bot-blocked
+      sites straight to "Tell us more". Three fixes: (1) real browser UA/headers + 10s timeout;
+      (2) "thin" now counts title/meta/OG as valid signal, so JS-only sites that render only
+      `<head>` still generate; (3) **reader fallback** (`r.jina.ai`, optional `JINA_API_KEY`)
+      that renders JS + bypasses most bot-walls when the direct fetch is blocked/empty, merged
+      with any directly-scraped metadata. Verified live: Product Hunt & Zillow (both 403 our
+      direct fetch) now return full results. Only extreme WAFs (Tesla-class) still fall through
+      to the description prompt. Covered by `lib/magic/scrape.test.ts`.
 - [x] **Decouple anonymous generation** — implemented as a **new, lighter teaser generator**
       (`lib/magic/generate.ts`) in `apps/marketing`; the existing `apps/app` `generateBrain`
       is untouched. Generates brand DNA + audience avatars for an anonymous visitor and

@@ -1,9 +1,19 @@
 import type { BrandSignals } from "./types";
 
+// A real browser UA + headers gets us past UA-only bot filters. (Deep WAFs that
+// fingerprint TLS still block us — that's what the reader fallback is for.)
 const UA =
-  "Mozilla/5.0 (compatible; EMSBot/1.0; +https://easymicrosaas.com)";
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 const MAX_TEXT = 6000;
-const TIMEOUT_MS = 8000;
+const DIRECT_TIMEOUT_MS = 10000;
+const READER_TIMEOUT_MS = 15000;
+// Jina Reader: renders JS + bypasses most bot-walls server-side. Free, no key
+// required; set JINA_API_KEY for higher limits / better rendering.
+const READER_BASE = "https://r.jina.ai/";
+
+// Titles served by bot-walls, captchas and error pages — never real content.
+const BLOCKED_TITLE =
+  /access denied|just a moment|attention required|forbidden|are you (a )?human|verify you are|error 40|error 50|service unavailable|captcha|cloudflare/i;
 
 function stripTags(s: string): string {
   return s.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -59,6 +69,31 @@ function findFavicon(html: string): string | undefined {
   return undefined;
 }
 
+/** A title is usable signal if it's descriptive and not a bot-wall/error page. */
+function usableTitle(title: string): boolean {
+  const t = title.trim();
+  return t.length >= 5 && !BLOCKED_TITLE.test(t);
+}
+
+/**
+ * "Thin" means we got too little to infer a brand and should ask the owner for
+ * a one-line description. A usable title, a meta description, any headings, or a
+ * real chunk of body text are each enough on their own — so JS-only sites that
+ * only render <head> still generate fine.
+ */
+function isThin(
+  title: string,
+  description: string,
+  headings: string[],
+  text: string,
+): boolean {
+  if (usableTitle(title)) return false;
+  if (description.trim().length > 0) return false;
+  if (headings.length > 0) return false;
+  if (text.length >= 200) return false;
+  return true;
+}
+
 export function extractSignals(html: string, url: string): BrandSignals {
   const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i);
   const title = titleMatch ? titleMatch[1].trim() : "";
@@ -79,7 +114,7 @@ export function extractSignals(html: string, url: string): BrandSignals {
     .replace(/<style[\s\S]*?<\/style>/gi, " ");
   const text = stripTags(body).slice(0, MAX_TEXT);
 
-  const thin = text.length < 200 && headings.length === 0;
+  const thin = isThin(title, description, headings, text);
 
   return {
     url,
@@ -94,6 +129,38 @@ export function extractSignals(html: string, url: string): BrandSignals {
   };
 }
 
+/** Parse Jina Reader's markdown output into signals. */
+export function extractReaderSignals(raw: string, url: string): BrandSignals {
+  const titleMatch = raw.match(/^Title:\s*(.+)$/m);
+  const rawTitle = titleMatch ? titleMatch[1].trim() : "";
+
+  const idx = raw.indexOf("Markdown Content:");
+  const content = idx >= 0 ? raw.slice(idx + "Markdown Content:".length) : raw;
+
+  const headings = [...content.matchAll(/^#{1,6}\s+(.+)$/gm)]
+    .map((m) => m[1].replace(/[#*_`>[\]]/g, "").trim())
+    .filter(Boolean)
+    .slice(0, 12);
+
+  const text = content
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ") // images
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1") // links → label
+    .replace(/[#*_`>|]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, MAX_TEXT);
+
+  // Jina returns 200 even when the upstream blocked it — detect that.
+  const upstreamErrored = /returned error \d|Access Denied|Forbidden/i.test(raw);
+  const title = usableTitle(rawTitle) ? rawTitle : "";
+
+  const thin =
+    (upstreamErrored && text.length < 200) ||
+    isThin(title, "", headings, text);
+
+  return { url, title, description: "", headings, text, thin };
+}
+
 function emptySignals(url: string): BrandSignals {
   return {
     url,
@@ -105,13 +172,19 @@ function emptySignals(url: string): BrandSignals {
   };
 }
 
-export async function fetchBrandSignals(url: string): Promise<BrandSignals> {
+async function fetchDirect(url: string): Promise<BrandSignals> {
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    const timer = setTimeout(() => controller.abort(), DIRECT_TIMEOUT_MS);
     const res = await fetch(url, {
-      headers: { "User-Agent": UA },
+      headers: {
+        "User-Agent": UA,
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+      },
       signal: controller.signal,
+      redirect: "follow",
     });
     clearTimeout(timer);
     if (!res.ok) return emptySignals(url);
@@ -120,4 +193,56 @@ export async function fetchBrandSignals(url: string): Promise<BrandSignals> {
   } catch {
     return emptySignals(url);
   }
+}
+
+async function fetchViaReader(url: string): Promise<BrandSignals | null> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), READER_TIMEOUT_MS);
+    const headers: Record<string, string> = {
+      Accept: "text/plain",
+      "X-Return-Format": "markdown",
+    };
+    if (process.env.JINA_API_KEY) {
+      headers.Authorization = `Bearer ${process.env.JINA_API_KEY}`;
+    }
+    const res = await fetch(READER_BASE + url, {
+      headers,
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const raw = await res.text();
+    return extractReaderSignals(raw, url);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetch brand signals for a URL. Tries a direct fetch first (fast, works for
+ * most server-rendered sites); if that's blocked, empty, or a JS-only shell,
+ * falls back to the reader and merges its content with any metadata (OG image,
+ * theme colour) we did manage to scrape directly.
+ */
+export async function fetchBrandSignals(url: string): Promise<BrandSignals> {
+  const direct = await fetchDirect(url);
+  if (!direct.thin) return direct;
+
+  const reader = await fetchViaReader(url);
+  if (reader && !reader.thin) {
+    return {
+      url,
+      title: usableTitle(direct.title) ? direct.title : reader.title,
+      description: direct.description || reader.description,
+      ogImage: direct.ogImage,
+      themeColor: direct.themeColor,
+      favicon: direct.favicon,
+      headings: reader.headings.length ? reader.headings : direct.headings,
+      text: reader.text || direct.text,
+      thin: false,
+    };
+  }
+
+  return direct; // both failed → thin → route asks for a one-line description
 }

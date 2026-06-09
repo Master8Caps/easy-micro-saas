@@ -36,6 +36,22 @@ describe("extractSignals", () => {
     const s = extractSignals("<html><body></body></html>", "https://x.com");
     expect(s.thin).toBe(true);
   });
+  it("treats a JS shell with a real title + description as usable (not thin)", () => {
+    // Client-rendered SPA: empty body, but head has solid signals.
+    const shell = `<html><head>
+      <title>Acme Plumbing — Emergency plumbers in Leeds</title>
+      <meta name="description" content="24/7 emergency plumbing across Leeds & West Yorkshire.">
+    </head><body><div id="root"></div></body></html>`;
+    const s = extractSignals(shell, "https://acme.example");
+    expect(s.thin).toBe(false);
+    expect(s.title).toContain("Acme Plumbing");
+    expect(s.description).toContain("emergency plumbing");
+  });
+  it("treats a bot-wall / challenge title as thin", () => {
+    const wall = `<html><head><title>Just a moment...</title></head><body></body></html>`;
+    const s = extractSignals(wall, "https://x.com");
+    expect(s.thin).toBe(true);
+  });
   it("extracts meta/og/link regardless of attribute order", () => {
     const html = `<html><head>
       <meta content="Swapped desc" name="description">
@@ -66,5 +82,29 @@ describe("fetchBrandSignals", () => {
     const s = await fetchBrandSignals("https://x.com");
     expect(s.title).toBe("Hi");
     expect(s.thin).toBe(false);
+  });
+  it("falls back to the reader when the direct fetch is blocked", async () => {
+    const reader = `Title: Tesla Cars
+URL Source: https://x.com
+Markdown Content:
+# Electric cars for everyone
+Lots of descriptive reader content here, easily long enough to clear the threshold and prove the fallback path works end to end.`;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((u: string) =>
+        String(u).includes("r.jina.ai")
+          ? Promise.resolve({ ok: true, text: () => Promise.resolve(reader) })
+          : Promise.resolve({ ok: false, status: 403 }),
+      ),
+    );
+    const s = await fetchBrandSignals("https://x.com");
+    expect(s.thin).toBe(false);
+    expect(s.title).toBe("Tesla Cars");
+    expect(s.headings).toContain("Electric cars for everyone");
+  });
+  it("stays thin when both the direct fetch and the reader fail", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 403 }));
+    const s = await fetchBrandSignals("https://x.com");
+    expect(s.thin).toBe(true);
   });
 });

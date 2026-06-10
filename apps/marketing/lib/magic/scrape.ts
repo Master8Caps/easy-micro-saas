@@ -69,6 +69,20 @@ function findFavicon(html: string): string | undefined {
   return undefined;
 }
 
+function findLogo(html: string): string | undefined {
+  const links = html.match(/<link\b[^>]*>/gi) ?? [];
+  for (const wanted of ["apple-touch-icon", "apple-touch-icon-precomposed"]) {
+    for (const tag of links) {
+      if (attr(tag, "rel")?.toLowerCase() === wanted) {
+        const href = attr(tag, "href");
+        if (href) return href;
+      }
+    }
+  }
+  // og:logo as a fallback (never og:image).
+  return ogContent(html, "og:logo");
+}
+
 /** A title is usable signal if it's descriptive and not a bot-wall/error page. */
 function usableTitle(title: string): boolean {
   const t = title.trim();
@@ -103,6 +117,7 @@ export function extractSignals(html: string, url: string): BrandSignals {
   const ogImage = abs(ogContent(html, "og:image"), url);
   const themeColor = metaContent(html, "theme-color");
   const favicon = abs(findFavicon(html), url);
+  const logoUrl = abs(findLogo(html), url) ?? favicon;
 
   const headings = [...html.matchAll(/<h[12][^>]*>([\s\S]*?)<\/h[12]>/gi)]
     .map((m) => stripTags(m[1]))
@@ -121,6 +136,7 @@ export function extractSignals(html: string, url: string): BrandSignals {
     title,
     description,
     ogImage,
+    logoUrl,
     themeColor,
     favicon,
     headings,

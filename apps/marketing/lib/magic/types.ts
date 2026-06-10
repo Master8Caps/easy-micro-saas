@@ -5,10 +5,14 @@ export interface BrandSignals {
   title: string;
   description: string;
   ogImage?: string;
+  /** The brand's real logo (apple-touch-icon → icon → og:logo). Never the OG image. */
+  logoUrl?: string;
   themeColor?: string;
   favicon?: string;
   headings: string[];
   text: string;
+  /** Declared/extracted brand colours, most brand-defining first. */
+  palette?: string[];
   /** True when the page yielded too little to generate well. */
   thin: boolean;
 }

@@ -63,6 +63,36 @@ describe("extractSignals", () => {
     expect(s.ogImage).toBe("https://x.com/img.png");
     expect(s.favicon).toBe("https://x.com/fav.ico");
   });
+
+  it("prefers apple-touch-icon as the logo over og:image", () => {
+    const html = `<html><head>
+      <title>Acme Ltd — tools for makers</title>
+      <meta property="og:image" content="/og-banner.png">
+      <link rel="apple-touch-icon" href="/touch-icon.png">
+      <link rel="icon" href="/favicon.ico">
+    </head><body><h1>Hello makers everywhere</h1></body></html>`;
+    const s = extractSignals(html, "https://acme.example");
+    expect(s.logoUrl).toBe("https://acme.example/touch-icon.png");
+    expect(s.ogImage).toBe("https://acme.example/og-banner.png");
+  });
+
+  it("falls back to icon then og:logo for the logo, never og:image", () => {
+    const onlyOg = `<html><head>
+      <title>Beta Co — widgets</title>
+      <meta property="og:image" content="/og.png">
+    </head><body><h1>Widgets for everyone here</h1></body></html>`;
+    const s = extractSignals(onlyOg, "https://beta.example");
+    expect(s.logoUrl).toBeUndefined();
+    expect(s.ogImage).toBe("https://beta.example/og.png");
+
+    const withOgLogo = `<html><head>
+      <title>Beta Co — widgets</title>
+      <meta property="og:logo" content="/brand.svg">
+      <meta property="og:image" content="/og.png">
+    </head><body><h1>Widgets for everyone here</h1></body></html>`;
+    const s2 = extractSignals(withOgLogo, "https://beta.example");
+    expect(s2.logoUrl).toBe("https://beta.example/brand.svg");
+  });
 });
 
 describe("fetchBrandSignals", () => {

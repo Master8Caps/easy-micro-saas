@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { generateMagicResult } from "./generate";
 import type { BrandSignals } from "./types";
+import { VISUAL_STYLE_KEYS } from "./image-style";
 
 const SIGNALS: BrandSignals = {
   url: "https://northwind.com",
@@ -23,12 +24,13 @@ const VALID_JSON = JSON.stringify({
     tone: ["calm", "friendly"],
     palette: ["#10b981", "#34d399"],
     positioning: "Automation for busy founders.",
+    visualStyle: "minimal_render",
   },
   avatars: [
     { name: "Maya", role: "Solo founder", painPoints: ["No time"], channels: ["Instagram"] },
   ],
   samplePosts: [
-    { platform: "Instagram", caption: "Reclaim your weekends.", hashtags: ["#worklife"], engagement: { likes: 200, comments: 12, shares: 5 } },
+    { platform: "Instagram", caption: "Reclaim your weekends.", hashtags: ["#worklife"], engagement: { likes: 200, comments: 12, shares: 5 }, imagePrompt: "a calm tidy desk at golden hour" },
   ],
 });
 
@@ -70,5 +72,18 @@ describe("generateMagicResult", () => {
     } as unknown as Anthropic;
     await expect(generateMagicResult(SIGNALS, undefined, client)).rejects.toThrow();
     expect((client.messages.create as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(2);
+  });
+
+  it("carries visualStyle and per-post imagePrompt through", async () => {
+    const result = await generateMagicResult(SIGNALS, undefined, mockClient(VALID_JSON));
+    expect(result.brand.visualStyle).toBe("minimal_render");
+    expect(result.samplePosts[0].imagePrompt).toBe("a calm tidy desk at golden hour");
+  });
+
+  it("falls back to a valid default style when the model omits/invents one", async () => {
+    const bad = JSON.parse(VALID_JSON);
+    bad.brand.visualStyle = "not_a_real_style";
+    const result = await generateMagicResult(SIGNALS, undefined, mockClient(JSON.stringify(bad)));
+    expect(VISUAL_STYLE_KEYS).toContain(result.brand.visualStyle);
   });
 });

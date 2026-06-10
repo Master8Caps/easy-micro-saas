@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { BrandSignals, MagicResult } from "./types";
+import type { BrandSignals, MagicResult, MagicSamplePost } from "./types";
+import { VISUAL_STYLE_KEYS, DEFAULT_STYLE_KEY, VISUAL_STYLES } from "./image-style";
 
 const MODEL = process.env.MAGIC_MODEL ?? "claude-sonnet-4-6";
 
@@ -23,12 +24,14 @@ INSTRUCTIONS
 2. Write a one-sentence positioning summary.
 3. Create 2-3 specific customer avatars: name, role, 2-3 pain points, 2 channels each.
 4. Write 3 sample social posts in the brand's tone: platform, caption, 2-3 hashtags, and realistic engagement numbers (likes/comments/shares).
+5. Choose ONE "visualStyle" for the brand from this exact list (pick the best fit): ${VISUAL_STYLE_KEYS.map((k) => `"${k}" (${VISUAL_STYLES[k].bestFor})`).join("; ")}.
+6. For EACH sample post, also write an "imagePrompt": a short, concrete description of a single photographable/renderable SUBJECT or scene that suits the post and brand. Describe only the subject and setting — NO text, NO logos, NO people's faces, NO app screenshots.
 
 Respond with ONLY valid JSON in exactly this shape:
 {
-  "brand": { "name": "", "tagline": "", "tone": ["",""], "palette": ["#hex"], "positioning": "" },
+  "brand": { "name": "", "tagline": "", "tone": ["",""], "palette": ["#hex"], "positioning": "", "visualStyle": "minimal_render" },
   "avatars": [ { "name": "", "role": "", "painPoints": ["",""], "channels": ["",""] } ],
-  "samplePosts": [ { "platform": "", "caption": "", "hashtags": ["#tag"], "engagement": { "likes": 0, "comments": 0, "shares": 0 } } ]
+  "samplePosts": [ { "platform": "", "caption": "", "hashtags": ["#tag"], "engagement": { "likes": 0, "comments": 0, "shares": 0 }, "imagePrompt": "" } ]
 }`;
 }
 
@@ -45,9 +48,20 @@ function normaliseResult(raw: MagicResult, signals: BrandSignals): MagicResult {
           : [signals.themeColor || "#6366f1", "#a78bfa"],
       logoUrl: raw.brand?.logoUrl || signals.logoUrl,
       positioning: raw.brand?.positioning || "",
+      visualStyle: VISUAL_STYLE_KEYS.includes(raw.brand?.visualStyle ?? "")
+        ? (raw.brand!.visualStyle as string)
+        : DEFAULT_STYLE_KEY,
     },
     avatars: Array.isArray(raw.avatars) ? raw.avatars : [],
-    samplePosts: Array.isArray(raw.samplePosts) ? raw.samplePosts : [],
+    samplePosts: Array.isArray(raw.samplePosts)
+      ? raw.samplePosts.map((p: MagicSamplePost) => ({
+          platform: p.platform,
+          caption: p.caption,
+          hashtags: Array.isArray(p.hashtags) ? p.hashtags : [],
+          engagement: p.engagement ?? { likes: 0, comments: 0, shares: 0 },
+          imagePrompt: typeof p.imagePrompt === "string" ? p.imagePrompt : undefined,
+        }))
+      : [],
   };
 }
 

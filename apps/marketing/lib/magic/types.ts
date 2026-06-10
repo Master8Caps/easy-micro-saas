@@ -45,4 +45,6 @@ export interface MagicResult {
   brand: MagicBrand;
   avatars: MagicAvatar[];
   samplePosts: MagicSamplePost[];
+  /** Schema version of the stored result; used to invalidate pre-redesign cache rows. */
+  version?: number;
 }

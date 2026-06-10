@@ -13,7 +13,7 @@ export function Reveal({ result }: { result: MagicResult }) {
       </section>
 
       {/* Supporting cards beneath. */}
-      <section className="grid gap-5 md:grid-cols-2">
+      <section className="flex flex-col gap-10">
         <div>
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">Your Brand DNA</h3>
           <BrandDna brand={result.brand} />

@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { MagicResult } from "./types";
+import { RESULT_VERSION, isCurrentResultVersion } from "./result-version";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -12,9 +13,10 @@ export async function createLead(
   sourceUrl: string,
   result: MagicResult,
 ): Promise<string | null> {
+  const versioned: MagicResult = { ...result, version: RESULT_VERSION };
   const { data, error } = await supabase
     .from("magic_leads")
-    .insert({ source_url: sourceUrl, result })
+    .insert({ source_url: sourceUrl, result: versioned })
     .select("id")
     .single();
   if (error || !data) {
@@ -59,5 +61,7 @@ export async function findRecentResultByUrl(
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  return data ? (data.result as MagicResult) : null;
+  if (!data) return null;
+  const result = data.result as MagicResult;
+  return isCurrentResultVersion(result) ? result : null;
 }

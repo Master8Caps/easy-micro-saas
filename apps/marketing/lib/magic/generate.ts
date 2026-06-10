@@ -15,11 +15,11 @@ WEBSITE SIGNALS
 - Description: ${signals.description}
 - Headings: ${signals.headings.join(" | ")}
 - Body excerpt: ${signals.text}
-${signals.themeColor ? `- Theme colour: ${signals.themeColor}` : ""}
+${signals.palette?.length ? `- Brand colours (EXTRACTED FROM THEIR SITE — authoritative): ${signals.palette.join(", ")}` : signals.themeColor ? `- Theme colour: ${signals.themeColor}` : ""}
 ${description ? `- Owner's one-line description: ${description}` : ""}
 
 INSTRUCTIONS
-1. Infer the brand: name, a short tagline, 2-3 tone-of-voice adjectives, and a palette of 2-4 hex colours that fit the brand (use the theme colour if given, otherwise infer tasteful colours).
+1. Infer the brand: name, a short tagline, 2-3 tone-of-voice adjectives. For the palette, USE the extracted brand colours above verbatim if present (you may reorder them); only invent a tasteful palette if none were provided.
 2. Write a one-sentence positioning summary.
 3. Create 2-3 specific customer avatars: name, role, 2-3 pain points, 2 channels each.
 4. Write 3 sample social posts in the brand's tone: platform, caption, 2-3 hashtags, and realistic engagement numbers (likes/comments/shares).
@@ -38,10 +38,12 @@ function normaliseResult(raw: MagicResult, signals: BrandSignals): MagicResult {
       name: raw.brand?.name || signals.title || "Your brand",
       tagline: raw.brand?.tagline || "",
       tone: raw.brand?.tone?.length ? raw.brand.tone : ["confident"],
-      palette: raw.brand?.palette?.length
-        ? raw.brand.palette
-        : [signals.themeColor || "#6366f1", "#a78bfa"],
-      logoUrl: raw.brand?.logoUrl || signals.ogImage || signals.favicon,
+      palette: signals.palette?.length
+        ? signals.palette
+        : raw.brand?.palette?.length
+          ? raw.brand.palette
+          : [signals.themeColor || "#6366f1", "#a78bfa"],
+      logoUrl: raw.brand?.logoUrl || signals.logoUrl,
       positioning: raw.brand?.positioning || "",
     },
     avatars: Array.isArray(raw.avatars) ? raw.avatars : [],

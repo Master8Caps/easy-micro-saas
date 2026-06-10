@@ -7,8 +7,10 @@ const SIGNALS: BrandSignals = {
   url: "https://northwind.com",
   title: "Northwind",
   description: "Reclaim your weekends.",
-  ogImage: "https://northwind.com/logo.png",
+  ogImage: "https://northwind.com/og-banner.png",
+  logoUrl: "https://northwind.com/logo.png",
   themeColor: "#10b981",
+  palette: ["#10b981", "#0f766e"],
   headings: ["Work less, live more"],
   text: "Northwind automates the boring parts.",
   thin: false,
@@ -39,12 +41,18 @@ function mockClient(text: string) {
 }
 
 describe("generateMagicResult", () => {
-  it("parses valid JSON and fills logoUrl from signals", async () => {
+  it("parses valid JSON and fills logoUrl from the real logo (not og:image)", async () => {
     const result = await generateMagicResult(SIGNALS, undefined, mockClient(VALID_JSON));
     expect(result.brand.name).toBe("Northwind");
     expect(result.brand.logoUrl).toBe("https://northwind.com/logo.png");
+    expect(result.brand.logoUrl).not.toBe(SIGNALS.ogImage);
     expect(result.avatars).toHaveLength(1);
     expect(result.samplePosts[0].platform).toBe("Instagram");
+  });
+
+  it("prefers the extracted palette over the model's invented colours", async () => {
+    const result = await generateMagicResult(SIGNALS, undefined, mockClient(VALID_JSON));
+    expect(result.brand.palette).toEqual(["#10b981", "#0f766e"]);
   });
 
   it("extracts JSON even with surrounding prose", async () => {

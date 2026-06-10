@@ -1,4 +1,5 @@
 import type { BrandSignals } from "./types";
+import { extractColors } from "./colors";
 
 // A real browser UA + headers gets us past UA-only bot filters. (Deep WAFs that
 // fingerprint TLS still block us — that's what the reader fallback is for.)
@@ -10,6 +11,9 @@ const READER_TIMEOUT_MS = 15000;
 // Jina Reader: renders JS + bypasses most bot-walls server-side. Free, no key
 // required; set JINA_API_KEY for higher limits / better rendering.
 const READER_BASE = "https://r.jina.ai/";
+
+const MAX_STYLESHEETS = 3;
+const CSS_TIMEOUT_MS = 6000;
 
 // Titles served by bot-walls, captchas and error pages — never real content.
 const BLOCKED_TITLE =
@@ -83,6 +87,39 @@ function findLogo(html: string): string | undefined {
   return ogContent(html, "og:logo");
 }
 
+function findStylesheetHrefs(html: string, base: string): string[] {
+  const links = html.match(/<link\b[^>]*>/gi) ?? [];
+  const hrefs: string[] = [];
+  for (const tag of links) {
+    if (attr(tag, "rel")?.toLowerCase() !== "stylesheet") continue;
+    const href = abs(attr(tag, "href"), base);
+    // Same-origin only — no off-site/internal fetches.
+    if (href && new URL(href).origin === new URL(base).origin) hrefs.push(href);
+  }
+  return hrefs.slice(0, MAX_STYLESHEETS);
+}
+
+async function fetchCssColors(html: string, base: string): Promise<string[]> {
+  const hrefs = findStylesheetHrefs(html, base);
+  const sheets = await Promise.all(
+    hrefs.map(async (href) => {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), CSS_TIMEOUT_MS);
+        const res = await fetch(href, {
+          headers: { "User-Agent": UA },
+          signal: controller.signal,
+        });
+        clearTimeout(timer);
+        return res.ok ? await res.text() : "";
+      } catch {
+        return "";
+      }
+    }),
+  );
+  return extractColors(sheets.join("\n"));
+}
+
 /** A title is usable signal if it's descriptive and not a bot-wall/error page. */
 function usableTitle(title: string): boolean {
   const t = title.trim();
@@ -131,6 +168,12 @@ export function extractSignals(html: string, url: string): BrandSignals {
 
   const thin = isThin(title, description, headings, text);
 
+  const inlineColors = extractColors(html);
+  const themeColorLower = themeColor?.toLowerCase();
+  const palette = themeColorLower
+    ? [themeColorLower, ...inlineColors.filter((c) => c !== themeColorLower)]
+    : inlineColors;
+
   return {
     url,
     title,
@@ -141,6 +184,7 @@ export function extractSignals(html: string, url: string): BrandSignals {
     favicon,
     headings,
     text,
+    palette: palette.length ? palette.slice(0, 5) : undefined,
     thin,
   };
 }
@@ -205,7 +249,14 @@ async function fetchDirect(url: string): Promise<BrandSignals> {
     clearTimeout(timer);
     if (!res.ok) return emptySignals(url);
     const html = await res.text();
-    return extractSignals(html, url);
+    const signals = extractSignals(html, url);
+    if (!signals.thin) {
+      const cssColors = await fetchCssColors(html, url);
+      const merged = [...(signals.palette ?? [])];
+      for (const c of cssColors) if (!merged.includes(c)) merged.push(c);
+      signals.palette = merged.slice(0, 5);
+    }
+    return signals;
   } catch {
     return emptySignals(url);
   }

@@ -93,6 +93,17 @@ describe("extractSignals", () => {
     const s2 = extractSignals(withOgLogo, "https://beta.example");
     expect(s2.logoUrl).toBe("https://beta.example/brand.svg");
   });
+
+  it("populates palette from inline <style> and theme-color", () => {
+    const html = `<html><head>
+      <title>Teal Co — calm tools for teams</title>
+      <meta name="theme-color" content="#0d9488">
+      <style>:root{--brand:#155e75}.btn{background:#0d9488}</style>
+    </head><body><h1>Calm tools for busy teams</h1></body></html>`;
+    const s = extractSignals(html, "https://teal.example");
+    expect(s.palette).toContain("#0d9488");
+    expect(s.palette).toContain("#155e75");
+  });
 });
 
 describe("fetchBrandSignals", () => {
@@ -137,6 +148,27 @@ Lots of descriptive reader content here, easily long enough to clear the thresho
     const s = await fetchBrandSignals("https://x.com");
     expect(s.thin).toBe(true);
   });
+  it("enriches palette by fetching a linked stylesheet", async () => {
+    const html = `<html><head>
+      <title>Teal Co — calm tools for teams</title>
+      <link rel="stylesheet" href="/styles.css">
+    </head><body><h1>Calm tools for busy teams</h1>
+      <p>Plenty of body copy here, long enough to clear the thin threshold easily.</p>
+    </body></html>`;
+    const cssText = `:root{--primary:#0d9488;--accent:#f97316}`;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((u: string) =>
+        String(u).endsWith("/styles.css")
+          ? Promise.resolve({ ok: true, text: () => Promise.resolve(cssText) })
+          : Promise.resolve({ ok: true, text: () => Promise.resolve(html) }),
+      ),
+    );
+    const s = await fetchBrandSignals("https://teal.example");
+    expect(s.palette).toContain("#0d9488");
+    expect(s.palette).toContain("#f97316");
+  });
+
   it("keeps the directly-scraped logo when falling back to the reader", async () => {
     const html = `<html><head><title>x</title><link rel="apple-touch-icon" href="/logo.png"></head><body></body></html>`;
     const reader = `Title: Real Brand Title\nMarkdown Content:\n# Big heading here\nLots of descriptive reader content here, easily long enough to clear the thin threshold and prove the merge path keeps the logo.`;

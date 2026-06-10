@@ -42,7 +42,8 @@ describe("extractColors", () => {
   });
 
   it("does not promote semantic colour tokens ahead of the real brand colour", () => {
-    const css = `:root{--primary:#3b82f6;--success-color:#22c55e;--error-color:#ef4444;--text-color:#111827}`;
+    // Semantic token appears FIRST — without the exclusion it would lead.
+    const css = `:root{--error-color:#ef4444;--text-color:#111827;--primary:#3b82f6}`;
     const out = extractColors(css);
     expect(out[0]).toBe("#3b82f6");
   });

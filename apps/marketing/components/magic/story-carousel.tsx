@@ -38,6 +38,8 @@ export function StoryCarousel({ ready, onDone }: Props) {
       <div className="mb-4 flex h-8 items-center justify-end">
         {ready && (
           <button
+            type="button"
+            aria-label="Skip to results"
             onClick={onDone}
             className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20"
           >
@@ -63,10 +65,11 @@ export function StoryCarousel({ ready, onDone }: Props) {
             <p className="mt-3 text-sm text-zinc-200">{post.caption}</p>
             <p className="mt-1 text-xs text-indigo-300/80">{post.tag}</p>
             <div className="mt-4 flex items-center justify-center gap-6">
-              <button onClick={swipe} aria-label="Skip" className="flex h-11 w-11 items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 text-red-400">✗</button>
-              <button onClick={swipe} aria-label="Approve" className="flex h-12 w-12 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/15 text-emerald-400">♥</button>
+              <button type="button" onClick={swipe} aria-label="Skip" className="flex h-11 w-11 items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 text-red-400">✗</button>
+              <button type="button" onClick={swipe} aria-label="Approve" className="flex h-12 w-12 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/15 text-emerald-400">♥</button>
             </div>
           </div>
+          <p className="mt-3 text-center text-xs text-zinc-600">{swipeIdx + 1} / {posts.length}</p>
           <NextButton onClick={advance} label="Next →" />
         </Card>
       )}
@@ -77,7 +80,7 @@ export function StoryCarousel({ ready, onDone }: Props) {
           <p className="mt-3 text-zinc-400">Ads, email, blog posts and tracked links — auto-created in your brand. Social is just the front door.</p>
           <div className="mt-5 grid grid-cols-2 gap-2">
             {["Ads", "Email", "Blog", "Socials"].map((label, i) => (
-              <div key={label} className="rounded-xl border border-white/[0.08] p-4 text-sm text-zinc-300" style={{ background: JOURNEY_SAMPLE_POSTS[i].gradient, opacity: 0.9 }}>{label}</div>
+              <div key={label} className="rounded-xl border border-white/[0.08] p-4 text-sm text-zinc-300" style={{ background: JOURNEY_SAMPLE_POSTS[i % JOURNEY_SAMPLE_POSTS.length].gradient, opacity: 0.9 }}>{label}</div>
             ))}
           </div>
           <NextButton onClick={advance} label="Almost there →" />
@@ -113,7 +116,7 @@ function Card({ children }: { children: React.ReactNode }) {
 
 function NextButton({ onClick, label }: { onClick: () => void; label: string }) {
   return (
-    <button onClick={onClick} className="mt-8 rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-200">
+    <button type="button" onClick={onClick} className="mt-8 rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-200">
       {label}
     </button>
   );

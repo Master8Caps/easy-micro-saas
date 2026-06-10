@@ -4,7 +4,7 @@ const MAX_COLORS = 5;
 
 // CSS custom properties whose name looks brand-defining.
 const BRAND_VAR =
-  /--[\w-]*(primary|brand|accent|secondary|theme|colou?r|main)[\w-]*\s*:\s*(#[0-9a-fA-F]{3,8}|rgba?\([^)]*\))/gi;
+  /--(?![\w-]*(?:text|background|bg|border|shadow|placeholder|disabled|error|success|warning|info|hover|focus|active|visited|link|muted|ring|outline)[\w-]*\s*:)[\w-]*(primary|brand|accent|secondary|theme|colou?r|main)[\w-]*\s*:\s*(#[0-9a-fA-F]{3,8}|rgba?\([^)]*\))/gi;
 const HEX = /#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b/g;
 const RGB = /rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/gi;
 
@@ -21,12 +21,14 @@ export function normaliseColor(raw: string): string | null {
   const v = raw.trim().toLowerCase();
   const rgb = v.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/);
   if (rgb) return `#${toHex(+rgb[1])}${toHex(+rgb[2])}${toHex(+rgb[3])}`;
-  const hex = v.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+  const hex = v.match(/^#([0-9a-f]{3,8})$/);
   if (!hex) return null;
-  const h = hex[1];
-  return h.length === 3
-    ? `#${h[0]}${h[0]}${h[1]}${h[1]}${h[2]}${h[2]}`
-    : `#${h}`;
+  let h = hex[1];
+  if (h.length === 4) h = h.slice(0, 3); // #rgba → #rgb
+  if (h.length === 8) h = h.slice(0, 6); // #rrggbbaa → #rrggbb
+  if (h.length === 3) return `#${h[0]}${h[0]}${h[1]}${h[1]}${h[2]}${h[2]}`;
+  if (h.length === 6) return `#${h}`;
+  return null; // 5 or 7 digits are invalid
 }
 
 /** True for near-white, near-black, or low-saturation greys — brand noise. */

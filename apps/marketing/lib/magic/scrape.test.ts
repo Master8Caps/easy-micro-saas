@@ -76,7 +76,7 @@ describe("extractSignals", () => {
     expect(s.ogImage).toBe("https://acme.example/og-banner.png");
   });
 
-  it("falls back to icon then og:logo for the logo, never og:image", () => {
+  it("falls back to og:logo for the logo, never og:image", () => {
     const onlyOg = `<html><head>
       <title>Beta Co — widgets</title>
       <meta property="og:image" content="/og.png">
@@ -136,5 +136,20 @@ Lots of descriptive reader content here, easily long enough to clear the thresho
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 403 }));
     const s = await fetchBrandSignals("https://x.com");
     expect(s.thin).toBe(true);
+  });
+  it("keeps the directly-scraped logo when falling back to the reader", async () => {
+    const html = `<html><head><title>x</title><link rel="apple-touch-icon" href="/logo.png"></head><body></body></html>`;
+    const reader = `Title: Real Brand Title\nMarkdown Content:\n# Big heading here\nLots of descriptive reader content here, easily long enough to clear the thin threshold and prove the merge path keeps the logo.`;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((u: string) =>
+        String(u).includes("r.jina.ai")
+          ? Promise.resolve({ ok: true, text: () => Promise.resolve(reader) })
+          : Promise.resolve({ ok: true, text: () => Promise.resolve(html) }),
+      ),
+    );
+    const s = await fetchBrandSignals("https://x.com");
+    expect(s.thin).toBe(false);
+    expect(s.logoUrl).toBe("https://x.com/logo.png");
   });
 });

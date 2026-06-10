@@ -40,4 +40,17 @@ describe("extractColors", () => {
     const css = `.a{color:#111abc}.b{color:#22abcd}.c{color:#3abcde}.d{color:#4bcdef}.e{color:#5cdef0}.f{color:#6def01}`;
     expect(extractColors(css).length).toBeLessThanOrEqual(5);
   });
+
+  it("does not promote semantic colour tokens ahead of the real brand colour", () => {
+    const css = `:root{--primary:#3b82f6;--success-color:#22c55e;--error-color:#ef4444;--text-color:#111827}`;
+    const out = extractColors(css);
+    expect(out[0]).toBe("#3b82f6");
+  });
+
+  it("handles 8-digit hex with alpha by keeping the rgb channels", () => {
+    expect(extractColors(":root{--brand:#0d948880}")).toContain("#0d9488");
+  });
+  it("handles 4-digit hex with alpha (#rgba)", () => {
+    expect(extractColors(":root{--brand:#0ab8}")).toContain("#00aabb");
+  });
 });

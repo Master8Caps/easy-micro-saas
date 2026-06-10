@@ -5,7 +5,7 @@ export interface BrandSignals {
   title: string;
   description: string;
   ogImage?: string;
-  /** The brand's real logo (apple-touch-icon → icon → og:logo). Never the OG image. */
+  /** The brand's real logo: apple-touch-icon → apple-touch-icon-precomposed → og:logo, else the favicon. Never the OG image. */
   logoUrl?: string;
   themeColor?: string;
   favicon?: string;

@@ -252,6 +252,7 @@ export async function fetchBrandSignals(url: string): Promise<BrandSignals> {
       title: usableTitle(direct.title) ? direct.title : reader.title,
       description: direct.description || reader.description,
       ogImage: direct.ogImage,
+      logoUrl: direct.logoUrl,
       themeColor: direct.themeColor,
       favicon: direct.favicon,
       headings: reader.headings.length ? reader.headings : direct.headings,

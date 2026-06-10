@@ -60,6 +60,7 @@ function normaliseResult(raw: MagicResult, signals: BrandSignals): MagicResult {
           hashtags: Array.isArray(p.hashtags) ? p.hashtags : [],
           engagement: p.engagement ?? { likes: 0, comments: 0, shares: 0 },
           imagePrompt: typeof p.imagePrompt === "string" ? p.imagePrompt : undefined,
+          imageUrl: typeof p.imageUrl === "string" ? p.imageUrl : undefined,
         }))
       : [],
   };

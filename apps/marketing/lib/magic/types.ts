@@ -25,6 +25,8 @@ export interface MagicBrand {
   palette: string[];
   logoUrl?: string;
   positioning: string;
+  /** Curated art-direction style key (see lib/magic/image-style.ts). */
+  visualStyle?: string;
 }
 
 export interface MagicAvatar {
@@ -39,6 +41,10 @@ export interface MagicSamplePost {
   caption: string;
   hashtags: string[];
   engagement: { likes: number; comments: number; shares: number };
+  /** Concrete, art-directable image subject for this post (no text/logos). */
+  imagePrompt?: string;
+  /** Populated after AI generation (post-email). Absent → render gradient fallback. */
+  imageUrl?: string;
 }
 
 export interface MagicResult {

@@ -106,6 +106,14 @@ table didn't exist. Both fixed: keys added, table created via migration
 - `components/magic/` — SwipeDeck, Reveal, and supporting components
 - Hero home-page URL entry updated to drive the `/start` flow
 
+- [x] **Magic flow redesign (2026-06-10)** — from the first real test (automatedpanda.com):
+      one-click analyse from the hero (#1); real declared-hex brand colours via
+      `lib/magic/colors.ts` (#2); self-paced `StoryCarousel` wait journey replacing the
+      broken swipe deck, skippable when ready (#3); code-built branded visuals, no AI
+      image calls pre-paywall (#4); "centre stage" Brand DNA layout with the real logo and
+      a one-post-at-a-time carousel (#5). See
+      `docs/superpowers/plans/2026-06-10-magic-flow-redesign.md`.
+
 ### Stage 3 — Conversion + access
 - [ ] **Swipe-to-approve queue** ("Tinder for social") — new UI over existing content
       approve/reject states.

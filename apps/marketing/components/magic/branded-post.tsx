@@ -27,7 +27,9 @@ export function BrandedPost({
         </div>
       </div>
 
-      <div className="h-44 w-full" style={{ background: `linear-gradient(135deg, ${accent}, ${accent2})` }} />
+      <div className="relative h-44 w-full" style={{ background: `linear-gradient(135deg, ${accent}, ${accent2})` }}>
+        <span className="absolute bottom-2 right-3 text-xs font-semibold text-white/70">{brand.name}</span>
+      </div>
 
       <div className="p-3">
         <div className="flex items-center gap-4 py-1 text-zinc-700">

@@ -168,6 +168,8 @@ export function extractSignals(html: string, url: string): BrandSignals {
 
   const thin = isThin(title, description, headings, text);
 
+  // Scan the whole HTML (not just <style>) so inline style attributes and
+  // <style> blocks are covered; declared brand vars still rank first.
   const inlineColors = extractColors(html);
   const themeColorLower = themeColor?.toLowerCase();
   const palette = themeColorLower
@@ -305,6 +307,7 @@ export async function fetchBrandSignals(url: string): Promise<BrandSignals> {
       ogImage: direct.ogImage,
       logoUrl: direct.logoUrl,
       themeColor: direct.themeColor,
+      palette: direct.palette,
       favicon: direct.favicon,
       headings: reader.headings.length ? reader.headings : direct.headings,
       text: reader.text || direct.text,

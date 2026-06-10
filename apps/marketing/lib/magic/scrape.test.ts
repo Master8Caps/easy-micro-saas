@@ -169,6 +169,36 @@ Lots of descriptive reader content here, easily long enough to clear the thresho
     expect(s.palette).toContain("#f97316");
   });
 
+  it("keeps the directly-scraped palette when falling back to the reader", async () => {
+    const html = `<html><head><title>x</title><meta name="theme-color" content="#0d9488"></head><body></body></html>`;
+    const reader = `Title: Real Brand Title\nMarkdown Content:\n# Big heading here\nLots of descriptive reader content here, easily long enough to clear the thin threshold and prove the merge keeps the palette.`;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((u: string) =>
+        String(u).includes("r.jina.ai")
+          ? Promise.resolve({ ok: true, text: () => Promise.resolve(reader) })
+          : Promise.resolve({ ok: true, text: () => Promise.resolve(html) }),
+      ),
+    );
+    const s = await fetchBrandSignals("https://x.com");
+    expect(s.thin).toBe(false);
+    expect(s.palette).toContain("#0d9488");
+  });
+
+  it("does not fetch stylesheets for a thin page (only the page itself, then the reader)", async () => {
+    // Thin page (empty body, no usable title) that nonetheless links a stylesheet.
+    const html = `<html><head><title>x</title><link rel="stylesheet" href="/styles.css"></head><body></body></html>`;
+    const fetchMock = vi.fn((u: string) =>
+      String(u).includes("r.jina.ai")
+        ? Promise.resolve({ ok: false, status: 404 })
+        : Promise.resolve({ ok: true, text: () => Promise.resolve(html) }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    await fetchBrandSignals("https://x.com");
+    // styles.css must never be requested (page is thin → fetchCssColors is skipped).
+    expect(fetchMock.mock.calls.some(([u]) => String(u).endsWith("/styles.css"))).toBe(false);
+  });
+
   it("keeps the directly-scraped logo when falling back to the reader", async () => {
     const html = `<html><head><title>x</title><link rel="apple-touch-icon" href="/logo.png"></head><body></body></html>`;
     const reader = `Title: Real Brand Title\nMarkdown Content:\n# Big heading here\nLots of descriptive reader content here, easily long enough to clear the thin threshold and prove the merge path keeps the logo.`;

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { MagicResult } from "@/lib/magic/types";
-import { SwipeDeck } from "./swipe-deck";
+import { StoryCarousel } from "./story-carousel";
 import { Reveal } from "./reveal";
 
 type Phase = "input" | "analysing" | "needsDescription" | "emailGate" | "reveal";
@@ -51,6 +51,14 @@ export function StartFlow({ initialUrl = "" }: { initialUrl?: string }) {
     },
     [],
   );
+
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!autoStarted.current && initialUrl.trim()) {
+      autoStarted.current = true;
+      analyse(initialUrl.trim());
+    }
+  }, [initialUrl, analyse]);
 
   async function handleUnlock() {
     if (unlocking) return;
@@ -113,14 +121,7 @@ export function StartFlow({ initialUrl = "" }: { initialUrl?: string }) {
   if (phase === "analysing") {
     return (
       <Centered>
-        <SwipeDeck onDone={() => { if (ready) setPhase("emailGate"); }} />
-        <button
-          onClick={() => ready && setPhase("emailGate")}
-          disabled={!ready}
-          className="mt-8 rounded-full border border-white/[0.1] bg-white/[0.03] px-6 py-2.5 text-sm font-medium text-zinc-300 hover:bg-white/[0.06] disabled:opacity-40"
-        >
-          {ready ? "See my Brand DNA →" : "Analysing your brand…"}
-        </button>
+        <StoryCarousel ready={ready} onDone={() => setPhase("emailGate")} />
         {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
       </Centered>
     );

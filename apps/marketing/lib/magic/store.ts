@@ -96,20 +96,20 @@ export async function uploadPostImage(
   }
 }
 
-/** Persist a generated image URL onto a stored result's sample post. */
+/**
+ * Persist a generated image URL onto a stored result's sample post.
+ * Uses an atomic jsonb_set RPC (set_magic_post_image) so parallel per-post
+ * generations don't clobber each other (read-modify-write would lose updates).
+ */
 export async function setPostImageUrl(
   id: string,
   index: number,
   url: string,
 ): Promise<void> {
-  const lead = await getLead(id);
-  if (!lead) return;
-  const posts = lead.result.samplePosts ?? [];
-  if (!posts[index]) return;
-  posts[index] = { ...posts[index], imageUrl: url };
-  const { error } = await supabase
-    .from("magic_leads")
-    .update({ result: { ...lead.result, samplePosts: posts } })
-    .eq("id", id);
+  const { error } = await supabase.rpc("set_magic_post_image", {
+    p_id: id,
+    p_index: index,
+    p_url: url,
+  });
   if (error) console.error("setPostImageUrl error:", error);
 }

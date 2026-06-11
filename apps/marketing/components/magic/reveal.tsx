@@ -3,13 +3,13 @@ import { BrandDna } from "./brand-dna";
 import { AvatarCards } from "./avatar-cards";
 import { BrandedPostCarousel } from "./branded-post-carousel";
 
-export function Reveal({ result }: { result: MagicResult }) {
+export function Reveal({ result, id }: { result: MagicResult; id: string }) {
   return (
     <div className="flex flex-col gap-12">
       {/* Centre stage: the branded posts lead. */}
       <section>
         <h2 className="mb-6 text-center text-xl font-bold tracking-tight">Sample posts, in your brand</h2>
-        <BrandedPostCarousel posts={result.samplePosts} brand={result.brand} />
+        <BrandedPostCarousel posts={result.samplePosts} brand={result.brand} id={id} />
       </section>
 
       {/* Supporting cards beneath. */}

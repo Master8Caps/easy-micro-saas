@@ -147,7 +147,7 @@ export function StartFlow({ initialUrl = "" }: { initialUrl?: string }) {
   // reveal
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
-      {result && <Reveal result={result} />}
+      {result && id && <Reveal result={result} id={id} />}
       <div className="mt-12 flex flex-col items-center gap-3 text-center">
         <h2 className="text-2xl font-bold tracking-tight">Ready to put it to work?</h2>
         <p className="text-zinc-400">Unlock the full machine &mdash; content queue, ads, scheduling and more.</p>

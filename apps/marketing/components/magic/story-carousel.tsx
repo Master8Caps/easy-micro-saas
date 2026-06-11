@@ -29,6 +29,7 @@ const STEP_SWIPE_GATE = PAIN_COUNT + 1;
 const STEP_FINALE = PAIN_COUNT + 2;
 
 function hostname(url: string): string {
+  if (!url.trim()) return "your site";
   try {
     return new URL(url.startsWith("http") ? url : `https://${url}`).hostname.replace(/^www\./, "");
   } catch {
@@ -98,22 +99,26 @@ export function StoryCarousel({ url, ready, onDone }: Props) {
         </div>
       )}
 
-      {step === STEP_SWIPE_GATE && example && (
+      {step === STEP_SWIPE_GATE && (
         <div className="text-center">
-          <p className="mb-3 text-sm text-zinc-400">
-            {example.expected === "reject" ? "Swipe LEFT to bin this one 👎" : "Swipe RIGHT to approve this one 👍"}
-          </p>
-          <div className="rounded-2xl border border-white/[0.08] bg-zinc-900/80 p-3 shadow-xl">
-            <p className="mb-2 text-xs text-zinc-400">{example.platform}</p>
-            <div className="h-40 rounded-xl" style={{ background: example.gradient }} />
-            <p className="mt-3 text-sm text-zinc-200">{example.caption}</p>
-          </div>
-          <div className="mt-4 flex items-center justify-center gap-6">
-            <button type="button" onClick={() => onSwipe("left")} aria-label="Swipe left to reject" className="flex h-12 w-12 items-center justify-center rounded-full border border-red-500/40 bg-red-500/10 text-xl text-red-400 hover:bg-red-500/20">{"✗"}</button>
-            <button type="button" onClick={() => onSwipe("right")} aria-label="Swipe right to approve" className="flex h-12 w-12 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/15 text-xl text-emerald-400 hover:bg-emerald-500/25">{"♥"}</button>
-          </div>
-          {feedback && <p className="mt-3 text-sm text-indigo-300">{feedback}</p>}
-          <p className="mt-3 text-xs text-zinc-600">{gateIdx + 1} / {SWIPE_EXAMPLES.length}</p>
+          {example ? (
+            <>
+              <p className="mb-3 text-sm text-zinc-400">
+                {example.expected === "reject" ? "Swipe LEFT to bin this one 👎" : "Swipe RIGHT to approve this one 👍"}
+              </p>
+              <div className="rounded-2xl border border-white/[0.08] bg-zinc-900/80 p-3 shadow-xl">
+                <p className="mb-2 text-xs text-zinc-400">{example.platform}</p>
+                <div className="h-40 rounded-xl" style={{ background: example.gradient }} />
+                <p className="mt-3 text-sm text-zinc-200">{example.caption}</p>
+              </div>
+              <div className="mt-4 flex items-center justify-center gap-6">
+                <button type="button" onClick={() => onSwipe("left")} aria-label="Swipe left to reject" className="flex h-12 w-12 items-center justify-center rounded-full border border-red-500/40 bg-red-500/10 text-xl text-red-400 hover:bg-red-500/20">{"✗"}</button>
+                <button type="button" onClick={() => onSwipe("right")} aria-label="Swipe right to approve" className="flex h-12 w-12 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/15 text-xl text-emerald-400 hover:bg-emerald-500/25">{"♥"}</button>
+              </div>
+              <p className="mt-3 text-xs text-zinc-600">{gateIdx + 1} / {SWIPE_EXAMPLES.length}</p>
+            </>
+          ) : null}
+          {feedback && <p className="mt-3 text-base font-medium text-indigo-300">{feedback}</p>}
         </div>
       )}
 

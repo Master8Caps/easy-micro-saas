@@ -114,6 +114,16 @@ table didn't exist. Both fixed: keys added, table created via migration
       a one-post-at-a-time carousel (#5). See
       `docs/superpowers/plans/2026-06-10-magic-flow-redesign.md`.
 
+- [x] **Magic flow v2 (2026-06-11)** — rebuilt the wait journey (pain-point info screens +
+      a forced swipe-left/swipe-right teaching beat, no dead gate, skippable once ready) and
+      added **art-directed** AI post images via `gpt-image-1`, generated after email capture
+      (`POST /api/magic/visuals`, gated to unlocked leads, stored in the `magic-images` bucket,
+      atomic `jsonb_set` persistence) and progressively loaded on the reveal with a gradient
+      fallback. Image art direction lives in `lib/magic/image-style.ts` (the quality lever).
+      ⚠️ Needs `OPENAI_API_KEY` in the marketing env (local + Vercel) and migrations
+      `00027_magic_images_bucket.sql` + `00028_set_magic_post_image.sql` applied. See
+      `docs/superpowers/plans/2026-06-10-magic-visuals-and-journey.md`.
+
 ### Stage 3 — Conversion + access
 - [ ] **Swipe-to-approve queue** ("Tinder for social") — new UI over existing content
       approve/reject states.

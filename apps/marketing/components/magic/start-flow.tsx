@@ -121,7 +121,7 @@ export function StartFlow({ initialUrl = "" }: { initialUrl?: string }) {
   if (phase === "analysing") {
     return (
       <Centered>
-        <StoryCarousel ready={ready} onDone={() => setPhase("emailGate")} />
+        <StoryCarousel url={url} ready={ready} onDone={() => setPhase("emailGate")} />
         {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
       </Centered>
     );

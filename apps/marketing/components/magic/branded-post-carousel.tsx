@@ -4,25 +4,20 @@ import { useState } from "react";
 import type { MagicBrand, MagicSamplePost } from "@/lib/magic/types";
 import { nextIndex, prevIndex } from "@/lib/magic/carousel";
 import { BrandedPost } from "./branded-post";
-import { usePostImages } from "./use-post-images";
-
 export function BrandedPostCarousel({
   posts,
   brand,
-  id,
 }: {
   posts: MagicSamplePost[];
   brand: MagicBrand;
-  id: string;
 }) {
   const [i, setI] = useState(0);
-  const images = usePostImages(id, posts);
   if (!posts.length) return null;
 
   return (
     <div className="mx-auto w-full max-w-md">
       <div className="mx-auto max-w-sm">
-        <BrandedPost post={posts[i]} brand={brand} imageUrl={images[i]?.url} loading={images[i]?.loading} />
+        <BrandedPost post={posts[i]} brand={brand} />
       </div>
       <div className="mt-5 flex items-center justify-between">
         <button

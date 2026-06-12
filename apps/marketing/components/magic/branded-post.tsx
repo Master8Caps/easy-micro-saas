@@ -1,18 +1,14 @@
 import type { MagicBrand, MagicSamplePost } from "@/lib/magic/types";
+import { PostGraphic } from "./post-graphic";
 
 export function BrandedPost({
   post,
   brand,
-  imageUrl,
-  loading = false,
 }: {
   post: MagicSamplePost;
   brand: MagicBrand;
-  imageUrl?: string;
-  loading?: boolean;
 }) {
   const accent = brand.palette[0] ?? "#6366f1";
-  const accent2 = brand.palette[1] ?? accent;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white text-zinc-900 shadow-xl">
@@ -31,14 +27,8 @@ export function BrandedPost({
         </div>
       </div>
 
-      <div className="relative h-44 w-full overflow-hidden" style={{ background: `linear-gradient(135deg, ${accent}, ${accent2})` }}>
-        {imageUrl ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={imageUrl} alt="" className="h-full w-full object-cover" />
-        ) : loading ? (
-          <div className="h-full w-full animate-pulse bg-white/10" />
-        ) : null}
-        <span className="absolute bottom-2 right-3 text-xs font-semibold text-white/70">{brand.name}</span>
+      <div className="w-full overflow-hidden">
+        <PostGraphic post={post} brand={brand} />
       </div>
 
       <div className="p-3">

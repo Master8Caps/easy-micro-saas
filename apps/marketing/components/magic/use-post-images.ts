@@ -1,3 +1,5 @@
+// DORMANT: the post flow now renders code-built graphics (PostGraphic) and no
+// longer calls this hook. Kept in case AI imagery is reintroduced elsewhere.
 "use client";
 
 import { useEffect, useState } from "react";

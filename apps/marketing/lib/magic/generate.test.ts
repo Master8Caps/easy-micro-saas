@@ -30,7 +30,7 @@ const VALID_JSON = JSON.stringify({
     { name: "Maya", role: "Solo founder", painPoints: ["No time"], channels: ["Instagram"] },
   ],
   samplePosts: [
-    { platform: "Instagram", caption: "Reclaim your weekends.", hashtags: ["#worklife"], engagement: { likes: 200, comments: 12, shares: 5 }, imagePrompt: "a calm tidy desk at golden hour" },
+    { platform: "Instagram", caption: "Reclaim your weekends.", headline: "Reclaim your weekends", hashtags: ["#worklife"], engagement: { likes: 200, comments: 12, shares: 5 }, imagePrompt: "a calm tidy desk at golden hour" },
   ],
 });
 
@@ -85,5 +85,18 @@ describe("generateMagicResult", () => {
     bad.brand.visualStyle = "not_a_real_style";
     const result = await generateMagicResult(SIGNALS, undefined, mockClient(JSON.stringify(bad)));
     expect(VISUAL_STYLE_KEYS).toContain(result.brand.visualStyle);
+  });
+
+  it("carries the per-post headline through", async () => {
+    const result = await generateMagicResult(SIGNALS, undefined, mockClient(VALID_JSON));
+    expect(result.samplePosts[0].headline).toBe("Reclaim your weekends");
+  });
+
+  it("derives a headline from the caption when the model omits one", async () => {
+    const bad = JSON.parse(VALID_JSON);
+    delete bad.samplePosts[0].headline;
+    bad.samplePosts[0].caption = "Work less, live more: the calm way to grow.";
+    const result = await generateMagicResult(SIGNALS, undefined, mockClient(JSON.stringify(bad)));
+    expect(result.samplePosts[0].headline).toBe("Work less, live more");
   });
 });

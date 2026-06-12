@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { BrandSignals, MagicResult, MagicSamplePost } from "./types";
 import { VISUAL_STYLE_KEYS, DEFAULT_STYLE_KEY, VISUAL_STYLES } from "./image-style";
+import { deriveHeadline } from "./headline";
 
 const MODEL = process.env.MAGIC_MODEL ?? "claude-sonnet-4-6";
 
@@ -23,7 +24,7 @@ INSTRUCTIONS
 1. Infer the brand: name, a short tagline, 2-3 tone-of-voice adjectives. For the palette, USE the extracted brand colours above verbatim if present (you may reorder them); only invent a tasteful palette if none were provided.
 2. Write a one-sentence positioning summary.
 3. Create 2-3 specific customer avatars: name, role, 2-3 pain points, 2 channels each.
-4. Write 3 sample social posts in the brand's tone: platform, caption, 2-3 hashtags, and realistic engagement numbers (likes/comments/shares).
+4. Write 3 sample social posts in the brand's tone. For each: platform, caption, a short "headline" of 3-6 punchy words suited to that platform (this is the BIG text on the post graphic — bold and benefit-led, NOT a copy of the caption), 2-3 hashtags, and realistic engagement numbers (likes/comments/shares).
 5. Choose ONE "visualStyle" for the brand from this exact list (pick the best fit): ${VISUAL_STYLE_KEYS.map((k) => `"${k}" (${VISUAL_STYLES[k].bestFor})`).join("; ")}.
 6. For EACH sample post, also write an "imagePrompt": a short, concrete description of a single photographable/renderable SUBJECT or scene that suits the post and brand. Describe only the subject and setting — NO text, NO logos, NO people's faces, NO app screenshots.
 
@@ -31,7 +32,7 @@ Respond with ONLY valid JSON in exactly this shape:
 {
   "brand": { "name": "", "tagline": "", "tone": ["",""], "palette": ["#hex"], "positioning": "", "visualStyle": "minimal_render" },
   "avatars": [ { "name": "", "role": "", "painPoints": ["",""], "channels": ["",""] } ],
-  "samplePosts": [ { "platform": "", "caption": "", "hashtags": ["#tag"], "engagement": { "likes": 0, "comments": 0, "shares": 0 }, "imagePrompt": "" } ]
+  "samplePosts": [ { "platform": "", "caption": "", "headline": "", "hashtags": ["#tag"], "engagement": { "likes": 0, "comments": 0, "shares": 0 }, "imagePrompt": "" } ]
 }`;
 }
 
@@ -57,6 +58,10 @@ function normaliseResult(raw: MagicResult, signals: BrandSignals): MagicResult {
       ? raw.samplePosts.map((p: MagicSamplePost) => ({
           platform: p.platform,
           caption: p.caption,
+          headline:
+            typeof p.headline === "string" && p.headline.trim()
+              ? p.headline.trim()
+              : deriveHeadline(p.caption),
           hashtags: Array.isArray(p.hashtags) ? p.hashtags : [],
           engagement: p.engagement ?? { likes: 0, comments: 0, shares: 0 },
           imagePrompt: typeof p.imagePrompt === "string" ? p.imagePrompt : undefined,

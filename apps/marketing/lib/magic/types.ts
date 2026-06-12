@@ -39,6 +39,8 @@ export interface MagicAvatar {
 export interface MagicSamplePost {
   platform: string;
   caption: string;
+  /** Short punchy line (3-6 words) rendered big on the post graphic. */
+  headline?: string;
   hashtags: string[];
   engagement: { likes: number; comments: number; shares: number };
   /** Concrete, art-directable image subject for this post (no text/logos). */

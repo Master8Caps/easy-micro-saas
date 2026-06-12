@@ -12,4 +12,7 @@ describe("isCurrentResultVersion", () => {
   it("rejects a result from an older version", () => {
     expect(isCurrentResultVersion({ version: 1 })).toBe(false);
   });
+  it("is at version 3 (headline added to sample posts)", () => {
+    expect(RESULT_VERSION).toBe(3);
+  });
 });

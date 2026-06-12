@@ -1,4 +1,5 @@
 import type { MagicBrand, MagicSamplePost } from "@/lib/magic/types";
+import { platformTheme } from "@/lib/magic/post-graphic-style";
 import { PostGraphic } from "./post-graphic";
 
 export function BrandedPost({
@@ -9,6 +10,8 @@ export function BrandedPost({
   brand: MagicBrand;
 }) {
   const accent = brand.palette[0] ?? "#6366f1";
+  // The graphic already carries the caption on text-heavy platforms — don't repeat it below.
+  const showCaptionBelow = !platformTheme(post.platform).body;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white text-zinc-900 shadow-xl">
@@ -37,10 +40,12 @@ export function BrandedPost({
           <span className="text-sm">💬 {post.engagement.comments}</span>
           <span className="text-sm">↗ {post.engagement.shares}</span>
         </div>
-        <p className="mt-1 text-sm">
-          <span className="font-semibold">{brand.name.toLowerCase().replace(/\s+/g, "")}</span>{" "}
-          {post.caption}
-        </p>
+        {showCaptionBelow ? (
+          <p className="mt-1 text-sm">
+            <span className="font-semibold">{brand.name.toLowerCase().replace(/\s+/g, "")}</span>{" "}
+            {post.caption}
+          </p>
+        ) : null}
         <p className="mt-1 text-sm" style={{ color: accent }}>
           {post.hashtags.join(" ")}
         </p>

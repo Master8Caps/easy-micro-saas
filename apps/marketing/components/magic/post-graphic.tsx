@@ -7,7 +7,7 @@ import { deriveHeadline } from "@/lib/magic/headline";
 const SCALE: Record<PlatformTheme["headlineScale"], string> = {
   lg: "text-3xl",
   md: "text-2xl",
-  sm: "text-xl",
+  sm: "text-lg",
 };
 
 /**
@@ -20,6 +20,26 @@ export function PostGraphic({ brand, post }: { brand: MagicBrand; post: MagicSam
   const accent = brand.palette[0] ?? "#6366f1";
   const accent2 = brand.palette[1] ?? accent;
   const onColor = theme.treatment !== "darkAccent";
+  const bodyText = post.caption?.trim();
+
+  // 2-3 supporting sentences under the headline (text-heavy platforms only),
+  // clamped so they never overflow the graphic.
+  const renderBody = (className: string) =>
+    theme.body && bodyText ? (
+      <p
+        className={`mt-2 font-medium ${className}`}
+        style={{
+          display: "-webkit-box",
+          WebkitLineClamp: theme.bodyLines,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+          fontSize: "0.84rem",
+          lineHeight: 1.45,
+        }}
+      >
+        {bodyText}
+      </p>
+    ) : null;
 
   const logo = (
     <span className="inline-flex items-center gap-2 font-semibold">
@@ -47,7 +67,8 @@ export function PostGraphic({ brand, post }: { brand: MagicBrand; post: MagicSam
         <span className="h-[3px] w-10 rounded-full" style={{ background: accent }} />
         <div>
           <p className={`font-bold leading-tight tracking-tight text-zinc-100 ${SCALE[theme.headlineScale]}`}>{headline}</p>
-          {theme.subhead && brand.tagline ? (
+          {renderBody("text-zinc-300")}
+          {!theme.body && theme.subhead && brand.tagline ? (
             <p className="mt-1 text-sm font-medium" style={{ color: accent2 }}>{brand.tagline}</p>
           ) : null}
         </div>
@@ -65,7 +86,10 @@ export function PostGraphic({ brand, post }: { brand: MagicBrand; post: MagicSam
       style={{ background, aspectRatio: String(theme.aspect) }}
     >
       <span className="text-xs">{logo}</span>
-      <p className={`font-extrabold leading-[1.1] tracking-tight ${SCALE[theme.headlineScale]}`}>{headline}</p>
+      <div>
+        <p className={`font-extrabold leading-[1.1] tracking-tight ${SCALE[theme.headlineScale]}`}>{headline}</p>
+        {renderBody("text-white/90")}
+      </div>
       <span className="text-xs font-semibold text-white/85">{footer}</span>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SWIPE_EXAMPLES } from "@/lib/magic/journey-cards";
+import { SwipeCard } from "@/components/magic/swipe-card";
 import {
   isCorrectSwipe,
   nextGateIndex,
@@ -104,13 +105,9 @@ export function StoryCarousel({ url, ready, onDone }: Props) {
           {example ? (
             <>
               <p className="mb-3 text-sm text-zinc-400">
-                {example.expected === "reject" ? "Swipe LEFT to bin this one 👎" : "Swipe RIGHT to approve this one 👍"}
+                {example.expected === "reject" ? "Drag LEFT to bin this one 👎" : "Drag RIGHT to save this one 👍"}
               </p>
-              <div className="rounded-2xl border border-white/[0.08] bg-zinc-900/80 p-3 shadow-xl">
-                <p className="mb-2 text-xs text-zinc-400">{example.platform}</p>
-                <div className="h-40 rounded-xl" style={{ background: example.gradient }} />
-                <p className="mt-3 text-sm text-zinc-200">{example.caption}</p>
-              </div>
+              <SwipeCard key={gateIdx} example={example} onResolve={onSwipe} />
               <div className="mt-4 flex items-center justify-center gap-6">
                 <button type="button" onClick={() => onSwipe("left")} aria-label="Swipe left to reject" className="flex h-12 w-12 items-center justify-center rounded-full border border-red-500/40 bg-red-500/10 text-xl text-red-400 hover:bg-red-500/20">{"✗"}</button>
                 <button type="button" onClick={() => onSwipe("right")} aria-label="Swipe right to approve" className="flex h-12 w-12 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/15 text-xl text-emerald-400 hover:bg-emerald-500/25">{"♥"}</button>

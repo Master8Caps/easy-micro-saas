@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { completeOnboardingStep } from "@/lib/actions/onboarding";
 import { createTrackedLink } from "./links";
 import { loadLearningInsights, type LearningInsight } from "./learning";
+import { loadRejectReasonLine } from "@/lib/review/reject-reason-context";
 
 const anthropic = new Anthropic();
 
@@ -327,6 +328,10 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
     if (insights) {
       prompt += buildContentPerformanceContext(insights);
     }
+
+    // Inject recent reject reasons (archived drafts are invisible to the
+    // learning loader, so this runs its own query).
+    prompt += await loadRejectReasonLine(supabase, input.productId);
 
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",

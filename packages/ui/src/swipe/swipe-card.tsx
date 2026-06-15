@@ -35,8 +35,11 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
     const [active, setActive] = useState(false);
     const [flung, setFlung] = useState<SwipeDirection | null>(null);
     const startX = useRef(0);
+    const committed = useRef(false);
 
     function commit(direction: SwipeDirection) {
+      if (committed.current) return;
+      committed.current = true;
       setFlung(direction);
       setTimeout(() => onResolve(direction), FLING_MS);
     }

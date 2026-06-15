@@ -3,9 +3,9 @@ export {
   glowFromDrag,
   type SwipeDirection,
   type DragGlow,
-} from "@repo/ui";
+} from "@repo/ui/swipe-gesture";
 
-import type { SwipeDirection } from "@repo/ui";
+import type { SwipeDirection } from "@repo/ui/swipe-gesture";
 
 export type SwipeExpectation = "reject" | "approve";
 

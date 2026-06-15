@@ -16,20 +16,24 @@
     --color-border: #e4e4e7;
     --color-border-subtle: #f4f4f5;
     --color-shadow: rgba(0, 0, 0, 0.05);
+    --color-accent: #6366f1;
+    --color-accent-2: #a855f7;
   }
 
   .dark {
-    --color-bg-primary: #09090b;
-    --color-bg-secondary: #18181b;
-    --color-bg-tertiary: #27272a;
-    --color-bg-card: rgba(255, 255, 255, 0.03);
-    --color-bg-card-hover: rgba(255, 255, 255, 0.05);
+    --color-bg-primary: #0a0a0f;
+    --color-bg-secondary: #101018;
+    --color-bg-tertiary: #18181f;
+    --color-bg-card: rgba(255, 255, 255, 0.04);
+    --color-bg-card-hover: rgba(255, 255, 255, 0.06);
     --color-text-primary: #f4f4f5;
     --color-text-secondary: #a1a1aa;
     --color-text-muted: #71717a;
-    --color-border: rgba(255, 255, 255, 0.06);
-    --color-border-subtle: rgba(255, 255, 255, 0.03);
-    --color-shadow: rgba(0, 0, 0, 0.3);
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-border-subtle: rgba(255, 255, 255, 0.04);
+    --color-shadow: rgba(0, 0, 0, 0.4);
+    --color-accent: #6366f1;
+    --color-accent-2: #a855f7;
   }
 
   body {

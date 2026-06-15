@@ -33,9 +33,14 @@ const config: Config = {
           DEFAULT: "var(--color-border)",
           subtle: "var(--color-border-subtle)",
         },
+        accent: {
+          DEFAULT: "var(--color-accent)",
+          2: "var(--color-accent-2)",
+        },
       },
       boxShadow: {
         card: "0 1px 3px var(--color-shadow)",
+        glow: "0 0 50px rgba(99,102,241,0.18)",
       },
     },
   },

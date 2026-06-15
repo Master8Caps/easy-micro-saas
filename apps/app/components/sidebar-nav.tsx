@@ -19,6 +19,16 @@ const navItems = [
     ),
   },
   {
+    label: "Review",
+    href: "/review",
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="4" y="3" width="13" height="17" rx="2" />
+        <path d="M8 20l3 1 3-1" />
+      </svg>
+    ),
+  },
+  {
     label: "Campaigns",
     href: "/campaigns",
     icon: (

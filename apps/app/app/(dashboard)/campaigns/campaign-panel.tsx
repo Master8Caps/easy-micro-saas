@@ -268,7 +268,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                 return (
                   <div
                     key={piece.id}
-                    className="rounded-xl border border-line bg-surface-card"
+                    className="rounded-2xl border border-line bg-surface-card"
                   >
                     {/* Compact header — always visible */}
                     <button

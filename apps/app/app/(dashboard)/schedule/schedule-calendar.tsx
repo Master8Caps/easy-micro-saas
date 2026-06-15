@@ -598,7 +598,7 @@ export function ScheduleCalendar({
 
         {/* Unscheduled content pool */}
         <DroppableZone id="unscheduled-pool">
-          <div className="rounded-xl border border-line bg-surface-card p-6">
+          <div className="rounded-2xl border border-line bg-surface-card p-6">
             <div className="mb-4 flex items-center gap-4">
               <div>
                 <h3 className="font-semibold">Unscheduled Content</h3>
@@ -849,7 +849,7 @@ function ContentPanel({
           )}
 
           {/* Content body */}
-          <div className="rounded-xl border border-line bg-surface-card p-5">
+          <div className="rounded-2xl border border-line bg-surface-card p-5">
             <p className="whitespace-pre-wrap text-sm leading-relaxed text-content-secondary">
               {piece.body}
             </p>
@@ -869,7 +869,7 @@ function UnscheduledCard({
   onLifecycleChange: (newStatus: string, scheduledFor?: string | null, postedAt?: string | null) => void;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-line bg-surface-card p-4">
+    <div className="flex items-center gap-4 rounded-2xl border border-line bg-surface-card p-4">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           {piece.campaigns && (

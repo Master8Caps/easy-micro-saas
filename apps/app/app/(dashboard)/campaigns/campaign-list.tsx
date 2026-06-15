@@ -158,7 +158,7 @@ export function CampaignList({ campaigns, contentCounts, clickCounts }: Campaign
             <button
               key={campaign.id}
               onClick={() => setSelectedCampaign(campaign)}
-              className="block w-full rounded-xl border border-line bg-surface-card p-6 text-left transition-all hover:border-line hover:bg-surface-card"
+              className="block w-full rounded-2xl border border-line bg-surface-card p-6 text-left transition-all hover:border-line hover:bg-surface-card"
             >
               {/* Product name prominently at top */}
               {campaign.products && (

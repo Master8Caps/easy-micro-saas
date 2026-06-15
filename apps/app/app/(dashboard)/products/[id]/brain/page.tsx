@@ -445,7 +445,7 @@ export default function BrainPage() {
           </div>
           <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {avatars.map((avatar) => (
-              <div key={avatar.id} className="group relative flex flex-col rounded-xl border border-line bg-surface-card p-6">
+              <div key={avatar.id} className="group relative flex flex-col rounded-2xl border border-line bg-surface-card p-6">
                 {/* Edit button */}
                 <button
                   onClick={() => setEditingAvatar(avatar)}
@@ -653,7 +653,7 @@ export default function BrainPage() {
             <h2 className="text-xl font-bold">Email Copy</h2>
             <div className="mt-6 space-y-4">
               {emailPieces.map((piece) => (
-                <div key={piece.id} className="rounded-xl border border-line bg-surface-card p-6">
+                <div key={piece.id} className="rounded-2xl border border-line bg-surface-card p-6">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <TypePill type={piece.type} />
@@ -677,7 +677,7 @@ export default function BrainPage() {
             {websiteKitPieces.length > 0 ? (
               <div className="mt-6 space-y-4">
                 {websiteKitPieces.map((piece) => (
-                  <div key={piece.id} className="rounded-xl border border-line bg-surface-card p-6">
+                  <div key={piece.id} className="rounded-2xl border border-line bg-surface-card p-6">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <TypePill type={piece.type} />
@@ -767,7 +767,7 @@ function CampaignCard({
   score?: { totalClicks: number; normalizedScore: number; linkCount: number; engagementRaw: number } | null;
 }) {
   return (
-    <div className="rounded-xl border border-line bg-surface-card p-6">
+    <div className="rounded-2xl border border-line bg-surface-card p-6">
       <div className="flex flex-wrap items-center gap-2">
         <ChannelPill channel={campaign.channel} />
         <TypePill type={campaign.content_type} />

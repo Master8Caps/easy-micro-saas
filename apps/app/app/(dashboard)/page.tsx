@@ -4,6 +4,7 @@ import { StatusPill } from "@/components/pills";
 import { ProductDeleteButton } from "@/components/product-delete-button";
 import { getOnboardingProgress } from "@/lib/actions/onboarding";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
+import { getReviewDeck } from "@/server/actions/review";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -44,6 +45,9 @@ export default async function DashboardPage() {
 
   const onboarding = await getOnboardingProgress();
 
+  const deck = await getReviewDeck();
+  const pending = deck.length;
+
   return (
     <>
       {onboarding && (
@@ -64,6 +68,20 @@ export default async function DashboardPage() {
           New Product
         </Link>
       </div>
+
+      <Link
+        href="/review"
+        className="mb-6 flex items-center justify-between rounded-2xl border border-indigo-400/35 bg-gradient-to-br from-indigo-500/[0.22] to-fuchsia-500/[0.18] p-6 shadow-glow transition-transform hover:scale-[1.01]"
+      >
+        <div>
+          <p className="text-[11px] uppercase tracking-wider text-indigo-200">Daily review</p>
+          <p className="mt-1 text-xl font-bold text-content-primary">
+            {pending > 0 ? `${pending} fresh draft${pending === 1 ? "" : "s"} are waiting` : "You're all caught up"}
+          </p>
+          <p className="mt-1 text-sm text-content-secondary">Swipe through them in ~2 minutes. Your AI learns from every call.</p>
+        </div>
+        <span className="whitespace-nowrap rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-zinc-950">Start reviewing 🃏</span>
+      </Link>
 
       <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-xl border border-line bg-surface-card p-6 transition-colors hover:bg-surface-card">

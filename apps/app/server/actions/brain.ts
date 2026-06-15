@@ -4,6 +4,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { completeOnboardingStep } from "@/lib/actions/onboarding";
 import { loadLearningInsights, type LearningInsight } from "./learning";
+import { loadRejectReasonLine } from "@/lib/review/reject-reason-context";
 
 const anthropic = new Anthropic();
 
@@ -109,6 +110,9 @@ export async function generateBrain(input: GenerateBrainInput) {
     if (insights) {
       prompt += buildPerformanceContext(insights);
     }
+
+    // Steer away from styles recent drafts were rejected for
+    prompt += await loadRejectReasonLine(supabase, input.productId);
 
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",

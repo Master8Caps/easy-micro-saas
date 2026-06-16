@@ -1,8 +1,8 @@
 /** Map a content-piece `type` to a platform when the type encodes one. */
 function channelFromType(type: string): string | null {
-  if (type.startsWith("linkedin")) return "linkedin";
-  if (type.startsWith("twitter")) return "twitter";
-  if (type.startsWith("facebook")) return "facebook";
+  if (type.startsWith("linkedin")) return "LinkedIn";
+  if (type.startsWith("twitter")) return "Twitter";
+  if (type.startsWith("facebook")) return "Facebook";
   return null;
 }
 

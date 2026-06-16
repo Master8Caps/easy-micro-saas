@@ -28,7 +28,7 @@ const channelStyles: Record<string, string> = {
 // ── Channel platform icons (brand glyphs) ────────────
 function icon(path: string) {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 shrink-0" aria-hidden>
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 shrink-0" aria-hidden="true">
       <path d={path} />
     </svg>
   );

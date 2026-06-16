@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isRejectReason, type RejectReason } from "@/lib/review/reject-reasons";
+import { resolveChannel } from "@/lib/review/channel";
 
 export interface ReviewCard {
   id: string;
@@ -13,6 +14,7 @@ export interface ReviewCard {
   productId: string;
   productName: string;
   avatarName: string | null;
+  channel: string | null;
 }
 
 /** Drafts awaiting a yes/no, newest first, scoped by RLS to the user's products. */
@@ -28,9 +30,10 @@ export async function getReviewDeck(productId?: string): Promise<ReviewCard[]> {
   let query = supabase
     .from("content_pieces")
     .select(`
-      id, type, title, body, image_url, product_id,
+      id, type, title, body, image_url, product_id, metadata,
       products(name),
-      avatars(name)
+      avatars(name),
+      campaigns(channel)
     `)
     .eq("status", "draft")
     .eq("archived", false)
@@ -44,6 +47,8 @@ export async function getReviewDeck(productId?: string): Promise<ReviewCard[]> {
   return (data as Record<string, unknown>[]).map((p) => {
     const product = p.products as { name: string } | null;
     const avatar = p.avatars as { name: string } | null;
+    const campaign = p.campaigns as { channel: string } | null;
+    const metadata = p.metadata as { channel?: string } | null;
     return {
       id: p.id as string,
       type: p.type as string,
@@ -53,6 +58,11 @@ export async function getReviewDeck(productId?: string): Promise<ReviewCard[]> {
       productId: p.product_id as string,
       productName: product?.name ?? "",
       avatarName: avatar?.name ?? null,
+      channel: resolveChannel(
+        p.type as string,
+        campaign?.channel ?? null,
+        metadata?.channel ?? null,
+      ),
     };
   });
 }

@@ -75,8 +75,12 @@ export function SwipeDeck<T>({
           <div
             key={keyFor(item)}
             aria-hidden
-            className="absolute inset-0 rounded-2xl border border-line bg-surface-card"
-            style={{ transform: `translateY(${(i + 1) * 7}px) scale(${1 - (i + 1) * 0.025})`, zIndex: 0 }}
+            className="absolute inset-0 rounded-2xl border border-line/60 bg-surface-card"
+            style={{
+              transform: `translateY(${(i + 1) * 14}px) scale(${1 - (i + 1) * 0.06})`,
+              opacity: 1 - (i + 1) * 0.4,
+              zIndex: 0,
+            }}
           />
         ))}
         <div className="relative" style={{ zIndex: 1 }}>

@@ -15,7 +15,7 @@ function gradientFor(id: string): string {
 
 export function PostCard({ card }: { card: ReviewCard }) {
   return (
-    <div className="rounded-2xl border border-line bg-surface-card p-4 shadow-xl">
+    <div className="rounded-2xl border border-line bg-surface-tertiary p-4 shadow-xl">
       {/* Header: product (left) · platform (right) */}
       <div className="mb-3 flex items-center justify-between gap-2">
         <span className="flex min-w-0 items-center gap-2 text-sm font-semibold text-content-primary">

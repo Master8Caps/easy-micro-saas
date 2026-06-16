@@ -17,6 +17,17 @@ export interface ReviewCard {
   channel: string | null;
 }
 
+// The swipe Review hub is social-only for now: visual, frequently-refreshed
+// content. Website copy / email / taglines and ads are reviewed elsewhere.
+// (Ads as a dedicated swipe + scheduling is a noted future initiative.)
+const SOCIAL_REVIEW_TYPES = [
+  "linkedin-post",
+  "twitter-post",
+  "twitter-thread",
+  "facebook-post",
+  "image-prompt",
+];
+
 /** Drafts awaiting a yes/no, newest first, scoped by RLS to the user's products. */
 export async function getReviewDeck(productId?: string): Promise<ReviewCard[]> {
   const supabase = await createClient();
@@ -37,6 +48,7 @@ export async function getReviewDeck(productId?: string): Promise<ReviewCard[]> {
     `)
     .eq("status", "draft")
     .eq("archived", false)
+    .in("type", SOCIAL_REVIEW_TYPES)
     .order("created_at", { ascending: false });
 
   if (productId) query = query.eq("product_id", productId);

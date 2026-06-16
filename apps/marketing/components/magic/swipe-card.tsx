@@ -20,6 +20,8 @@ export type SwipeCardExample = {
   platform: string;
   caption: string;
   gradient: string;
+  /** Optional static image; falls back to the gradient if missing or it fails to load. */
+  image?: string;
   expected: SwipeExpectation;
 };
 
@@ -38,6 +40,7 @@ export function SwipeCard({ example, onResolve }: Props) {
   const [dx, setDx] = useState(0);
   const [active, setActive] = useState(false);
   const [flung, setFlung] = useState<SwipeDirection | null>(null);
+  const [imgFailed, setImgFailed] = useState(false);
   const startX = useRef(0);
 
   function onPointerDown(e: PointerEvent<HTMLDivElement>) {
@@ -116,7 +119,18 @@ export function SwipeCard({ example, onResolve }: Props) {
       </div>
 
       <p className="mb-2 text-xs text-zinc-400">{example.platform}</p>
-      <div className="h-40 rounded-xl" style={{ background: example.gradient }} />
+      <div className="h-40 overflow-hidden rounded-xl" style={{ background: example.gradient }}>
+        {example.image && !imgFailed && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={example.image}
+            alt=""
+            draggable={false}
+            onError={() => setImgFailed(true)}
+            className="pointer-events-none h-full w-full select-none object-cover"
+          />
+        )}
+      </div>
       <p className="mt-3 text-sm text-zinc-200">{example.caption}</p>
     </div>
   );

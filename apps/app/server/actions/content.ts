@@ -5,6 +5,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { completeOnboardingStep } from "@/lib/actions/onboarding";
 import { createTrackedLink } from "./links";
+import { renderAndStoreImage } from "./images";
 import { loadLearningInsights, type LearningInsight } from "./learning";
 import { loadRejectReasonLine } from "@/lib/review/reject-reason-context";
 import { mapContentType, isSocialPostType } from "@/lib/content/types";
@@ -393,6 +394,27 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
       .select("id, type, title, body, metadata, status, archived, created_at, image_url, image_source, image_prompt_used");
 
     if (insertError) return { error: insertError.message };
+
+    // Best-effort: Instagram posts always carry an image — generate now.
+    // Failures leave the piece "pending" (prompt set, no url); never block.
+    if (savedPieces) {
+      await Promise.allSettled(
+        savedPieces
+          .filter((p) => p.type === "instagram-post" && p.image_prompt_used)
+          .map(async (p) => {
+            const url = await renderAndStoreImage({
+              contentPieceId: p.id,
+              productId: input.productId,
+              prompt: p.image_prompt_used as string,
+              channel: campaign.channel,
+            });
+            await supabase
+              .from("content_pieces")
+              .update({ image_url: url, image_source: "generated" })
+              .eq("id", p.id);
+          }),
+      );
+    }
 
     // Auto-generate tracked links if destination URL is available
     const destinationUrl = campaign.destination_url || product.website_url;

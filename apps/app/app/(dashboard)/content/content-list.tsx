@@ -519,7 +519,7 @@ export function ContentList({
                   )}
                 </button>
 
-                {/* Image generator (when expanded, for image-prompt type) */}
+                {/* Image generator (when expanded, for any social post type) */}
                 {isExpanded && isSocialPostType(piece.type) && (
                   <ImageGenerator
                     contentPieceId={piece.id}

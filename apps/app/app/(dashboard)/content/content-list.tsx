@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { ChannelPill, TypePill, ArchivedBadge, ArchiveToggle } from "@/components/pills";
+import { isSocialPostType } from "@/lib/content/types";
 import { CopyButton } from "@/components/copy-button";
 import { LifecycleAction } from "@/components/lifecycle-action";
 import { DatePicker } from "@/components/date-picker";
@@ -519,7 +520,7 @@ export function ContentList({
                 </button>
 
                 {/* Image generator (when expanded, for image-prompt type) */}
-                {isExpanded && piece.type === "image-prompt" && (
+                {isExpanded && isSocialPostType(piece.type) && (
                   <ImageGenerator
                     contentPieceId={piece.id}
                     imageUrl={piece.image_url}

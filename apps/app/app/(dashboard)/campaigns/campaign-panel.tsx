@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ChannelPill, TypePill, ArchivedBadge, ArchiveToggle } from "@/components/pills";
+import { isSocialPostType } from "@/lib/content/types";
 import { CopyButton } from "@/components/copy-button";
 import { LifecycleAction } from "@/components/lifecycle-action";
 import { RatingButtons } from "@/components/rating-buttons";
@@ -347,7 +348,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                             <CopyButton text={`${baseUrl}/r/${piece.links[0].slug}`} />
                           </div>
                         )}
-                        {piece.type === "image-prompt" && (
+                        {isSocialPostType(piece.type) && (
                           <ImageGenerator
                             contentPieceId={piece.id}
                             imageUrl={piece.image_url}

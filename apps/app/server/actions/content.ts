@@ -402,16 +402,23 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
         savedPieces
           .filter((p) => p.type === "instagram-post" && p.image_prompt_used)
           .map(async (p) => {
-            const url = await renderAndStoreImage({
-              contentPieceId: p.id,
-              productId: input.productId,
-              prompt: p.image_prompt_used as string,
-              channel: campaign.channel,
-            });
-            await supabase
-              .from("content_pieces")
-              .update({ image_url: url, image_source: "generated" })
-              .eq("id", p.id);
+            try {
+              const url = await renderAndStoreImage({
+                contentPieceId: p.id,
+                productId: input.productId,
+                prompt: p.image_prompt_used as string,
+                channel: campaign.channel,
+              });
+              const { error } = await supabase
+                .from("content_pieces")
+                .update({ image_url: url, image_source: "generated" })
+                .eq("id", p.id);
+              if (error) {
+                console.error(`Instagram image save failed for ${p.id}:`, error.message);
+              }
+            } catch (err) {
+              console.error(`Instagram image generation failed for ${p.id}:`, err);
+            }
           }),
       );
     }

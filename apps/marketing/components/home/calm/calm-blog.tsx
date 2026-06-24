@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { calmHome } from "@/content/home.calm";
 import { fetchArticles } from "@/lib/blog/articles";
-import { ArticleCard } from "@/components/blog/article-card";
+import { CalmArticleCard } from "./calm-article-card";
 
 export async function CalmBlog() {
   const articles = await fetchArticles(3);
@@ -18,7 +18,7 @@ export async function CalmBlog() {
         </div>
         <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
-            <ArticleCard key={article.slug} article={article} />
+            <CalmArticleCard key={article.slug} article={article} />
           ))}
         </div>
       </div>

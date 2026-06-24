@@ -9,6 +9,7 @@ export const calmHome = {
     subline:
       "Drop in your website. Taiga learns your brand and quietly runs your social, ads, email and blog — so you never have to become a marketer.",
     reassurance: "Free brand reveal — no card, no signup to look.",
+    cta: "See your brand come alive →",
   },
   magic: {
     eyebrow: "The magic, before you pay",

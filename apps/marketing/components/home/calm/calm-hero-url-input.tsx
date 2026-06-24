@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { calmHome } from "@/content/home.calm";
 
 export function CalmHeroUrlInput() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export function CalmHeroUrlInput() {
         type="submit"
         className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-paper transition-all hover:opacity-90"
       >
-        See your brand come alive →
+        {calmHome.hero.cta}
       </button>
     </form>
   );

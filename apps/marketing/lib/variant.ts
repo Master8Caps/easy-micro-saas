@@ -34,6 +34,7 @@ export const BRANDS: Record<SiteVariant, BrandConfig> = {
     name: "Taiga",
     domain: "gettaiga.com",
     tagline: "Grow your business. Stay calm.",
+    // Calm GA is per-deployment: undefined until NEXT_PUBLIC_GA_ID is set, which intentionally omits GA.
     gaId: process.env.NEXT_PUBLIC_GA_ID,
     metaTitle: "Taiga — Grow your business. Stay calm.",
     metaDescription:

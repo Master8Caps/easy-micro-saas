@@ -16,8 +16,8 @@ export function CalmMagic() {
         </div>
         <div className="w-56 rounded-xl border border-paper/10 bg-ink/20 p-5 text-left">
           <p className="mb-3 text-xs uppercase tracking-wide text-sage">{c.audienceLabel}</p>
-          {["bg-sage", "bg-accent", "bg-birch"].map((b, i) => (
-            <div key={i} className="mb-2 flex items-center gap-2">
+          {["bg-sage", "bg-accent", "bg-birch"].map((b) => (
+            <div key={b} className="mb-2 flex items-center gap-2">
               <span className={`h-6 w-6 rounded-full ${b}`} />
               <span className="h-2 flex-1 rounded bg-paper/20" />
             </div>

@@ -29,6 +29,47 @@ function getDefaultSize(channel?: string): ImageSize {
 }
 
 /**
+ * Render an image with gpt-image-1 and store it in the content-images bucket.
+ * Returns the public URL (cache-busted). Throws on failure — callers decide
+ * whether that is fatal (on-demand) or best-effort (auto-gen).
+ */
+export async function renderAndStoreImage(opts: {
+  contentPieceId: string;
+  productId: string;
+  prompt: string;
+  channel?: string;
+  size?: ImageSize;
+  quality?: ImageQuality;
+}): Promise<string> {
+  const size = opts.size ?? getDefaultSize(opts.channel);
+  const quality = opts.quality ?? "medium";
+
+  const response = await openai.images.generate({
+    model: "gpt-image-1",
+    prompt: opts.prompt,
+    n: 1,
+    size,
+    quality,
+  });
+  const imageData = response.data?.[0]?.b64_json;
+  if (!imageData) throw new Error("No image data returned");
+
+  const serviceClient = createServiceClient();
+  const storagePath = `${opts.productId}/${opts.contentPieceId}.png`;
+  const buffer = Buffer.from(imageData, "base64");
+
+  const { error: uploadError } = await serviceClient.storage
+    .from("content-images")
+    .upload(storagePath, buffer, { contentType: "image/png", upsert: true });
+  if (uploadError) throw new Error(`Failed to upload image: ${uploadError.message}`);
+
+  const { data: urlData } = serviceClient.storage
+    .from("content-images")
+    .getPublicUrl(storagePath);
+  return `${urlData.publicUrl}?v=${Date.now()}`;
+}
+
+/**
  * Extract the image generation prompt from a content piece body.
  * The body typically has sections like "**Image Prompt:**" and "**Caption:**".
  * We want just the image prompt part.
@@ -74,24 +115,19 @@ export async function generateImage(
   const size = options?.size || getDefaultSize(channel);
   const quality = options?.quality || "medium";
 
-  // Call GPT Image 1
-  let imageBase64: string;
+  let imageUrl: string;
   try {
-    const response = await openai.images.generate({
-      model: "gpt-image-1",
+    imageUrl = await renderAndStoreImage({
+      contentPieceId,
+      productId: piece.product_id as string,
       prompt,
-      n: 1,
-      size: size as "1024x1024" | "1024x1536" | "1536x1024",
+      channel,
+      size,
       quality,
     });
-
-    const imageData = response.data?.[0]?.b64_json;
-    if (!imageData) throw new Error("No image data returned");
-    imageBase64 = imageData;
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : "Image generation failed";
-    // Check for content policy violation
     if (message.includes("content_policy") || message.includes("safety")) {
       throw new Error(
         "Image couldn't be generated due to content policy. Try adjusting the prompt."
@@ -99,28 +135,6 @@ export async function generateImage(
     }
     throw new Error(`Image generation failed: ${message}`);
   }
-
-  // Upload to Supabase Storage via service client
-  const serviceClient = createServiceClient();
-  const storagePath = `${piece.product_id}/${contentPieceId}.png`;
-  const buffer = Buffer.from(imageBase64, "base64");
-
-  const { error: uploadError } = await serviceClient.storage
-    .from("content-images")
-    .upload(storagePath, buffer, {
-      contentType: "image/png",
-      upsert: true,
-    });
-
-  if (uploadError)
-    throw new Error(`Failed to upload image: ${uploadError.message}`);
-
-  // Get public URL with cache-busting
-  const { data: urlData } = serviceClient.storage
-    .from("content-images")
-    .getPublicUrl(storagePath);
-
-  const imageUrl = `${urlData.publicUrl}?v=${Date.now()}`;
 
   // Update content piece
   const { error: updateError } = await supabase

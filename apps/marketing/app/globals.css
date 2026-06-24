@@ -3,12 +3,41 @@
 @tailwind utilities;
 
 @layer base {
+  :root,
+  [data-variant="techy"] {
+    --color-paper: 9 9 11;        /* zinc-950 */
+    --color-ink: 244 244 245;     /* zinc-100 */
+    --color-primary: 99 102 241;  /* indigo-500 */
+    --color-sage: 129 140 248;
+    --color-accent: 139 92 246;
+    --color-birch: 167 139 250;
+    --color-surface: 24 24 27;
+    --color-muted: 161 161 170;
+    --font-heading: var(--font-outfit);
+    --font-body: var(--font-dm-sans);
+  }
+
+  [data-variant="calm"] {
+    --color-paper: 244 238 227;   /* #F4EEE3 linen */
+    --color-ink: 31 44 36;        /* #1F2C24 pine */
+    --color-primary: 47 74 60;    /* #2F4A3C forest */
+    --color-sage: 136 163 139;    /* #88A38B */
+    --color-accent: 192 98 62;    /* #C0623E ember */
+    --color-birch: 194 168 120;   /* #C2A878 */
+    --color-surface: 255 255 255; /* #FFFFFF */
+    --color-muted: 74 87 76;      /* #4A574C */
+    --font-heading: var(--font-fraunces);
+    --font-body: var(--font-dm-sans);
+  }
+
   html {
     scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-zinc-950 text-zinc-100 antialiased;
+    background-color: rgb(var(--color-paper));
+    color: rgb(var(--color-ink));
+    @apply antialiased;
   }
 
   h1,

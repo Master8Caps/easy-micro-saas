@@ -5,32 +5,12 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { completeOnboardingStep } from "@/lib/actions/onboarding";
 import { createTrackedLink } from "./links";
+import { renderAndStoreImage } from "./images";
 import { loadLearningInsights, type LearningInsight } from "./learning";
 import { loadRejectReasonLine } from "@/lib/review/reject-reason-context";
+import { mapContentType, isSocialPostType } from "@/lib/content/types";
 
 const anthropic = new Anthropic();
-
-// ── Type mapping ─────────────────────────────────────
-function mapContentType(contentType: string, channel: string): string {
-  const key = contentType.toLowerCase();
-  const ch = channel.toLowerCase();
-
-  if (key === "text-post") {
-    if (ch.includes("email")) return "email";
-    if (ch.includes("linkedin")) return "linkedin-post";
-    if (ch.includes("twitter") || ch.includes("x")) return "twitter-post";
-    if (ch.includes("facebook")) return "facebook-post";
-    if (ch.includes("instagram")) return "image-prompt";
-    return "linkedin-post";
-  }
-  if (key === "thread") return "twitter-thread";
-  if (key === "video-script") return "video-script";
-  if (key === "image-prompt") return "image-prompt";
-  if (key === "landing-page") return "landing-page-copy";
-  if (key === "email") return "email";
-  if (key === "ad-copy") return "ad-copy";
-  return "linkedin-post";
-}
 
 // ── Format instructions per content type ─────────────
 function getFormatInstructions(type: string, channel?: string): string {
@@ -125,6 +105,12 @@ function buildContentPrompt(
   contentPieceType: string,
 ): string {
   const formatInstructions = getFormatInstructions(contentPieceType, campaign.channel);
+  const wantsInstagram = campaign.channel.toLowerCase().includes("instagram");
+  const imageInstruction = isSocialPostType(contentPieceType)
+    ? wantsInstagram
+      ? `\n\nIMAGE: Every piece MUST include an "image_prompt" — a detailed image-generation brief (subject, style, mood, composition, colour palette, any text overlay). Instagram is visual-first.`
+      : `\n\nIMAGE: For pieces where a strong visual would lift engagement, include an "image_prompt" — a detailed image-generation brief (subject, style, mood, composition, colour palette, any text overlay). Omit "image_prompt" entirely for pieces that work better as text only.`
+    : "";
 
   return `You are a world-class content marketer. Generate 2-3 high-quality content pieces for the campaign described below.
 
@@ -148,7 +134,7 @@ CAMPAIGN:
 - Opening hook: ${campaign.hook}
 
 CONTENT FORMAT: ${contentPieceType}
-${formatInstructions}
+${formatInstructions}${imageInstruction}
 
 RULES:
 1. Each piece must be ready to use — no placeholders like [insert X here].
@@ -164,7 +150,8 @@ Respond with ONLY valid JSON:
       "title": "A short internal title for this piece",
       "body": "The full content, ready to post",
       "cta_text": "The call-to-action text used in the piece",
-      "notes": "Brief note on what makes this piece effective"
+      "notes": "Brief note on what makes this piece effective",
+      "image_prompt": "Detailed image-generation brief — include per the IMAGE rule above, otherwise omit this field"
     }
   ]
 }`;
@@ -353,7 +340,7 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
     if (!jsonMatch) throw new Error("No JSON found in response");
 
     const output: {
-      pieces: { content_type?: string; title: string; body: string; cta_text?: string; notes?: string }[];
+      pieces: { content_type?: string; title: string; body: string; cta_text?: string; notes?: string; image_prompt?: string }[];
     } = JSON.parse(jsonMatch[0]);
 
     // Clean up any stored images for old content pieces before deleting
@@ -398,6 +385,7 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
         angle: campaign.angle,
       },
       status: "draft" as const,
+      image_prompt_used: piece.image_prompt?.trim() || null,
     }));
 
     const { data: savedPieces, error: insertError } = await supabase
@@ -406,6 +394,34 @@ export async function generateContentForCampaign(input: GenerateContentInput) {
       .select("id, type, title, body, metadata, status, archived, created_at, image_url, image_source, image_prompt_used");
 
     if (insertError) return { error: insertError.message };
+
+    // Best-effort: Instagram posts always carry an image — generate now.
+    // Failures leave the piece "pending" (prompt set, no url); never block.
+    if (savedPieces) {
+      await Promise.allSettled(
+        savedPieces
+          .filter((p) => p.type === "instagram-post" && p.image_prompt_used)
+          .map(async (p) => {
+            try {
+              const url = await renderAndStoreImage({
+                contentPieceId: p.id,
+                productId: input.productId,
+                prompt: p.image_prompt_used as string,
+                channel: campaign.channel,
+              });
+              const { error } = await supabase
+                .from("content_pieces")
+                .update({ image_url: url, image_source: "generated" })
+                .eq("id", p.id);
+              if (error) {
+                console.error(`Instagram image save failed for ${p.id}:`, error.message);
+              }
+            } catch (err) {
+              console.error(`Instagram image generation failed for ${p.id}:`, err);
+            }
+          }),
+      );
+    }
 
     // Auto-generate tracked links if destination URL is available
     const destinationUrl = campaign.destination_url || product.website_url;

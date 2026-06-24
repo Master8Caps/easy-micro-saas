@@ -9,11 +9,15 @@ import { BlogTeaser } from "@/components/blog-teaser";
 import { Pricing } from "@/components/pricing";
 import { CTA } from "@/components/cta";
 import { Footer } from "@/components/footer";
+import { SITE_VARIANT } from "@/lib/variant";
+import { CalmHome } from "@/components/home/calm/calm-home";
 
 // Revalidate so the blog teaser picks up newly published posts.
 export const revalidate = 60;
 
 export default function HomePage() {
+  if (SITE_VARIANT === "calm") return <CalmHome />;
+
   return (
     <>
       <Navbar />

@@ -3,6 +3,7 @@ import { Outfit, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeScript } from "@/components/theme-script";
+import { SITE_VARIANT, APP_BRAND } from "@/lib/variant";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -15,7 +16,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Marketing Machine",
+  title: APP_BRAND.title,
   description: "AI-powered marketing for micro SaaS",
 };
 
@@ -25,7 +26,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${dmSans.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      data-variant={SITE_VARIANT}
+      className={`${outfit.variable} ${dmSans.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <ThemeScript />
       </head>

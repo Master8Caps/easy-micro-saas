@@ -129,7 +129,7 @@ export default function NewProductPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. InvoiceBot"
-                  className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                  className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
                 />
               </div>
 
@@ -142,7 +142,7 @@ export default function NewProductPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="e.g. Automated invoicing for freelancers"
-                  className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                  className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
                 />
               </div>
 
@@ -155,7 +155,7 @@ export default function NewProductPage() {
                   onChange={(e) => setMarket(e.target.value)}
                   rows={3}
                   placeholder="e.g. Freelance designers and developers who waste hours every month creating and following up on invoices. They need something that handles it automatically."
-                  className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                  className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
                 />
               </div>
             </div>
@@ -188,7 +188,7 @@ export default function NewProductPage() {
                 onChange={(e) => setGoals(e.target.value)}
                 rows={4}
                 placeholder="e.g. Get 50 signups from freelancers, validate that automated invoice reminders are the killer feature, figure out if LinkedIn or Twitter is the better channel."
-                className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
               />
             </div>
 
@@ -357,7 +357,7 @@ export default function NewProductPage() {
                       value={websiteUrl}
                       onChange={(e) => setWebsiteUrl(e.target.value)}
                       placeholder="https://yourproduct.com"
-                      className="block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-sm text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                      className="block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-sm text-content-primary placeholder-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
                     />
                   </div>
                 )}

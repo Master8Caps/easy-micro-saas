@@ -190,12 +190,12 @@ export function DatePicker({
               onClick={() => selectDay(day)}
               className={`flex h-9 w-full items-center justify-center rounded-lg text-sm transition-colors ${
                 isSelected
-                  ? "bg-indigo-500/30 font-medium text-indigo-200"
+                  ? "bg-accent/30 font-medium text-accent/70"
                   : isToday
-                    ? "border border-indigo-500/30 font-medium text-content-primary"
+                    ? "border border-accent/30 font-medium text-content-primary"
                     : isPast
                       ? "text-content-muted hover:bg-surface-card-hover hover:text-content-secondary"
-                      : "text-content-secondary hover:bg-indigo-500/15 hover:text-indigo-200"
+                      : "text-content-secondary hover:bg-accent/15 hover:text-accent/70"
               }`}
             >
               {day}
@@ -220,7 +220,7 @@ export function DatePicker({
                   {...(selectedTime === slot.value ? { "data-selected": true } : {})}
                   className={`rounded-md px-2 py-1.5 text-xs transition-colors ${
                     selectedTime === slot.value
-                      ? "bg-indigo-500/30 font-medium text-indigo-200"
+                      ? "bg-accent/30 font-medium text-accent/70"
                       : "text-content-secondary hover:bg-surface-card-hover hover:text-content-primary"
                   }`}
                 >
@@ -232,7 +232,7 @@ export function DatePicker({
 
           <button
             onClick={handleConfirm}
-            className="mt-3 w-full rounded-lg bg-indigo-500/20 py-2 text-sm font-medium text-indigo-300 transition-colors hover:bg-indigo-500/30"
+            className="mt-3 w-full rounded-lg bg-accent/20 py-2 text-sm font-medium text-accent/80 transition-colors hover:bg-accent/30"
           >
             Schedule for {confirmLabel}
           </button>

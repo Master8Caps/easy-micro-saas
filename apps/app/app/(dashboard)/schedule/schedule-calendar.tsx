@@ -122,7 +122,7 @@ function DroppableZone({
   return (
     <div
       ref={setNodeRef}
-      className={`${className ?? ""} ${isOver ? "ring-2 ring-indigo-500/40" : ""}`}
+      className={`${className ?? ""} ${isOver ? "ring-2 ring-accent/40" : ""}`}
     >
       {children}
     </div>
@@ -416,7 +416,7 @@ export function ScheduleCalendar({
             onClick={() => switchView("week")}
             className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
               view === "week"
-                ? "bg-indigo-500 text-white"
+                ? "bg-accent text-white"
                 : "text-content-secondary hover:bg-surface-hover"
             }`}
           >
@@ -426,7 +426,7 @@ export function ScheduleCalendar({
             onClick={() => switchView("month")}
             className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
               view === "month"
-                ? "bg-indigo-500 text-white"
+                ? "bg-accent text-white"
                 : "text-content-secondary hover:bg-surface-hover"
             }`}
           >
@@ -455,7 +455,7 @@ export function ScheduleCalendar({
                 {weekOffset !== 0 && (
                   <button
                     onClick={goToThisWeek}
-                    className="mt-0.5 text-xs text-indigo-400 hover:text-indigo-300"
+                    className="mt-0.5 text-xs text-accent hover:text-accent/80"
                   >
                     Back to this week
                   </button>
@@ -487,16 +487,16 @@ export function ScheduleCalendar({
                     id={`day-${day.date}`}
                     className={`flex min-h-[200px] flex-col rounded-xl border bg-surface-card p-3 ${
                       isToday
-                        ? "border-indigo-500/40"
+                        ? "border-accent/40"
                         : "border-line"
                     }`}
                   >
                     {/* Day header */}
                     <div className="mb-2 border-b border-line pb-2">
-                      <p className={`text-xs font-medium ${isToday ? "text-indigo-400" : "text-content-muted"}`}>
+                      <p className={`text-xs font-medium ${isToday ? "text-accent" : "text-content-muted"}`}>
                         {day.label}
                       </p>
-                      <p className={`text-lg font-bold ${isToday ? "text-indigo-300" : isPast ? "text-content-muted" : ""}`}>
+                      <p className={`text-lg font-bold ${isToday ? "text-accent/80" : isPast ? "text-content-muted" : ""}`}>
                         {day.dayOfMonth}
                       </p>
                     </div>
@@ -560,7 +560,7 @@ export function ScheduleCalendar({
                 {!isCurrentMonth && (
                   <button
                     onClick={goToThisMonth}
-                    className="mt-0.5 text-xs text-indigo-400 hover:text-indigo-300"
+                    className="mt-0.5 text-xs text-accent hover:text-accent/80"
                   >
                     Back to this month
                   </button>
@@ -609,7 +609,7 @@ export function ScheduleCalendar({
               <select
                 value={productFilter}
                 onChange={(e) => setProductFilter(e.target.value)}
-                className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
+                className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-accent/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
               >
                 <option value="">All products</option>
                 {products.map((p) => (
@@ -655,7 +655,7 @@ export function ScheduleCalendar({
       {/* Drag overlay */}
       <DragOverlay>
         {activePiece ? (
-          <div className="rounded-lg border border-indigo-500/40 bg-surface-card px-3 py-2 text-sm font-medium text-content-secondary shadow-lg">
+          <div className="rounded-lg border border-accent/40 bg-surface-card px-3 py-2 text-sm font-medium text-content-secondary shadow-lg">
             {activePiece.title ?? activePiece.campaigns?.angle ?? "Untitled"}
           </div>
         ) : null}
@@ -674,7 +674,7 @@ function CalendarCard({
 }) {
   const statusDot =
     piece.status === "posted" ? "bg-emerald-400" :
-    piece.status === "scheduled" ? "bg-violet-400" :
+    piece.status === "scheduled" ? "bg-accent-2" :
     piece.status === "approved" ? "bg-blue-400" :
     "bg-amber-400";
 
@@ -691,7 +691,7 @@ function CalendarCard({
           <ChannelPill channel={piece.campaigns.channel} />
         )}
         {piece.scheduled_for && (
-          <p className="shrink-0 text-[10px] text-indigo-400/70">
+          <p className="shrink-0 text-[10px] text-accent/70">
             {new Date(piece.scheduled_for).toLocaleTimeString("en-US", {
               hour: "numeric",
               minute: "2-digit",
@@ -773,7 +773,7 @@ function ContentPanel({
               </p>
             )}
             {piece.scheduled_for && (
-              <p className="mt-2 text-xs text-indigo-400/80">
+              <p className="mt-2 text-xs text-accent/80">
                 Scheduled for{" "}
                 {new Date(piece.scheduled_for).toLocaleDateString("en-US", {
                   weekday: "short",

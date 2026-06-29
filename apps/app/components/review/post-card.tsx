@@ -65,7 +65,7 @@ export function PostCard({ card }: { card: ReviewCard }) {
       {/* Header: product (left) · platform (right) */}
       <div className="mb-3 flex items-center justify-between gap-2">
         <span className="flex min-w-0 items-center gap-2 text-sm font-semibold text-content-primary">
-          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true" />
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
           <span className="truncate">{card.productName}</span>
         </span>
         {card.channel && <ChannelPill channel={card.channel} />}
@@ -117,7 +117,7 @@ export function PostCard({ card }: { card: ReviewCard }) {
           type="button"
           onPointerDown={(e) => e.stopPropagation()}
           onClick={() => setExpanded((v) => !v)}
-          className="mt-2 text-xs font-medium text-indigo-300 transition-colors hover:text-indigo-200"
+          className="mt-2 text-xs font-medium text-accent/80 transition-colors hover:text-accent/70"
         >
           {expanded ? "Show less ▴" : "Show more ▾"}
         </button>

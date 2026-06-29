@@ -117,7 +117,7 @@ export default function AdminUsersPage() {
 
   const roleBadge = (r: string) => {
     const styles: Record<string, string> = {
-      admin: "border-indigo-500/30 bg-indigo-500/10 text-indigo-400",
+      admin: "border-accent/30 bg-accent/10 text-accent",
       paid: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
       free: "border-zinc-500/30 bg-zinc-500/10 text-content-secondary",
     };
@@ -158,16 +158,16 @@ export default function AdminUsersPage() {
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
               placeholder="email@example.com"
-              className="flex-1 rounded-lg border border-line bg-surface-card px-3 py-2 text-sm text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+              className="flex-1 rounded-lg border border-line bg-surface-card px-3 py-2 text-sm text-content-primary placeholder-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
             />
             <button
               type="submit"
               disabled={inviting || !inviteEmail.trim()}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+              className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent disabled:opacity-50"
             >
               {inviting ? (
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 animate-spin rounded-full border border-indigo-300/30 border-t-indigo-300" />
+                  <span className="h-3 w-3 animate-spin rounded-full border border-accent/30 border-t-accent" />
                   Sending...
                 </span>
               ) : (
@@ -185,7 +185,7 @@ export default function AdminUsersPage() {
 
         {loading ? (
           <div className="mt-12 flex justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
           </div>
         ) : (
           <>
@@ -296,11 +296,11 @@ export default function AdminUsersPage() {
                             <button
                               onClick={() => handleActivate(user)}
                               disabled={activatingIds.has(user.id)}
-                              className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+                              className="rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-accent disabled:opacity-50"
                             >
                               {activatingIds.has(user.id) ? (
                                 <span className="flex items-center gap-1.5">
-                                  <span className="h-3 w-3 animate-spin rounded-full border border-indigo-300/30 border-t-indigo-300" />
+                                  <span className="h-3 w-3 animate-spin rounded-full border border-accent/30 border-t-accent" />
                                   Activating...
                                 </span>
                               ) : (

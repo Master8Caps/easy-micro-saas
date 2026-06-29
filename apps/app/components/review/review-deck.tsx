@@ -72,7 +72,7 @@ export function ReviewDeck({ initialCards }: { initialCards: ReviewCard[] }) {
                 key={r.slug}
                 type="button"
                 onClick={() => pickReason(reasonFor, r.slug)}
-                className="rounded-full border border-line px-2.5 py-1 text-[11px] text-content-secondary hover:border-indigo-400 hover:text-content-primary"
+                className="rounded-full border border-line px-2.5 py-1 text-[11px] text-content-secondary hover:border-accent hover:text-content-primary"
               >
                 {r.label}
               </button>

@@ -17,7 +17,7 @@ const statusConfig: Record<LifecycleStatus, { label: string; style: string }> = 
   },
   scheduled: {
     label: "Scheduled",
-    style: "border-violet-500/30 bg-violet-500/10 text-violet-400",
+    style: "border-accent-2/30 bg-accent-2/10 text-accent-2",
   },
   posted: {
     label: "Posted",
@@ -149,7 +149,7 @@ export function LifecycleAction({
         <button
           onClick={() => setShowDatePicker(!showDatePicker)}
           disabled={saving}
-          className="rounded-full border border-violet-500/20 bg-violet-500/5 px-2.5 py-0.5 text-xs font-medium text-violet-400 transition-colors hover:bg-violet-500/15 disabled:opacity-50"
+          className="rounded-full border border-accent-2/20 bg-accent-2/5 px-2.5 py-0.5 text-xs font-medium text-accent-2 transition-colors hover:bg-accent-2/15 disabled:opacity-50"
         >
           Schedule
         </button>

@@ -135,7 +135,7 @@ export function AnalyticsDashboard({
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
+          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-accent/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
         >
           <option value="">All products</option>
           {products.map((p) => (
@@ -177,7 +177,7 @@ export function AnalyticsDashboard({
                   title={`${day.date}: ${day.count} click${day.count === 1 ? "" : "s"}`}
                 >
                   <div
-                    className="w-full rounded-t bg-indigo-500/60 transition-colors group-hover:bg-indigo-400/80"
+                    className="w-full rounded-t bg-accent/60 transition-colors group-hover:bg-accent/80"
                     style={{
                       height: `${Math.max((day.count / maxDailyClicks) * 100, day.count > 0 ? 4 : 0)}%`,
                       minHeight: day.count > 0 ? "4px" : "0px",
@@ -212,7 +212,7 @@ export function AnalyticsDashboard({
                             "Untitled"}
                         </p>
                         <div className="mt-1 flex items-center gap-2">
-                          <span className="font-mono text-xs text-indigo-400">
+                          <span className="font-mono text-xs text-accent">
                             /r/{link.slug}
                           </span>
                           {link.products && (
@@ -264,7 +264,7 @@ export function AnalyticsDashboard({
                           </div>
                           <div className="h-2 w-full rounded-full bg-surface-card-hover">
                             <div
-                              className="h-2 rounded-full bg-indigo-500/60"
+                              className="h-2 rounded-full bg-accent/60"
                               style={{ width: `${pct}%` }}
                             />
                           </div>
@@ -282,7 +282,7 @@ export function AnalyticsDashboard({
           {/* Performance Scores — shown when a product is selected */}
           {productFilter && perfLoading && (
             <div className="mt-8 flex justify-center py-8">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
             </div>
           )}
           {productFilter && perfData && perfData.hasData && !perfLoading && (

@@ -7,10 +7,10 @@ import { useTheme } from "@/components/theme-provider";
 import { SITE_VARIANT } from "@/lib/variant";
 
 const inputClass =
-  "mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30";
+  "mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30";
 
 const btnClass =
-  "rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50";
+  "rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent disabled:opacity-50";
 
 interface SettingsFormProps {
   initialEmail: string;
@@ -43,7 +43,7 @@ function Avatar({
     .slice(0, 2);
 
   return (
-    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-500/20 text-lg font-semibold text-indigo-300">
+    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-lg font-semibold text-accent/80">
       {initials}
     </div>
   );
@@ -204,7 +204,7 @@ export function SettingsForm({
           >
             {profileSaving ? (
               <span className="flex items-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
                 Saving...
               </span>
             ) : (
@@ -257,7 +257,7 @@ export function SettingsForm({
           >
             {emailSaving ? (
               <span className="flex items-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
                 Sending...
               </span>
             ) : (
@@ -336,7 +336,7 @@ export function SettingsForm({
           >
             {passwordSaving ? (
               <span className="flex items-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
                 Updating...
               </span>
             ) : (
@@ -364,7 +364,7 @@ export function SettingsForm({
                 onClick={() => setTheme(option)}
                 className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors capitalize ${
                   theme === option
-                    ? "bg-indigo-600 text-white"
+                    ? "bg-accent text-white"
                     : "bg-surface-secondary text-content-secondary hover:bg-surface-tertiary hover:text-content-primary"
                 }`}
               >

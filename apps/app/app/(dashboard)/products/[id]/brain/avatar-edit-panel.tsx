@@ -134,7 +134,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
   }
 
   const inputClass =
-    "w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-sm text-content-primary placeholder:text-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30";
+    "w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-sm text-content-primary placeholder:text-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30";
 
   return (
     <>
@@ -217,7 +217,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
             </div>
             <button
               onClick={addPainPoint}
-              className="mt-2 text-sm text-indigo-400 transition-colors hover:text-indigo-300"
+              className="mt-2 text-sm text-accent transition-colors hover:text-accent/80"
             >
               + Add pain point
             </button>
@@ -239,7 +239,7 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
                     onClick={() => toggleChannel(ch)}
                     className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                       selected
-                        ? "border-indigo-500/30 bg-indigo-500/15 text-indigo-300"
+                        ? "border-accent/30 bg-accent/15 text-accent/80"
                         : "border-line bg-surface-card text-content-muted hover:border-line hover:text-content-secondary"
                     }`}
                   >
@@ -305,11 +305,11 @@ export function AvatarEditPanel({ avatar, onSave, onClose }: AvatarEditPanelProp
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex-1 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+              className="flex-1 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent disabled:opacity-50"
             >
               {saving ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
                   Saving...
                 </span>
               ) : (

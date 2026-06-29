@@ -111,7 +111,7 @@ export function MetricoolPublishModal({
                   onClick={() => toggleNetwork(network)}
                   className={`rounded-lg border px-3 py-1.5 text-sm transition-colors ${
                     selectedNetworks.includes(network)
-                      ? "border-indigo-500 bg-indigo-500/10 text-indigo-400"
+                      ? "border-accent bg-accent/10 text-accent"
                       : "border-line text-content-muted hover:border-zinc-400"
                   }`}
                 >
@@ -167,7 +167,7 @@ export function MetricoolPublishModal({
           <button
             onClick={handlePublish}
             disabled={loading || selectedNetworks.length === 0}
-            className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+            className="w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent disabled:opacity-50"
           >
             {loading ? "Publishing..." : `Schedule on ${selectedNetworks.length} platform${selectedNetworks.length === 1 ? "" : "s"}`}
           </button>

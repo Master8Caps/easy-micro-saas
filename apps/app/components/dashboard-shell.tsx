@@ -80,7 +80,7 @@ export function DashboardShell({ email, children }: DashboardShellProps) {
               <path d="M21,18 L25,23 L21,22Z" className="fill-accent-2"/>
               <path d="M14,24 L16,28 L18,24Z" className="fill-accent-2"/>
               <path d="M27,4 L28,6.5 L30,7 L28,7.5 L27,10 L26,7.5 L24,7 L26,6.5Z" className="fill-accent-2"/>
-              <path d="M4,21 L4.7,22.5 L6,23 L4.7,23.5 L4,25 L3.3,23.5 L2,23 L3.3,22.5Z" fill="#c4b5fd"/>
+              <path d="M4,21 L4.7,22.5 L6,23 L4.7,23.5 L4,25 L3.3,23.5 L2,23 L3.3,22.5Z" className="fill-accent-2"/>
             </svg>
             <span className="font-heading text-sm font-semibold">
               {APP_BRAND.name}

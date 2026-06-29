@@ -10,7 +10,7 @@ const channelStyles: Record<string, string> = {
   reddit: "border-orange-500/30 bg-orange-500/10 text-orange-400",
   "product hunt": "border-rose-500/30 bg-rose-500/10 text-rose-400",
   "indie hackers": "border-cyan-500/30 bg-cyan-500/10 text-cyan-400",
-  email: "border-purple-500/30 bg-purple-500/10 text-purple-400",
+  email: "border-accent-2/30 bg-accent-2/10 text-accent-2",
   "blog / seo": "border-green-500/30 bg-green-500/10 text-green-400",
   blog: "border-green-500/30 bg-green-500/10 text-green-400",
   seo: "border-green-500/30 bg-green-500/10 text-green-400",
@@ -101,7 +101,7 @@ function formatContentType(type: string) {
 
 export function TypePill({ type }: { type: string }) {
   return (
-    <span className="rounded-md border border-indigo-500/20 bg-indigo-500/5 px-2 py-0.5 text-xs text-indigo-300/70">
+    <span className="rounded-md border border-accent/20 bg-accent/5 px-2 py-0.5 text-xs text-accent/70">
       {formatContentType(type)}
     </span>
   );
@@ -115,7 +115,7 @@ const statusStyles: Record<string, string> = {
   ready: "border-blue-500/30 bg-blue-500/10 text-blue-400",
   published: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
   approved: "border-blue-500/30 bg-blue-500/10 text-blue-400",
-  scheduled: "border-violet-500/30 bg-violet-500/10 text-violet-400",
+  scheduled: "border-accent-2/30 bg-accent-2/10 text-accent-2",
   posted: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
 };
 

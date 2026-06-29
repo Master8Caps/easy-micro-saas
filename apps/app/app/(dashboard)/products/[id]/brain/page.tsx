@@ -307,7 +307,7 @@ export default function BrainPage() {
   if (status === "loading") {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
       </div>
     );
   }
@@ -316,7 +316,7 @@ export default function BrainPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
           <h1 className="mt-6 font-heading text-2xl font-bold">
             Generating your Marketing Brain
           </h1>
@@ -434,7 +434,7 @@ export default function BrainPage() {
                   onClick={() => setPerfPeriod(p)}
                   className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                     perfPeriod === p
-                      ? "bg-indigo-500/20 text-indigo-300"
+                      ? "bg-accent/20 text-accent/80"
                       : "text-content-muted hover:text-content-secondary"
                   }`}
                 >
@@ -555,7 +555,7 @@ export default function BrainPage() {
               <button
                 onClick={() => handleBulkGenerate(sortedSocial, setBulkGenerating)}
                 disabled={bulkGenerating || allSocialGenerated}
-                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+                className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
               >
                 {bulkGenerating
                   ? "Generating..."
@@ -601,7 +601,7 @@ export default function BrainPage() {
                 <button
                   onClick={() => handleBulkGenerate(sortedAds, setBulkAdGenerating)}
                   disabled={bulkAdGenerating || allAdsGenerated}
-                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+                  className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
                 >
                   {bulkAdGenerating
                     ? "Generating..."
@@ -810,11 +810,11 @@ function CampaignCard({
         <button
           onClick={onGenerate}
           disabled={isGenerating}
-          className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-300 transition-colors hover:bg-indigo-500/20 disabled:opacity-50"
+          className="rounded-lg border border-accent/30 bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent/80 transition-colors hover:bg-accent/20 disabled:opacity-50"
         >
           {isGenerating ? (
             <span className="flex items-center gap-1.5">
-              <span className="h-3 w-3 animate-spin rounded-full border border-indigo-300/30 border-t-indigo-300" />
+              <span className="h-3 w-3 animate-spin rounded-full border border-accent/30 border-t-accent" />
               Generating...
             </span>
           ) : pieces && pieces.length > 0 ? (

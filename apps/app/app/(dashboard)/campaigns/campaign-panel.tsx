@@ -163,12 +163,12 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                     value={destUrl}
                     onChange={(e) => setDestUrl(e.target.value)}
                     placeholder="https://yoursite.com/page"
-                    className="flex-1 rounded-md border border-line bg-surface-card px-2.5 py-1.5 text-sm text-content-primary placeholder:text-content-muted focus:border-indigo-500/50 focus:outline-none"
+                    className="flex-1 rounded-md border border-line bg-surface-card px-2.5 py-1.5 text-sm text-content-primary placeholder:text-content-muted focus:border-accent/50 focus:outline-none"
                   />
                   <button
                     onClick={handleSaveUrl}
                     disabled={savingUrl}
-                    className="rounded-md bg-indigo-500/20 px-3 py-1.5 text-xs font-medium text-indigo-300 transition-colors hover:bg-indigo-500/30 disabled:opacity-50"
+                    className="rounded-md bg-accent/20 px-3 py-1.5 text-xs font-medium text-accent/80 transition-colors hover:bg-accent/30 disabled:opacity-50"
                   >
                     {savingUrl ? "..." : "Save"}
                   </button>
@@ -182,7 +182,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
               ) : (
                 <div className="flex items-center gap-2">
                   {destUrl ? (
-                    <span className="truncate rounded-md bg-surface-card px-3 py-1.5 font-mono text-xs text-indigo-400">{destUrl}</span>
+                    <span className="truncate rounded-md bg-surface-card px-3 py-1.5 font-mono text-xs text-accent">{destUrl}</span>
                   ) : (
                     <span className="text-sm text-content-muted">Not set (uses product URL)</span>
                   )}
@@ -229,11 +229,11 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
             <button
               onClick={handleGenerate}
               disabled={generating}
-              className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-4 py-2 text-sm font-medium text-indigo-300 transition-colors hover:bg-indigo-500/20 disabled:opacity-50"
+              className="rounded-lg border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-medium text-accent/80 transition-colors hover:bg-accent/20 disabled:opacity-50"
             >
               {generating ? (
                 <span className="flex items-center gap-2">
-                  <span className="h-3.5 w-3.5 animate-spin rounded-full border border-indigo-300/30 border-t-indigo-300" />
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border border-accent/30 border-t-accent" />
                   Generating...
                 </span>
               ) : hasContent ? (
@@ -247,7 +247,7 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
           {/* Loading state */}
           {loading && (
             <div className="flex justify-center py-12">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
             </div>
           )}
 
@@ -335,11 +335,11 @@ export function CampaignPanel({ campaign, onClose }: CampaignPanelProps) {
                         {/* Tracked link */}
                         {piece.links && piece.links.length > 0 && (
                           <div className="mb-3 flex items-center gap-2 rounded-md bg-surface-card px-3 py-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-indigo-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
                               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
                               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
                             </svg>
-                            <span className="min-w-0 flex-1 truncate font-mono text-xs text-indigo-400">
+                            <span className="min-w-0 flex-1 truncate font-mono text-xs text-accent">
                               {baseUrl}/r/{piece.links[0].slug}
                             </span>
                             <span className="shrink-0 text-xs text-content-muted">

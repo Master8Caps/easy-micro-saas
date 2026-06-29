@@ -1,4 +1,17 @@
+import { SITE_VARIANT } from "@/lib/variant";
+
 export function ThemeScript() {
+  if (SITE_VARIANT === "calm") {
+    // Calm is light-only — never apply the dark class.
+    return (
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `document.documentElement.classList.remove('dark');`,
+        }}
+      />
+    );
+  }
+
   const script = `
     (function() {
       try {

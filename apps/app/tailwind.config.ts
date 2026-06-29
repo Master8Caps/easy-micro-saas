@@ -36,11 +36,12 @@ const config: Config = {
         accent: {
           DEFAULT: "var(--color-accent)",
           2: "var(--color-accent-2)",
+          hover: "var(--color-accent-hover)",
         },
       },
       boxShadow: {
         card: "0 1px 3px var(--color-shadow)",
-        glow: "0 0 50px rgba(99,102,241,0.18)",
+        glow: "0 0 50px var(--color-glow)",
       },
     },
   },

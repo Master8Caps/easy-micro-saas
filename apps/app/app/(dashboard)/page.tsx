@@ -71,10 +71,10 @@ export default async function DashboardPage() {
 
       <Link
         href="/review"
-        className="mb-6 flex items-center justify-between rounded-2xl border border-indigo-400/35 bg-gradient-to-br from-indigo-500/[0.22] to-fuchsia-500/[0.18] p-6 shadow-glow transition-transform hover:scale-[1.01]"
+        className="mb-6 flex items-center justify-between rounded-2xl border border-accent/35 bg-gradient-to-br from-accent/[0.22] to-accent-2/[0.18] p-6 shadow-glow transition-transform hover:scale-[1.01]"
       >
         <div>
-          <p className="text-[11px] uppercase tracking-wider text-indigo-200">Daily review</p>
+          <p className="text-[11px] uppercase tracking-wider text-accent/70">Daily review</p>
           <p className="mt-1 text-xl font-bold text-content-primary">
             {pending > 0 ? `${pending} fresh draft${pending === 1 ? "" : "s"} are waiting` : "You're all caught up"}
           </p>

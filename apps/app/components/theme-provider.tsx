@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { updateThemePreference } from "@/lib/actions/theme";
+import { SITE_VARIANT } from "@/lib/variant";
 
 type Theme = "dark" | "light" | "system";
 
@@ -27,11 +28,21 @@ function applyTheme(theme: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
-  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">("dark");
+  const [theme, setThemeState] = useState<Theme>(
+    SITE_VARIANT === "calm" ? "light" : "dark",
+  );
+  const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">(
+    SITE_VARIANT === "calm" ? "light" : "dark",
+  );
 
   // Initialize from localStorage
   useEffect(() => {
+    if (SITE_VARIANT === "calm") {
+      document.documentElement.classList.remove("dark");
+      setThemeState("light");
+      setResolvedTheme("light");
+      return;
+    }
     const stored = localStorage.getItem("theme") as Theme | null;
     const initial = stored || "dark";
     setThemeState(initial);
@@ -49,10 +60,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
+    if (SITE_VARIANT === "calm") return; // light-locked
     setThemeState(newTheme);
     localStorage.setItem("theme", newTheme);
     setResolvedTheme(applyTheme(newTheme));
-    // Non-blocking sync to Supabase
     updateThemePreference(newTheme).catch(() => {});
   };
 

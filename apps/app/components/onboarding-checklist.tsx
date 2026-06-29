@@ -90,7 +90,7 @@ export function OnboardingChecklist({ completedSteps }: OnboardingChecklistProps
         {allDone && (
           <button
             onClick={handleDismiss}
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors"
+            className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover transition-colors"
           >
             Dismiss
           </button>
@@ -100,7 +100,7 @@ export function OnboardingChecklist({ completedSteps }: OnboardingChecklistProps
       {/* Progress bar */}
       <div className="h-2 rounded-full bg-surface-tertiary mb-6 overflow-hidden">
         <div
-          className="h-full rounded-full bg-indigo-500 transition-all duration-500"
+          className="h-full rounded-full bg-accent transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -121,7 +121,7 @@ export function OnboardingChecklist({ completedSteps }: OnboardingChecklistProps
               <div
                 className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
                   isDone
-                    ? "border-indigo-500 bg-indigo-500"
+                    ? "border-accent bg-accent"
                     : "border-content-muted"
                 }`}
               >

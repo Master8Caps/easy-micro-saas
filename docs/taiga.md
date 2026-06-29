@@ -29,24 +29,24 @@ to take it live.
 ### Step 1 — Finish your local env file *(2 minutes)*
 Your `apps/marketing/.env.local` was reconstructed but has **two placeholders**.
 Open it and replace:
-- [ ] `BLOG_PUBLISH_API_KEY` → your real blog-publish secret *(needed for the blog publisher)*
-- [ ] `JINA_API_KEY` → your Jina key *(optional — works blank, just lower rate limits)*
+- [x] `BLOG_PUBLISH_API_KEY` → your real blog-publish secret *(needed for the blog publisher)*
+- [x] `JINA_API_KEY` → your Jina key *(optional — works blank, just lower rate limits)*
 
 ### Step 2 — Push `main` to GitHub *(1 minute)*
 Vercel deploys from GitHub, so nothing happens until `main` is pushed.
 - [ ] `git push origin main`  *(or ask Claude to do it)*
 
 ### Step 3 — Buy the domain *(~£10)*
-- [ ] Register **`gettaiga.com`** (Namecheap / Cloudflare / wherever you normally buy).
+- [x] Register **`gettaiga.com`** (Namecheap / Cloudflare / wherever you normally buy).
 
 ### Step 4 — Create the **second Vercel project** *(the Taiga deployment)*
 Your existing techy marketing project stays exactly as-is. Add a NEW project:
-- [ ] **New Project** → import the **same GitHub repo** as the techy site.
-- [ ] **Root Directory:** `apps/marketing`
-- [ ] **Framework Preset:** Next.js *(same as techy)*
-- [ ] **Branch:** `main` *(production)*
-- [ ] Add the environment variables in Step 5.
-- [ ] Deploy.
+- [x] **New Project** → import the **same GitHub repo** as the techy site.
+- [x] **Root Directory:** `apps/marketing`
+- [x] **Framework Preset:** Next.js *(same as techy)*
+- [x] **Branch:** `main` *(production)*
+- [x] Add the environment variables in Step 5.
+- [x] Deploy.
 
 ### Step 5 — Set the Taiga project's environment variables
 Copy the **values** from your existing techy Vercel project (or your
@@ -72,8 +72,8 @@ first one.
 > want preview deploys to work). Never commit any of these values to git.
 
 ### Step 6 — Point the domain at the Taiga project
-- [ ] In the Taiga Vercel project → **Settings → Domains** → add `gettaiga.com`.
-- [ ] Follow Vercel's DNS instructions at your registrar (A record / nameservers).
+- [x] In the Taiga Vercel project → **Settings → Domains** → add `gettaiga.com`.
+- [x] Follow Vercel's DNS instructions at your registrar (A record / nameservers).
 - [ ] Confirm HTTPS is issued and the calm site loads.
 
 ### Step 7 — *(Optional)* Taiga analytics

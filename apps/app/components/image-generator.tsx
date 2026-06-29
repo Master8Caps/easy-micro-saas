@@ -180,7 +180,7 @@ export default function ImageGenerator({
                   setError("Failed to download image");
                 }
               }}
-              className="text-xs text-indigo-400 hover:text-indigo-300"
+              className="text-xs text-accent hover:text-accent/80"
             >
               Download
             </button>
@@ -188,7 +188,7 @@ export default function ImageGenerator({
             {imageSource === "generated" && (
               <button
                 onClick={() => setShowPromptEditor(!showPromptEditor)}
-                className="text-xs text-indigo-400 hover:text-indigo-300"
+                className="text-xs text-accent hover:text-accent/80"
               >
                 Edit Prompt
               </button>
@@ -198,7 +198,7 @@ export default function ImageGenerator({
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="text-xs text-indigo-400 hover:text-indigo-300"
+                  className="text-xs text-accent hover:text-accent/80"
                 >
                   Replace
                 </button>
@@ -242,12 +242,12 @@ export default function ImageGenerator({
             value={editedPrompt}
             onChange={(e) => setEditedPrompt(e.target.value)}
             rows={4}
-            className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 dark:border-white/[0.06] dark:bg-zinc-900 dark:text-zinc-100"
+            className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30 dark:border-white/[0.06] dark:bg-zinc-900 dark:text-zinc-100"
           />
           <div className="mt-1 flex gap-2">
             <button
               onClick={handleSavePrompt}
-              className="text-xs text-indigo-400 hover:text-indigo-300"
+              className="text-xs text-accent hover:text-accent/80"
             >
               Save Prompt
             </button>
@@ -279,7 +279,7 @@ export default function ImageGenerator({
               onChange={(e) =>
                 setQuality(e.target.checked ? "high" : "medium")
               }
-              className="rounded border-zinc-300 text-indigo-500 focus:ring-indigo-500/30 dark:border-zinc-600"
+              className="rounded border-zinc-300 text-accent focus:ring-accent/30 dark:border-zinc-600"
             />
             HD
           </label>
@@ -287,7 +287,7 @@ export default function ImageGenerator({
           {/* Generate button */}
           <button
             onClick={handleGenerate}
-            className="rounded-md bg-indigo-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-400 disabled:opacity-50"
+            className="rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-white hover:bg-accent-hover disabled:opacity-50"
           >
             {imageUrl ? "Regenerate" : "Generate Image"}
           </button>
@@ -321,13 +321,13 @@ export default function ImageGenerator({
       {/* Loading states */}
       {isGenerating && (
         <div className="flex items-center gap-2 py-2">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
           <span className="text-sm text-zinc-400">Generating image...</span>
         </div>
       )}
       {isUploading && (
         <div className="flex items-center gap-2 py-2">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-400/30 border-t-indigo-400" />
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
           <span className="text-sm text-zinc-400">Uploading...</span>
         </div>
       )}

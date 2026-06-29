@@ -301,15 +301,15 @@ export function ContentList({
           title={allFilteredSelected ? "Deselect all" : "Select all visible"}
           className={`flex h-[38px] items-center gap-2 rounded-lg border px-3 text-sm transition-colors ${
             allFilteredSelected
-              ? "border-indigo-500/30 bg-indigo-500/10 text-indigo-300"
+              ? "border-accent/30 bg-accent/10 text-accent/80"
               : "border-line text-content-muted hover:text-content-secondary"
           }`}
         >
           <span className={`flex h-4 w-4 items-center justify-center rounded border ${
             allFilteredSelected
-              ? "border-indigo-400 bg-indigo-500"
+              ? "border-accent bg-accent"
               : selectedIds.size > 0
-                ? "border-indigo-400 bg-indigo-500/50"
+                ? "border-accent bg-accent/50"
                 : "border-line"
           }`}>
             {(allFilteredSelected || selectedIds.size > 0) && (
@@ -328,7 +328,7 @@ export function ContentList({
         <select
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
+          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-accent/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
         >
           <option value="">All products</option>
           {products.map((p) => (
@@ -340,7 +340,7 @@ export function ContentList({
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
+          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-accent/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
         >
           {typeOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -351,7 +351,7 @@ export function ContentList({
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-indigo-500/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
+          className="rounded-lg border border-line bg-surface-secondary px-3 py-2 text-sm text-content-secondary focus:border-accent/50 focus:outline-none [&>option]:bg-surface-secondary [&>option]:text-content-secondary"
         >
           {statusOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -394,7 +394,7 @@ export function ContentList({
               key={piece.id}
               className={`flex gap-4 rounded-xl border p-6 transition-all ${
                 isSelected
-                  ? "border-indigo-500/30 bg-indigo-500/[0.04]"
+                  ? "border-accent/30 bg-accent/[0.04]"
                   : "border-line bg-surface-card"
               } ${piece.status === "posted" ? "opacity-60" : ""}`}
             >
@@ -405,7 +405,7 @@ export function ContentList({
               >
                 <span className={`flex h-4 w-4 items-center justify-center rounded border transition-colors ${
                   isSelected
-                    ? "border-indigo-400 bg-indigo-500"
+                    ? "border-accent bg-accent"
                     : "border-line hover:border-zinc-400"
                 }`}>
                   {isSelected && (
@@ -475,11 +475,11 @@ export function ContentList({
                 {/* Tracked link */}
                 {piece.links && piece.links.length > 0 && (
                   <div className="mt-2 flex items-center gap-2 rounded-md bg-surface-card px-3 py-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-indigo-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-accent">
                       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
                       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
                     </svg>
-                    <span className="min-w-0 flex-1 truncate font-mono text-xs text-indigo-400">
+                    <span className="min-w-0 flex-1 truncate font-mono text-xs text-accent">
                       {baseUrl}/r/{piece.links[0].slug}
                     </span>
                     <span className="shrink-0 text-xs text-content-muted">
@@ -537,7 +537,7 @@ export function ContentList({
                     <div className="mt-3 flex items-center gap-2">
                       <button
                         onClick={() => setPublishingPieceId(piece.id)}
-                        className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-400 transition-colors hover:bg-indigo-500/20"
+                        className="rounded-lg border border-accent/30 bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent transition-colors hover:bg-accent/20"
                       >
                         Publish to Metricool
                       </button>
@@ -591,7 +591,7 @@ export function ContentList({
                 <button
                   onClick={() => setShowBulkDatePicker(!showBulkDatePicker)}
                   disabled={bulkActing}
-                  className="rounded-lg border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 text-xs font-medium text-violet-400 transition-colors hover:bg-violet-500/20 disabled:opacity-50"
+                  className="rounded-lg border border-accent-2/30 bg-accent-2/10 px-3 py-1.5 text-xs font-medium text-accent-2 transition-colors hover:bg-accent-2/20 disabled:opacity-50"
                 >
                   {bulkActing ? "..." : "Schedule"}
                 </button>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/components/user-context";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SITE_VARIANT } from "@/lib/variant";
 
 const navItems = [
   {
@@ -131,7 +132,7 @@ const adminItems = [
 const linkClass = (active: boolean) =>
   `flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${
     active
-      ? "border-l-2 border-indigo-400 bg-indigo-500/[0.08] pl-[10px] font-medium text-content-primary"
+      ? "border-l-2 border-accent bg-accent/[0.08] pl-[10px] font-medium text-content-primary"
       : "border-l-2 border-transparent text-content-secondary hover:bg-surface-card hover:text-content-primary"
   }`;
 
@@ -144,7 +145,7 @@ function NavLink({
 }) {
   return (
     <Link key={item.href} href={item.href} className={linkClass(active)}>
-      <span className={active ? "text-indigo-400" : ""}>{item.icon}</span>
+      <span className={active ? "text-accent" : ""}>{item.icon}</span>
       {item.label}
     </Link>
   );
@@ -192,7 +193,7 @@ export function SidebarNav() {
         )}
 
         {/* Theme toggle */}
-        <ThemeToggle />
+        {SITE_VARIANT !== "calm" && <ThemeToggle />}
 
         {/* Settings pinned directly above user info */}
         <NavLink item={settingsItem} active={isActive(settingsItem.href)} />

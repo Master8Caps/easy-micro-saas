@@ -81,7 +81,7 @@ export function EngagementPopover({
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-1 rounded px-1.5 py-1 text-xs transition-colors ${
           hasData
-            ? "text-indigo-400 bg-indigo-400/10 hover:bg-indigo-400/20"
+            ? "text-accent bg-accent/10 hover:bg-accent/20"
             : "text-content-muted hover:text-content-secondary hover:bg-surface-card-hover"
         }`}
         title={hasData ? summaryParts.join(" · ") : "Log engagement"}
@@ -113,7 +113,7 @@ export function EngagementPopover({
                   value={value}
                   onChange={(e) => set(e.target.value)}
                   placeholder="0"
-                  className="flex-1 rounded-lg border border-line bg-surface-card px-2 py-1 text-xs text-content-primary focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                  className="flex-1 rounded-lg border border-line bg-surface-card px-2 py-1 text-xs text-content-primary focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
                 />
               </div>
             ))}
@@ -121,7 +121,7 @@ export function EngagementPopover({
           <button
             onClick={handleSave}
             disabled={saving}
-            className="mt-3 w-full rounded-lg bg-indigo-600 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+            className="mt-3 w-full rounded-lg bg-accent py-1.5 text-xs font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save"}
           </button>

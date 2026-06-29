@@ -44,7 +44,7 @@ const WEEKDAY_HEADERS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const STATUS_DOT: Record<string, string> = {
   posted: "bg-emerald-400",
-  scheduled: "bg-violet-400",
+  scheduled: "bg-accent-2",
   approved: "bg-blue-400",
   draft: "bg-amber-400",
 };
@@ -74,11 +74,11 @@ function DayCell({
       onClick={onSelect}
       className={`flex min-h-[80px] flex-col items-start rounded-lg border p-2 text-left transition-colors ${
         isOver
-          ? "border-indigo-500 ring-2 ring-indigo-500/30"
+          ? "border-accent ring-2 ring-accent/30"
           : isSelected
-            ? "border-indigo-500/60 bg-indigo-500/10"
+            ? "border-accent/60 bg-accent/10"
             : isToday
-              ? "border-indigo-500/40 bg-surface-card"
+              ? "border-accent/40 bg-surface-card"
               : "border-line bg-surface-card"
       } ${
         day.inMonth ? "" : "opacity-40"
@@ -87,7 +87,7 @@ function DayCell({
       <span
         className={`text-sm font-medium ${
           isToday
-            ? "text-indigo-400"
+            ? "text-accent"
             : day.inMonth
               ? "text-content-secondary"
               : "text-content-muted"

@@ -59,14 +59,14 @@ export default function SetupPage() {
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-sm">
         <div className="text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 32 32" className="mx-auto">
-            <path d="M16,3 Q21,10 21,18 Q21,24 16,24 Q11,24 11,18 Q11,10 16,3Z" fill="#6366f1"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 32 32" className="mx-auto text-accent">
+            <path d="M16,3 Q21,10 21,18 Q21,24 16,24 Q11,24 11,18 Q11,10 16,3Z" fill="currentColor"/>
             <circle cx="16" cy="14" r="2.5" fill="white"/>
-            <path d="M11,18 L7,23 L11,22Z" fill="#818cf8"/>
-            <path d="M21,18 L25,23 L21,22Z" fill="#818cf8"/>
-            <path d="M14,24 L16,28 L18,24Z" fill="#a78bfa"/>
-            <path d="M27,4 L28,6.5 L30,7 L28,7.5 L27,10 L26,7.5 L24,7 L26,6.5Z" fill="#a78bfa"/>
-            <path d="M4,21 L4.7,22.5 L6,23 L4.7,23.5 L4,25 L3.3,23.5 L2,23 L3.3,22.5Z" fill="#c4b5fd"/>
+            <path d="M11,18 L7,23 L11,22Z" className="fill-accent-2"/>
+            <path d="M21,18 L25,23 L21,22Z" className="fill-accent-2"/>
+            <path d="M14,24 L16,28 L18,24Z" className="fill-accent-2"/>
+            <path d="M27,4 L28,6.5 L30,7 L28,7.5 L27,10 L26,7.5 L24,7 L26,6.5Z" className="fill-accent-2"/>
+            <path d="M4,21 L4.7,22.5 L6,23 L4.7,23.5 L4,25 L3.3,23.5 L2,23 L3.3,22.5Z" className="fill-accent-2"/>
           </svg>
 
           <h1 className="mt-6 font-heading text-2xl font-bold">
@@ -91,7 +91,7 @@ export default function SetupPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Your name"
-              className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+              className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
             />
           </div>
 
@@ -110,7 +110,7 @@ export default function SetupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 6 characters"
-              className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+              className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
             />
           </div>
 
@@ -129,7 +129,7 @@ export default function SetupPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Re-enter password"
-              className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+              className="mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
             />
           </div>
 

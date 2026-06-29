@@ -59,8 +59,8 @@ export default function SetupPage() {
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-sm">
         <div className="text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 32 32" className="mx-auto">
-            <path d="M16,3 Q21,10 21,18 Q21,24 16,24 Q11,24 11,18 Q11,10 16,3Z" fill="#6366f1"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 32 32" className="mx-auto text-accent">
+            <path d="M16,3 Q21,10 21,18 Q21,24 16,24 Q11,24 11,18 Q11,10 16,3Z" fill="currentColor"/>
             <circle cx="16" cy="14" r="2.5" fill="white"/>
             <path d="M11,18 L7,23 L11,22Z" fill="#818cf8"/>
             <path d="M21,18 L25,23 L21,22Z" fill="#818cf8"/>

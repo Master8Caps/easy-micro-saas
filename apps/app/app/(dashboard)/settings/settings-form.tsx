@@ -10,7 +10,7 @@ const inputClass =
   "mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30";
 
 const btnClass =
-  "rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent disabled:opacity-50";
+  "rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50";
 
 interface SettingsFormProps {
   initialEmail: string;

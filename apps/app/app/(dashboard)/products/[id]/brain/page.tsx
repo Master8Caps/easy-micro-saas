@@ -555,7 +555,7 @@ export default function BrainPage() {
               <button
                 onClick={() => handleBulkGenerate(sortedSocial, setBulkGenerating)}
                 disabled={bulkGenerating || allSocialGenerated}
-                className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent disabled:opacity-50"
+                className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
               >
                 {bulkGenerating
                   ? "Generating..."
@@ -601,7 +601,7 @@ export default function BrainPage() {
                 <button
                   onClick={() => handleBulkGenerate(sortedAds, setBulkAdGenerating)}
                   disabled={bulkAdGenerating || allAdsGenerated}
-                  className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent disabled:opacity-50"
+                  className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
                 >
                   {bulkAdGenerating
                     ? "Generating..."

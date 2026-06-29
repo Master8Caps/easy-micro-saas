@@ -287,7 +287,7 @@ export default function ImageGenerator({
           {/* Generate button */}
           <button
             onClick={handleGenerate}
-            className="rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-white hover:bg-accent disabled:opacity-50"
+            className="rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-white hover:bg-accent-hover disabled:opacity-50"
           >
             {imageUrl ? "Regenerate" : "Generate Image"}
           </button>

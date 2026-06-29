@@ -121,7 +121,7 @@ export function EngagementPopover({
           <button
             onClick={handleSave}
             disabled={saving}
-            className="mt-3 w-full rounded-lg bg-accent py-1.5 text-xs font-medium text-white transition-colors hover:bg-accent disabled:opacity-50"
+            className="mt-3 w-full rounded-lg bg-accent py-1.5 text-xs font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save"}
           </button>

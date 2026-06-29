@@ -167,7 +167,7 @@ export function MetricoolPublishModal({
           <button
             onClick={handlePublish}
             disabled={loading || selectedNetworks.length === 0}
-            className="w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent disabled:opacity-50"
+            className="w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {loading ? "Publishing..." : `Schedule on ${selectedNetworks.length} platform${selectedNetworks.length === 1 ? "" : "s"}`}
           </button>

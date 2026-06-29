@@ -35,6 +35,7 @@ nul
 
 # Internal
 EMS_PLAN.md
+notes.md
 .claude/
 .worktrees/
 .superpowers/

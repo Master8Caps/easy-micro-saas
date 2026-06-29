@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { updateProfile, updatePassword } from "@/server/actions/settings";
 import { createClient } from "@/lib/supabase/client";
 import { useTheme } from "@/components/theme-provider";
+import { SITE_VARIANT } from "@/lib/variant";
 
 const inputClass =
   "mt-1 block w-full rounded-lg border border-line bg-surface-card px-3 py-2 text-content-primary placeholder-content-muted focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30";
@@ -351,26 +352,28 @@ export function SettingsForm({
         </div>
       </form>
 
-      {/* ── Appearance ── */}
-      <div className="rounded-xl border border-line bg-surface-card p-6">
-        <h2 className="text-lg font-heading font-semibold text-content-primary mb-1">Appearance</h2>
-        <p className="text-sm text-content-muted mb-4">Choose your preferred theme.</p>
-        <div className="flex gap-3">
-          {(["light", "dark", "system"] as const).map((option) => (
-            <button
-              key={option}
-              onClick={() => setTheme(option)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors capitalize ${
-                theme === option
-                  ? "bg-indigo-600 text-white"
-                  : "bg-surface-secondary text-content-secondary hover:bg-surface-tertiary hover:text-content-primary"
-              }`}
-            >
-              {option}
-            </button>
-          ))}
+      {SITE_VARIANT !== "calm" && (
+        /* ── Appearance ── */
+        <div className="rounded-xl border border-line bg-surface-card p-6">
+          <h2 className="text-lg font-heading font-semibold text-content-primary mb-1">Appearance</h2>
+          <p className="text-sm text-content-muted mb-4">Choose your preferred theme.</p>
+          <div className="flex gap-3">
+            {(["light", "dark", "system"] as const).map((option) => (
+              <button
+                key={option}
+                onClick={() => setTheme(option)}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors capitalize ${
+                  theme === option
+                    ? "bg-indigo-600 text-white"
+                    : "bg-surface-secondary text-content-secondary hover:bg-surface-tertiary hover:text-content-primary"
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

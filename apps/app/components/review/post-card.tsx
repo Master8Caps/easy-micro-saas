@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReviewCard } from "@/server/actions/review";
 import { ChannelPill, TypePill } from "@/components/pills";
+import { imageState } from "@/lib/content/types";
+import { generateImage } from "@/server/actions/images";
 
 const GRADIENTS = [
   "linear-gradient(135deg,#6366f1,#a855f7)",
@@ -21,15 +23,33 @@ export function PostCard({ card }: { card: ReviewCard }) {
   const [overflowing, setOverflowing] = useState(false);
   const bodyRef = useRef<HTMLParagraphElement>(null);
 
-  // Image posts get the visual box; pure text posts let the copy lead.
-  const showVisual = Boolean(card.imageUrl) || card.type === "image-prompt";
+  // Local image state so a freshly-generated image shows without a reload.
+  const [imageUrl, setImageUrl] = useState<string | null>(card.imageUrl);
+  const [generating, setGenerating] = useState(false);
 
-  // Measure while collapsed so "Show more" only appears when text is clipped.
+  const state = imageState(card.imagePromptUsed, imageUrl);
+  // Instagram always wants a visual; pending/ready always show the block.
+  const showVisual = state !== "none" || card.type === "instagram-post";
+
   useEffect(() => {
     if (expanded) return;
     const el = bodyRef.current;
     if (el) setOverflowing(el.scrollHeight > el.clientHeight + 1);
   }, [card.body, expanded, showVisual]);
+
+  async function handleGenerate(e: React.PointerEvent) {
+    e.stopPropagation();
+    if (generating) return;
+    setGenerating(true);
+    try {
+      const result = await generateImage(card.id);
+      if (result?.imageUrl) setImageUrl(result.imageUrl);
+    } catch {
+      // generateImage throws on failure; leave the card pending so it can retry.
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   const metaRow = (
     <div className="flex items-center justify-between gap-2">
@@ -51,16 +71,26 @@ export function PostCard({ card }: { card: ReviewCard }) {
         {card.channel && <ChannelPill channel={card.channel} />}
       </div>
 
-      {/* Visual block — only for posts that actually have (or expect) an image */}
+      {/* Visual block — image, or a pending placeholder with a generate button */}
       {showVisual && (
         <>
           <div
-            className="mb-3 h-40 overflow-hidden rounded-xl"
+            className="relative mb-3 flex h-40 items-center justify-center overflow-hidden rounded-xl"
             style={{ background: gradientFor(card.id) }}
           >
-            {card.imageUrl && (
+            {imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={card.imageUrl} alt="" draggable={false} className="pointer-events-none h-full w-full select-none object-cover" />
+              <img src={imageUrl} alt="" draggable={false} className="pointer-events-none h-full w-full select-none object-cover" />
+            ) : (
+              <button
+                type="button"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => handleGenerate(e as unknown as React.PointerEvent)}
+                disabled={generating}
+                className="rounded-lg border border-white/30 bg-black/30 px-3 py-1.5 text-xs font-medium text-white backdrop-blur transition-colors hover:bg-black/40 disabled:opacity-60"
+              >
+                {generating ? "Generating…" : "Generate image"}
+              </button>
             )}
           </div>
           <div className="mb-3">{metaRow}</div>

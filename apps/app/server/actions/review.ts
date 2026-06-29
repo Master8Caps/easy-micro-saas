@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { isRejectReason, type RejectReason } from "@/lib/review/reject-reasons";
 import { resolveChannel } from "@/lib/review/channel";
+import { SOCIAL_POST_TYPES } from "@/lib/content/types";
 
 export interface ReviewCard {
   id: string;
@@ -11,22 +12,12 @@ export interface ReviewCard {
   title: string | null;
   body: string;
   imageUrl: string | null;
+  imagePromptUsed: string | null;
   productId: string;
   productName: string;
   avatarName: string | null;
   channel: string | null;
 }
-
-// The swipe Review hub is social-only for now: visual, frequently-refreshed
-// content. Website copy / email / taglines and ads are reviewed elsewhere.
-// (Ads as a dedicated swipe + scheduling is a noted future initiative.)
-const SOCIAL_REVIEW_TYPES = [
-  "linkedin-post",
-  "twitter-post",
-  "twitter-thread",
-  "facebook-post",
-  "image-prompt",
-];
 
 /** Drafts awaiting a yes/no, newest first, scoped by RLS to the user's products. */
 export async function getReviewDeck(productId?: string): Promise<ReviewCard[]> {
@@ -41,14 +32,14 @@ export async function getReviewDeck(productId?: string): Promise<ReviewCard[]> {
   let query = supabase
     .from("content_pieces")
     .select(`
-      id, type, title, body, image_url, product_id, metadata,
+      id, type, title, body, image_url, image_prompt_used, product_id, metadata,
       products(name),
       avatars(name),
       campaigns(channel)
     `)
     .eq("status", "draft")
     .eq("archived", false)
-    .in("type", SOCIAL_REVIEW_TYPES)
+    .in("type", SOCIAL_POST_TYPES as unknown as string[])
     .order("created_at", { ascending: false });
 
   if (productId) query = query.eq("product_id", productId);
@@ -67,6 +58,7 @@ export async function getReviewDeck(productId?: string): Promise<ReviewCard[]> {
       title: (p.title as string | null) ?? null,
       body: p.body as string,
       imageUrl: (p.image_url as string | null) ?? null,
+      imagePromptUsed: (p.image_prompt_used as string | null) ?? null,
       productId: p.product_id as string,
       productName: product?.name ?? "",
       avatarName: avatar?.name ?? null,

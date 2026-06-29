@@ -5,12 +5,21 @@ import type { ReviewCard } from "@/server/actions/review";
 import { ChannelPill, TypePill } from "@/components/pills";
 import { imageState } from "@/lib/content/types";
 import { generateImage } from "@/server/actions/images";
+import { SITE_VARIANT } from "@/lib/variant";
 
-const GRADIENTS = [
-  "linear-gradient(135deg,#6366f1,#a855f7)",
-  "linear-gradient(135deg,#0ea5e9,#6366f1)",
-  "linear-gradient(135deg,#a855f7,#ec4899)",
-];
+const GRADIENTS =
+  SITE_VARIANT === "calm"
+    ? [
+        "linear-gradient(135deg,#2F4A3C,#C0623E)", // forest → ember
+        "linear-gradient(135deg,#88A38B,#2F4A3C)", // sage → forest
+        "linear-gradient(135deg,#C2A878,#C0623E)", // birch → ember
+        "linear-gradient(135deg,#2F4A3C,#88A38B)", // forest → sage
+      ]
+    : [
+        "linear-gradient(135deg,#6366f1,#a855f7)",
+        "linear-gradient(135deg,#0ea5e9,#6366f1)",
+        "linear-gradient(135deg,#a855f7,#ec4899)",
+      ];
 
 function gradientFor(id: string): string {
   let h = 0;
